@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stellar Abyss</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; color: #fff; font-family: 'Courier New', monospace; overflow: hidden; width: 100vw; height: 100vh; }
+
+  #canvas-container { width: 100%; height: 100%; position: relative; }
+  canvas { display: block; }
+
+  /* HUD */
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 10;
+  }
+
+  #crosshair {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 20px; height: 20px;
+  }
+  #crosshair::before, #crosshair::after {
+    content: ''; position: absolute; background: rgba(100,255,100,0.85);
+    border-radius: 1px;
+  }
+  #crosshair::before { width: 2px; height: 100%; top: 0; left: 50%; transform: translateX(-50%); }
+  #crosshair::after  { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
+
+  #health-bar-wrap {
+    position: absolute; bottom: 30px; left: 30px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .bar-label { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+  .bar-outer { width: 180px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+  #health-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #52B043, #7AE060); border-radius: 4px; transition: width 0.3s; }
+  #shield-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #3080FF, #60B0FF); border-radius: 4px; transition: width 0.3s; }
+
+  #ammo-display {
+    position: absolute; bottom: 30px; right: 30px;
+    font-size: 28px; font-weight: bold; color: rgba(255,255,255,0.9);
+    text-align: right; line-height: 1;
+  }
+  #ammo-display span { font-size: 13px; color: rgba(255,255,255,0.4); display: block; letter-spacing: 2px; margin-bottom: 4px; }
+
+  #area-name {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(82,176,67,0.9); text-shadow: 0 0 10px rgba(82,176,67,0.5);
+  }
+
+  #kill-counter {
+    position: absolute; top: 20px; right: 30px;
+    font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5);
+    text-align: right;
+  }
+  #kill-counter strong { color: #FF6060; font-size: 18px; display: block; }
+
+  #hit-flash {
+    position: absolute; inset: 0;
+    background: rgba(255,0,0,0.15);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.05s;
+  }
+
+  #shoot-flash {
+    position: absolute; inset: 0;
+    background: rgba(255,255,150,0.04);
+    opacity: 0; pointer-events: none;
+  }
+
+  /* KILL FEED */
+  #kill-feed {
+    position: absolute; top: 80px; right: 30px;
+    display: flex; flex-direction: column; gap: 4px; align-items: flex-end;
+  }
+  .kill-entry {
+    font-size: 11px; color: rgba(255,150,100,0.9);
+    letter-spacing: 1px; animation: kfade 3s forwards;
+    background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 2px;
+    border-left: 2px solid #FF6060;
+  }
+  @keyframes kfade { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
+
+  /* SCREENS */
+  .screen {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center, #080F08 0%, #000 100%);
+  }
+
+  .screen-title {
+    font-size: 52px; font-weight: bold; letter-spacing: 6px;
+    color: #52B043; text-shadow: 0 0 30px rgba(82,176,67,0.6);
+    margin-bottom: 8px; text-transform: uppercase;
+  }
+  .screen-sub {
+    font-size: 13px; letter-spacing: 3px; color: rgba(255,255,255,0.4);
+    margin-bottom: 50px;
+  }
+
+  .menu-btn {
+    background: transparent; border: 1px solid rgba(82,176,67,0.5);
+    color: #52B043; padding: 12px 40px; font-size: 13px;
+    letter-spacing: 3px; cursor: pointer; font-family: 'Courier New', monospace;
+    text-transform: uppercase; transition: all 0.2s; margin: 6px;
+    min-width: 260px;
+  }
+  .menu-btn:hover { background: rgba(82,176,67,0.15); border-color: #52B043; box-shadow: 0 0 20px rgba(82,176,67,0.2); }
+  .menu-btn.primary { background: rgba(82,176,67,0.2); border-color: #52B043; }
+  .menu-btn.danger { border-color: rgba(255,80,80,0.5); color: #FF8080; }
+  .menu-btn.danger:hover { background: rgba(255,80,80,0.1); }
+
+  .controls-hint {
+    margin-top: 40px; font-size: 11px; color: rgba(255,255,255,0.25);
+    letter-spacing: 2px; line-height: 2.2; text-align: center;
+  }
+
+  /* NAV MAP */
+  #nav-map {
+    position: fixed; inset: 0; z-index: 40; display: none;
+    background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
+    flex-direction: column; align-items: center; justify-content: center;
+  }
+  #nav-map.open { display: flex; }
+  #nav-map h2 { font-size: 18px; letter-spacing: 6px; color: rgba(82,176,67,0.8); margin-bottom: 40px; text-transform: uppercase; }
+
+  .nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 680px; width: 100%; padding: 0 20px; }
+
+  .nav-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; padding: 24px 20px; cursor: pointer; transition: all 0.2s;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .nav-card:hover { border-color: rgba(82,176,67,0.5); background: rgba(82,176,67,0.06); transform: translateY(-2px); }
+  .nav-card.current { border-color: rgba(82,176,67,0.7); background: rgba(82,176,67,0.1); }
+  .nav-card.locked { opacity: 0.35; cursor: not-allowed; }
+  .nav-card .nc-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+  .nav-card .nc-name { font-size: 13px; letter-spacing: 2px; color: #fff; text-transform: uppercase; margin-bottom: 6px; }
+  .nav-card .nc-desc { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 1px; line-height: 1.6; }
+  .nav-card .nc-status { font-size: 9px; margin-top: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .nc-status.safe { color: #52B043; }
+  .nc-status.danger { color: #FF6060; }
+  .nc-status.neutral { color: #6090FF; }
+  .nav-close { margin-top: 30px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 2px; cursor: pointer; }
+  .nav-close:hover { color: rgba(255,255,255,0.6); }
+
+  /* DIALOGUE */
+  #dialogue-box {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    width: 680px; max-width: 90vw;
+    background: rgba(0,8,0,0.9); border: 1px solid rgba(82,176,67,0.3);
+    border-radius: 6px; padding: 20px 24px; z-index: 30; display: none;
+    backdrop-filter: blur(6px);
+  }
+  #dialogue-box.open { display: block; pointer-events: all; }
+  #dialogue-speaker { font-size: 10px; letter-spacing: 3px; color: #52B043; text-transform: uppercase; margin-bottom: 8px; }
+  #dialogue-text { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.7; min-height: 42px; }
+  #dialogue-continue { margin-top: 12px; font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-align: right; animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* INTERACTION */
+  #interact-prompt {
+    position: fixed; bottom: 160px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; letter-spacing: 3px; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; display: none; background: rgba(0,0,0,0.5);
+    padding: 6px 16px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.1);
+    pointer-events: none;
+  }
+
+  /* TRANSITION */
+  #transition-overlay {
+    position: fixed; inset: 0; z-index: 60;
+    background: #000; opacity: 0; pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  #transition-overlay.fade-in { opacity: 1; pointer-events: all; }
+
+  /* DEATH / WIN screens */
+  #death-screen {
+    position: fixed; inset: 0; z-index: 58; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+  }
+  #death-screen.open { display: flex; }
+  #death-screen h2 { font-size: 42px; letter-spacing: 6px; color: #FF4040; margin-bottom: 16px; text-shadow: 0 0 30px rgba(255,64,64,0.5); }
+  #death-screen p { font-size: 13px; color: rgba(255,255,255,0.4); letter-spacing: 2px; margin-bottom: 40px; }
+
+  /* PAUSE SCREEN */
+  #pause-screen {
+    position: fixed; inset: 0; z-index: 55;
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(6px);
+  }
+  #pause-screen.open { display: flex; }
+
+  #pause-controls-screen {
+    position: fixed; inset: 0; z-index: 56;
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(10px);
+  }
+  #pause-controls-screen.open { display: flex; }
+
+  /* Stars bg for screens */
+  .stars-bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .star-dot {
+    position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--d) infinite;
+  }
+  @keyframes twinkle { 0%,100%{opacity:var(--o)} 50%{opacity:0.1} }
+</style>
+</head>
+<body>
+
+<!-- TRANSITION OVERLAY -->
+<div id="transition-overlay"></div>
+
+<!-- TITLE SCREEN -->
+<div class="screen" id="title-screen">
+  <div class="stars-bg" id="title-stars"></div>
+  <div style="text-align:center; position:relative; z-index:2;">
+    <div style="font-size:14px; letter-spacing:6px; color:rgba(82,176,67,0.6); margin-bottom:16px;">— A GAMEHUB ORIGINAL —</div>
+    <div class="screen-title">STELLAR ABYSS</div>
+    <div class="screen-sub">The colonies went silent. You were sent to find out why.</div>
+    <button class="menu-btn primary" onclick="startGame()">▶ &nbsp;Begin Mission</button><br>
+    <button class="menu-btn" onclick="showControls()">Controls</button>
+  </div>
+</div>
+
+<!-- CONTROLS SCREEN -->
+<div class="screen" id="controls-screen" style="display:none;">
+  <div class="screen-title" style="font-size:28px;">Controls</div>
+  <div class="controls-hint" style="font-size:12px; color:rgba(255,255,255,0.5);">
+    WASD / Arrow Keys &nbsp;—&nbsp; Move<br>
+    Mouse &nbsp;—&nbsp; Look around<br>
+    Left Click &nbsp;—&nbsp; Shoot<br>
+    E &nbsp;—&nbsp; Interact<br>
+    M &nbsp;—&nbsp; Navigation Map<br>
+    ESC &nbsp;—&nbsp; Menu / Unlock mouse<br>
+    R &nbsp;—&nbsp; Reload
+  </div>
+  <button class="menu-btn" style="margin-top:40px;" onclick="document.getElementById('controls-screen').style.display='none'; document.getElementById('title-screen').style.display='flex';">← Back</button>
+</div>
+
+<!-- NAV MAP -->
+<div id="nav-map">
+  <h2>⬡ Navigation Chart</h2>
+  <div class="nav-grid">
+    <div class="nav-card current" id="nav-haven" onclick="travelTo('haven')">
+      <span class="nc-icon">🛸</span>
+      <div class="nc-name">Safe Haven</div>
+      <div class="nc-desc">Your base of operations. Rest, restock, and plan your next move.</div>
+      <div class="nc-status safe">◉ Safe Zone</div>
+    </div>
+    <div class="nav-card" id="nav-deepspace" onclick="travelTo('deepspace')">
+      <span class="nc-icon">🌌</span>
+      <div class="nc-name">Deep Space</div>
+      <div class="nc-desc">Open void. Pirates patrol these sectors. High risk, high reward.</div>
+      <div class="nc-status danger">⚠ Hostile</div>
+    </div>
+    <div class="nav-card" id="nav-station" onclick="travelTo('station')">
+      <span class="nc-icon">🏗️</span>
+      <div class="nc-name">Station Kira-7</div>
+      <div class="nc-desc">Abandoned space station. Something still moves in the corridors.</div>
+      <div class="nc-status danger">⚠ Hostile</div>
+    </div>
+  </div>
+  <div class="nav-close" onclick="closeMap()">[ ESC ] Close Map</div>
+</div>
+
+<!-- DIALOGUE BOX -->
+<div id="dialogue-box">
+  <div id="dialogue-speaker">Unknown</div>
+  <div id="dialogue-text"></div>
+  <div id="dialogue-continue">[ E ] Continue</div>
+</div>
+
+<!-- INTERACT PROMPT -->
+<div id="interact-prompt">[E] Interact</div>
+
+<!-- HUD -->
+<div id="hud" style="display:none;">
+  <div id="hit-flash"></div>
+  <div id="shoot-flash"></div>
+  <div id="crosshair"></div>
+  <div id="area-name">Safe Haven</div>
+  <div id="health-bar-wrap">
+    <div class="bar-label">Hull Integrity</div>
+    <div class="bar-outer"><div id="health-bar"></div></div>
+    <div class="bar-label" style="margin-top:6px;">Shields</div>
+    <div class="bar-outer"><div id="shield-bar"></div></div>
+  </div>
+  <div id="ammo-display">
+    <span>Plasma Rounds</span>
+    <span id="ammo-current">30</span>/<span id="ammo-max" style="font-size:16px; color:rgba(255,255,255,0.4);">30</span>
+  </div>
+  <div id="kill-counter">
+    <span>ENEMIES DOWN</span>
+    <strong id="kill-count">0</strong>
+  </div>
+  <div id="kill-feed"></div>
+</div>
+
+<!-- DEATH SCREEN -->
+<div id="death-screen">
+  <h2>HULL BREACH</h2>
+  <p>You have been destroyed.</p>
+  <button class="menu-btn danger" onclick="respawn()">↺ &nbsp;Respawn at Haven</button>
+</div>
+
+<!-- PAUSE MENU -->
+<div id="pause-screen">
+  <div class="stars-bg" id="pause-stars"></div>
+  <div style="position:relative; z-index:2; text-align:center;">
+    <div style="font-size:11px; letter-spacing:6px; color:rgba(82,176,67,0.5); margin-bottom:12px; text-transform:uppercase;">Paused</div>
+    <div class="screen-title" style="font-size:38px; margin-bottom:6px;">STELLAR ABYSS</div>
+    <div class="screen-sub" style="margin-bottom:36px;" id="pause-area-label">Safe Haven</div>
+    <button class="menu-btn primary" onclick="resumeGame()">&#9654; &nbsp;Resume Mission</button><br>
+    <button class="menu-btn" onclick="pauseShowControls()">Controls</button><br>
+    <button class="menu-btn" onclick="pauseOpenMap()">Navigation Map</button><br>
+    <button class="menu-btn danger" onclick="quitToTitle()">Quit to Title</button>
+    <div style="margin-top:32px; font-size:10px; color:rgba(255,255,255,0.18); letter-spacing:2px;">[ B ] or [ ESC ] to resume</div>
+  </div>
+</div>
+
+<!-- PAUSE CONTROLS OVERLAY -->
+<div id="pause-controls-screen">
+  <div style="position:relative; z-index:2; text-align:center;">
+    <div class="screen-title" style="font-size:26px; margin-bottom:28px;">Controls</div>
+    <div class="controls-hint" style="font-size:12px; color:rgba(255,255,255,0.5);">
+      WASD / Arrow Keys &nbsp;--- Move<br>
+      Mouse &nbsp;--- Look around<br>
+      Left Click &nbsp;--- Shoot<br>
+      E &nbsp;--- Interact / Advance dialogue<br>
+      M &nbsp;--- Navigation Map<br>
+      B or ESC &nbsp;--- Pause / Unpause<br>
+      R &nbsp;--- Reload<br>
+      Space / Shift &nbsp;--- Up / Down (Deep Space only)
+    </div>
+    <button class="menu-btn" style="margin-top:36px;" onclick="closePauseControls()">Back</button>
+  </div>
+</div>
+
+<!-- THREE.JS CANVAS -->
+<div id="canvas-container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STELLAR ABYSS — Core Engine
+// ═══════════════════════════════════════════════════════════════
+
+const Game = {
+  scene: null, camera: null, renderer: null,
+  clock: new THREE.Clock(),
+  currentArea: 'haven',
+  player: { health: 100, shield: 100, ammo: 30, maxAmmo: 30, kills: 0, speed: 0.07 },
+  keys: {}, mouseX: 0, mouseY: 0,
+  enemies: [], bullets: [], enemyBullets: [], interactables: [],
+  locked: false, dialogueOpen: false, mapOpen: false, isDead: false, paused: false,
+  yaw: 0, pitch: 0,
+  reloading: false, shootCooldown: 0,
+  objects: [],   // collidable world objects
+};
+
+// ─── INIT ────────────────────────────────────────────────────────
+function init() {
+  // Scene
+  Game.scene = new THREE.Scene();
+  Game.scene.fog = new THREE.FogExp2(0x000005, 0.04);
+
+  // Camera (player POV)
+  Game.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.05, 800);
+  Game.camera.position.set(0, 1.7, 0);
+
+  // Renderer
+  Game.renderer = new THREE.WebGLRenderer({ antialias: true });
+  Game.renderer.setSize(window.innerWidth, window.innerHeight);
+  Game.renderer.shadowMap.enabled = true;
+  Game.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.getElementById('canvas-container').appendChild(Game.renderer.domElement);
+
+  window.addEventListener('resize', () => {
+    Game.camera.aspect = window.innerWidth / window.innerHeight;
+    Game.camera.updateProjectionMatrix();
+    Game.renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  buildStarfield();
+  setupControls();
+  animate();
+}
+
+// ─── STARFIELD ───────────────────────────────────────────────────
+function buildStarfield() {
+  const geo = new THREE.BufferGeometry();
+  const verts = [];
+  for (let i = 0; i < 3000; i++) {
+    verts.push((Math.random()-0.5)*600, (Math.random()-0.5)*600, (Math.random()-0.5)*600);
+  }
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  const stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.4, sizeAttenuation: true }));
+  Game.scene.add(stars);
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────
+function setupControls() {
+  document.addEventListener('keydown', e => {
+    Game.keys[e.code] = true;
+
+    // B key or Escape toggles pause (when in game)
+    if ((e.code === 'KeyB' || e.code === 'Escape') && !Game.isDead &&
+        document.getElementById('hud').style.display !== 'none') {
+      if (Game.paused) {
+        resumeGame();
+      } else if (!Game.dialogueOpen) {
+        pauseGame();
+      }
+      return;
+    }
+
+    if (Game.paused) return; // block all other input while paused
+
+    if (e.code === 'KeyM' && !Game.dialogueOpen && !Game.isDead && Game.locked) toggleMap();
+    if (e.code === 'KeyE') handleInteract();
+    if (e.code === 'KeyR') reloadAmmo();
+  });
+  document.addEventListener('keyup', e => { Game.keys[e.code] = false; });
+
+  document.addEventListener('mousemove', e => {
+    if (!Game.locked || Game.dialogueOpen || Game.mapOpen || Game.isDead || Game.paused) return;
+    Game.yaw   -= e.movementX * 0.0018;
+    Game.pitch -= e.movementY * 0.0018;
+    Game.pitch = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, Game.pitch));
+  });
+
+  document.addEventListener('mousedown', e => {
+    if (e.button === 0 && Game.locked && !Game.dialogueOpen && !Game.mapOpen && !Game.isDead && !Game.paused) shoot();
+    // Click on canvas when unlocked + not paused = re-lock
+    if (!Game.locked && !Game.mapOpen && !Game.paused &&
+        document.getElementById('hud').style.display !== 'none') requestLock();
+  });
+
+  document.addEventListener('pointerlockchange', () => {
+    Game.locked = !!document.pointerLockElement;
+    // If pointer lock was lost for a reason other than pausing, open pause menu
+    if (!Game.locked && !Game.paused && !Game.isDead && !Game.dialogueOpen && !Game.mapOpen &&
+        document.getElementById('hud').style.display !== 'none') {
+      pauseGame();
+    }
+  });
+
+  document.getElementById('canvas-container').addEventListener('click', () => {
+    if (!Game.paused && !Game.mapOpen && !Game.dialogueOpen) requestLock();
+  });
+}
+
+function requestLock() {
+  if (!document.getElementById('hud') ||
+      document.getElementById('hud').style.display === 'none' ||
+      document.getElementById('hud').style.display === '') return;
+  document.getElementById('canvas-container').requestPointerLock();
+}
+
+// ─── PAUSE ───────────────────────────────────────────────────────
+function pauseGame() {
+  if (Game.paused || Game.isDead) return;
+  Game.paused = true;
+  if (document.pointerLockElement) document.exitPointerLock();
+  // Update area label in pause menu
+  const areaNames = { haven: 'Safe Haven', deepspace: 'Deep Space - Sector 9', station: 'Station Kira-7' };
+  document.getElementById('pause-area-label').textContent = areaNames[Game.currentArea] || '';
+  document.getElementById('pause-screen').classList.add('open');
+  // Populate pause stars if empty
+  if (!document.getElementById('pause-stars').hasChildNodes()) buildPauseStars();
+}
+
+function resumeGame() {
+  if (!Game.paused) return;
+  Game.paused = false;
+  document.getElementById('pause-screen').classList.remove('open');
+  document.getElementById('pause-controls-screen').classList.remove('open');
+  // Re-lock pointer
+  requestLock();
+}
+
+function pauseShowControls() {
+  document.getElementById('pause-controls-screen').classList.add('open');
+}
+
+function closePauseControls() {
+  document.getElementById('pause-controls-screen').classList.remove('open');
+}
+
+function pauseOpenMap() {
+  document.getElementById('pause-screen').classList.remove('open');
+  Game.paused = false; // map handles its own state
+  toggleMap();
+}
+
+function quitToTitle() {
+  Game.paused = false;
+  document.getElementById('pause-screen').classList.remove('open');
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('title-screen').style.display = 'flex';
+  if (document.pointerLockElement) document.exitPointerLock();
+}
+
+function buildPauseStars() {
+  const container = document.getElementById('pause-stars');
+  for (let i = 0; i < 80; i++) {
+    const star = document.createElement('div');
+    star.className = 'star-dot';
+    const size = Math.random() * 2 + 0.5;
+    star.style.cssText = 'width:'+size+'px; height:'+size+'px; left:'+
+      (Math.random()*100)+'%; top:'+(Math.random()*100)+'%; --o:'+(Math.random()*0.6+0.1)+
+      '; --d:'+(Math.random()*4+2)+'s; animation-delay:'+(Math.random()*4)+'s;';
+    container.appendChild(star);
+  }
+}
+
+// ─── AREAS ───────────────────────────────────────────────────────
+function clearArea() {
+  // Remove everything except stars
+  const toRemove = [];
+  Game.scene.children.forEach(c => {
+    if (c.isPoints) return; // keep stars
+    toRemove.push(c);
+  });
+  toRemove.forEach(c => Game.scene.remove(c));
+  Game.enemies = [];
+  Game.bullets = [];
+  Game.enemyBullets = [];
+  Game.interactables = [];
+  Game.objects = [];
+  buildStarfield();
+}
+
+function buildHaven() {
+  clearArea();
+  Game.scene.fog = new THREE.FogExp2(0x000510, 0.03);
+  Game.scene.background = new THREE.Color(0x000510);
+
+  // Ambient + directional
+  Game.scene.add(new THREE.AmbientLight(0x103050, 1.2));
+  const sun = new THREE.DirectionalLight(0x4080ff, 1.0);
+  sun.position.set(10, 20, 10);
+  sun.castShadow = true;
+  Game.scene.add(sun);
+  const greenFill = new THREE.PointLight(0x20ff60, 1.5, 30);
+  greenFill.position.set(0, 3, 0);
+  Game.scene.add(greenFill);
+
+  // Floor
+  const floor = new THREE.Mesh(
+    new THREE.CylinderGeometry(18, 18, 0.3, 32),
+    new THREE.MeshStandardMaterial({ color: 0x0a1a2a, roughness: 0.8, metalness: 0.3 })
+  );
+  floor.position.y = -0.15;
+  floor.receiveShadow = true;
+  Game.scene.add(floor);
+
+  // Docking bay floor grid lines
+  for (let i = -14; i <= 14; i += 4) {
+    addBox(i, 0.01, 0, 0.08, 0.01, 28, 0x1a3a5a);
+    addBox(0, 0.01, i, 28, 0.01, 0.08, 0x1a3a5a);
+  }
+
+  // Central command column
+  addBox(0, 2, 0, 1.5, 4, 1.5, 0x0d2a3a, true);
+  // Glowing top
+  const topLight = new THREE.PointLight(0x00ffaa, 2, 8);
+  topLight.position.set(0, 5, 0);
+  Game.scene.add(topLight);
+  addBox(0, 4.2, 0, 1.8, 0.15, 1.8, 0x00ffaa);
+
+  // Side pillars
+  [[-8,0,-8],[8,0,-8],[-8,0,8],[8,0,8]].forEach(([x,,z]) => {
+    addBox(x, 2.5, z, 0.6, 5, 0.6, 0x0d2535, true);
+    const pl = new THREE.PointLight(0x0060ff, 1.2, 6);
+    pl.position.set(x, 5.5, z);
+    Game.scene.add(pl);
+  });
+
+  // Outer walls (partial — open hangar feel)
+  addBox(-18, 4, 0, 0.4, 8, 36, 0x080f18, true);
+  addBox(18, 4, 0, 0.4, 8, 36, 0x080f18, true);
+  addBox(0, 4, -18, 36, 8, 0.4, 0x080f18, true);
+
+  // Ceiling panels
+  for (let x = -12; x <= 12; x += 6) {
+    for (let z = -12; z <= 12; z += 6) {
+      addBox(x, 7.9, z, 5.5, 0.1, 5.5, 0x0a1520);
+    }
+  }
+
+  // NPC — Commander Voss
+  const npc = addBox(0, 1, -4, 0.6, 1.8, 0.4, 0x2244aa, true);
+  npc.userData = { isNPC: true, name: 'COMMANDER VOSS', dialogue: [
+    "Good, you're awake. I'm Commander Voss.",
+    "Six colonies went dark three weeks ago. No distress signal. Nothing.",
+    "We've tracked interference to Sector 9 — that's Deep Space territory.",
+    "Pirates have been active. Station Kira-7 is derelict, but our scans show movement.",
+    "Your mission: investigate and report back. Watch your back out there."
+  ], dIndex: 0 };
+  npc.position.set(0, 0.9, -4);
+  Game.interactables.push(npc);
+
+  // NPC glow
+  const npcLight = new THREE.PointLight(0x4488ff, 1, 5);
+  npcLight.position.set(0, 2, -4);
+  Game.scene.add(npcLight);
+
+  // Supply crates
+  [[4,0,2],[-4,0,2],[6,0,-6],[-6,0,-6]].forEach(([x,y,z]) => {
+    addBox(x, 0.5, z, 1, 1, 1, 0x1a2a3a, true);
+  });
+
+  // Parked ship (decorative)
+  addBox(10, 0.6, 8, 4, 1.2, 8, 0x1a1a2a, true);  // body
+  addBox(10, 1.4, 8, 6, 0.2, 2, 0x0d1a2a, true);   // wing
+  addBox(10, 0.8, 4.5, 0.8, 0.4, 3, 0x1a1a2a, true); // nacelle
+
+  document.getElementById('area-name').textContent = '🛸  Safe Haven';
+  document.getElementById('area-name').style.color = 'rgba(82,176,67,0.9)';
+
+  spawnAt(0, 1.7, 2);
+}
+
+function buildDeepSpace() {
+  clearArea();
+  Game.scene.fog = new THREE.FogExp2(0x000000, 0.018);
+  Game.scene.background = new THREE.Color(0x000000);
+
+  Game.scene.add(new THREE.AmbientLight(0x080818, 0.8));
+  const distant = new THREE.DirectionalLight(0xffeedd, 0.4);
+  distant.position.set(-50, 30, -80);
+  Game.scene.add(distant);
+
+  // Nebula glow volumes
+  [[20,0,-30,0xff4400],[-30,10,-50,0x4400ff],[-10,-20,40,0x00ffaa]].forEach(([x,y,z,col]) => {
+    const nl = new THREE.PointLight(col, 0.6, 60);
+    nl.position.set(x,y,z);
+    Game.scene.add(nl);
+  });
+
+  // Floating debris field
+  for (let i = 0; i < 40; i++) {
+    const size = Math.random()*1.5+0.3;
+    const geo = Math.random() > 0.5
+      ? new THREE.DodecahedronGeometry(size, 0)
+      : new THREE.BoxGeometry(size, size*0.6, size*0.8);
+    const mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color().setHSL(0.6+Math.random()*0.1, 0.2, 0.15),
+      roughness: 0.9, metalness: 0.4
+    });
+    const rock = new THREE.Mesh(geo, mat);
+    const ang = Math.random()*Math.PI*2;
+    const r = 8 + Math.random()*35;
+    rock.position.set(Math.cos(ang)*r, (Math.random()-0.5)*20, Math.sin(ang)*r);
+    rock.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+    rock.userData.rotSpeed = { x: (Math.random()-0.5)*0.005, y: (Math.random()-0.5)*0.005 };
+    Game.scene.add(rock);
+    Game.objects.push(rock);
+  }
+
+  // Derelict ship hulk
+  addBox(15, 0, -20, 8, 2, 20, 0x0d0d14, true);
+  addBox(15, 1.5, -20, 12, 0.3, 5, 0x0a0a12, true);
+  const wreckLight = new THREE.PointLight(0xff3300, 1.5, 12);
+  wreckLight.position.set(15, 2, -20);
+  Game.scene.add(wreckLight);
+
+  // Spawn enemies (space pirates)
+  for (let i = 0; i < 5; i++) spawnEnemy('pirate', 'deepspace');
+
+  document.getElementById('area-name').textContent = '🌌  Deep Space — Sector 9';
+  document.getElementById('area-name').style.color = 'rgba(255,100,100,0.9)';
+
+  spawnAt(0, 0, 0);
+}
+
+function buildStation() {
+  clearArea();
+  Game.scene.fog = new THREE.FogExp2(0x050008, 0.06);
+  Game.scene.background = new THREE.Color(0x050008);
+
+  Game.scene.add(new THREE.AmbientLight(0x100818, 0.6));
+
+  // Corridor system: main + side arms
+  const corridorMat = new THREE.MeshStandardMaterial({ color: 0x0a080f, roughness: 0.7, metalness: 0.5 });
+  const ceilMat = new THREE.MeshStandardMaterial({ color: 0x0d0a14, roughness: 0.8 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x080610, roughness: 0.9, metalness: 0.3 });
+
+  function corridor(x, y, z, w, h, d) {
+    // Floor
+    const fl = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), floorMat);
+    fl.position.set(x, y-h/2+0.05, z); Game.scene.add(fl);
+    // Ceiling
+    const ce = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), ceilMat);
+    ce.position.set(x, y+h/2-0.05, z); Game.scene.add(ce);
+    // Walls
+    const wl = new THREE.Mesh(new THREE.BoxGeometry(0.15, h, d), corridorMat);
+    wl.position.set(x-w/2, y, z); wl.castShadow = true; Game.scene.add(wl); Game.objects.push(wl);
+    const wr = new THREE.Mesh(new THREE.BoxGeometry(0.15, h, d), corridorMat);
+    wr.position.set(x+w/2, y, z); wr.castShadow = true; Game.scene.add(wr); Game.objects.push(wr);
+  }
+
+  // Main corridor (Z axis)
+  corridor(0, 1.5, 0, 5, 3.2, 40);
+  // Side arm 1
+  corridor(-6, 1.5, -8, 5, 3.2, 12);
+  // Side arm 2
+  corridor(6, 1.5, 5, 5, 3.2, 12);
+  // End room
+  corridor(0, 1.5, -22, 10, 3.5, 8);
+
+  // Emergency lights (red strips)
+  [[-14],[-6],[2],[10],[18]].forEach(([z]) => {
+    const el = new THREE.PointLight(0xff0022, 1.2, 7);
+    el.position.set(0, 2.8, z);
+    Game.scene.add(el);
+    // Flickering
+    el.userData.flicker = true;
+    el.userData.baseInt = 1.2;
+  });
+
+  // Scattered crates / cover
+  [[2,0,-5],[-2,0,-12],[1.5,0,-18],[-1.5,0,3]].forEach(([x,y,z]) => {
+    addBox(x, 0.5+y, z, 1.2, 1, 1, 0x1a0a1a, true);
+  });
+
+  // Spawn enemies (station drones)
+  for (let i = 0; i < 6; i++) spawnEnemy('drone', 'station');
+
+  document.getElementById('area-name').textContent = '🏗️  Station Kira-7';
+  document.getElementById('area-name').style.color = 'rgba(140,80,255,0.9)';
+
+  spawnAt(0, 1.7, 16);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────
+function addBox(x, y, z, w, h, d, color, collide) {
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({ color })
+  );
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  Game.scene.add(mesh);
+  if (collide) Game.objects.push(mesh);
+  return mesh;
+}
+
+function spawnAt(x, y, z) {
+  Game.camera.position.set(x, y, z);
+  Game.yaw = 0; Game.pitch = 0;
+}
+
+// ─── ENEMIES ─────────────────────────────────────────────────────
+function spawnEnemy(type, area) {
+  const isStation = area === 'station';
+  const ang = Math.random() * Math.PI * 2;
+  const r = isStation ? (3 + Math.random() * 12) : (8 + Math.random() * 25);
+  const x = Math.cos(ang) * r;
+  const z = Math.sin(ang) * r + (isStation ? -8 : 0);
+  const y = isStation ? 1.5 : (Math.random() - 0.5) * 8;
+
+  const colors = { pirate: 0xff3300, drone: 0x8822ff };
+  const geo = type === 'pirate'
+    ? new THREE.ConeGeometry(0.5, 1.6, 6)
+    : new THREE.OctahedronGeometry(0.7);
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: colors[type], emissive: colors[type], emissiveIntensity: 0.3, roughness: 0.4
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x, y, z);
+
+  // Eye light
+  const el = new THREE.PointLight(colors[type], 1, 4);
+  el.position.set(0, 0.5, 0);
+  mesh.add(el);
+
+  Game.scene.add(mesh);
+  Game.enemies.push({
+    mesh, type, hp: type === 'pirate' ? 3 : 2,
+    speed: type === 'pirate' ? 0.022 : 0.03,
+    shootTimer: Math.random() * 2,
+    shootInterval: type === 'pirate' ? 2.5 : 1.8,
+    active: true
+  });
+}
+
+// ─── SHOOTING ────────────────────────────────────────────────────
+function shoot() {
+  if (Game.reloading || Game.shootCooldown > 0) return;
+  if (Game.player.ammo <= 0) { reloadAmmo(); return; }
+
+  Game.player.ammo--;
+  updateAmmoHUD();
+  Game.shootCooldown = 0.12;
+
+  // Muzzle flash
+  const sf = document.getElementById('shoot-flash');
+  sf.style.opacity = '1';
+  setTimeout(() => { sf.style.opacity = '0'; }, 60);
+
+  // Bullet
+  const dir = new THREE.Vector3();
+  Game.camera.getWorldDirection(dir);
+
+  const geo = new THREE.SphereGeometry(0.06, 6, 6);
+  const mat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
+  const bullet = new THREE.Mesh(geo, mat);
+  bullet.position.copy(Game.camera.position).addScaledVector(dir, 0.5);
+
+  const light = new THREE.PointLight(0x00ffcc, 2, 4);
+  bullet.add(light);
+
+  Game.scene.add(bullet);
+  Game.bullets.push({ mesh: bullet, dir: dir.clone(), speed: 0.8, life: 2.5 });
+}
+
+function reloadAmmo() {
+  if (Game.reloading || Game.player.ammo === Game.player.maxAmmo) return;
+  Game.reloading = true;
+  document.getElementById('ammo-current').textContent = 'RELOADING';
+  setTimeout(() => {
+    Game.player.ammo = Game.player.maxAmmo;
+    Game.reloading = false;
+    updateAmmoHUD();
+  }, 1800);
+}
+
+function enemyShoot(enemy) {
+  const dir = new THREE.Vector3().subVectors(Game.camera.position, enemy.mesh.position).normalize();
+  // Spread
+  dir.x += (Math.random() - 0.5) * 0.18;
+  dir.y += (Math.random() - 0.5) * 0.12;
+  dir.normalize();
+
+  const geo = new THREE.SphereGeometry(0.08, 5, 5);
+  const col = enemy.type === 'pirate' ? 0xff4400 : 0xcc00ff;
+  const mat = new THREE.MeshBasicMaterial({ color: col });
+  const bullet = new THREE.Mesh(geo, mat);
+  bullet.position.copy(enemy.mesh.position).addScaledVector(dir, 0.8);
+
+  const light = new THREE.PointLight(col, 2, 4);
+  bullet.add(light);
+
+  Game.scene.add(bullet);
+  Game.enemyBullets.push({ mesh: bullet, dir: dir.clone(), speed: 0.3, life: 3 });
+}
+
+// ─── INTERACTION ─────────────────────────────────────────────────
+let dialogueQueue = [], dlgIdx = 0, dlgTarget = null;
+
+function handleInteract() {
+  if (Game.dialogueOpen) {
+    advanceDialogue();
+    return;
+  }
+  if (Game.mapOpen) { closeMap(); return; }
+
+  // Check for nearby interactable
+  const playerPos = Game.camera.position;
+  for (const obj of Game.interactables) {
+    if (obj.position.distanceTo(playerPos) < 3.5) {
+      startDialogue(obj);
+      return;
+    }
+  }
+}
+
+function startDialogue(obj) {
+  dlgTarget = obj;
+  dialogueQueue = obj.userData.dialogue;
+  dlgIdx = 0;
+  Game.dialogueOpen = true;
+  if (document.pointerLockElement) document.exitPointerLock();
+  document.getElementById('dialogue-speaker').textContent = obj.userData.name;
+  document.getElementById('dialogue-box').classList.add('open');
+  showDialogueLine();
+}
+
+function showDialogueLine() {
+  const box = document.getElementById('dialogue-text');
+  box.textContent = '';
+  const text = dialogueQueue[dlgIdx];
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < text.length) { box.textContent += text[i]; i++; }
+    else clearInterval(interval);
+  }, 22);
+}
+
+function advanceDialogue() {
+  dlgIdx++;
+  if (dlgIdx >= dialogueQueue.length) {
+    Game.dialogueOpen = false;
+    document.getElementById('dialogue-box').classList.remove('open');
+    dlgTarget = null;
+  } else {
+    showDialogueLine();
+  }
+}
+
+// ─── NAV MAP ─────────────────────────────────────────────────────
+function toggleMap() {
+  if (Game.mapOpen) closeMap();
+  else {
+    Game.mapOpen = true;
+    if (document.pointerLockElement) document.exitPointerLock();
+    document.getElementById('nav-map').classList.add('open');
+    // Highlight current
+    ['haven','deepspace','station'].forEach(a => {
+      document.getElementById('nav-' + a).classList.toggle('current', a === Game.currentArea);
+    });
+  }
+}
+
+function closeMap() {
+  Game.mapOpen = false;
+  document.getElementById('nav-map').classList.remove('open');
+  if (!Game.paused && !Game.isDead) requestLock();
+}
+
+function travelTo(area) {
+  if (area === Game.currentArea) { closeMap(); return; }
+  closeMap();
+  fadeTransition(() => {
+    Game.currentArea = area;
+    Game.player.health = Math.min(100, Game.player.health + 30);
+    Game.player.shield = Math.min(100, Game.player.shield + 50);
+    updateHealthHUD();
+    if (area === 'haven') buildHaven();
+    else if (area === 'deepspace') buildDeepSpace();
+    else if (area === 'station') buildStation();
+    requestLock();
+  });
+}
+
+function fadeTransition(cb) {
+  const ov = document.getElementById('transition-overlay');
+  ov.classList.add('fade-in');
+  setTimeout(() => {
+    cb();
+    ov.classList.remove('fade-in');
+  }, 500);
+}
+
+// ─── PLAYER MOVEMENT ─────────────────────────────────────────────
+const playerBox = new THREE.Box3();
+const testBox = new THREE.Box3();
+const tmpVec = new THREE.Vector3();
+
+function movePlayer(dt) {
+  if (Game.dialogueOpen || Game.mapOpen || Game.isDead || Game.paused) return;
+
+  const forward = new THREE.Vector3(-Math.sin(Game.yaw), 0, -Math.cos(Game.yaw));
+  const right   = new THREE.Vector3( Math.cos(Game.yaw), 0, -Math.sin(Game.yaw));
+  const spd = Game.player.speed;
+
+  const move = new THREE.Vector3();
+  if (Game.keys['KeyW'] || Game.keys['ArrowUp'])    move.addScaledVector(forward, spd);
+  if (Game.keys['KeyS'] || Game.keys['ArrowDown'])  move.addScaledVector(forward, -spd);
+  if (Game.keys['KeyA'] || Game.keys['ArrowLeft'])  move.addScaledVector(right, -spd);
+  if (Game.keys['KeyD'] || Game.keys['ArrowRight']) move.addScaledVector(right, spd);
+
+  // Space/deep-space: allow vertical movement
+  if (Game.currentArea === 'deepspace') {
+    if (Game.keys['Space'])     move.y += spd * 0.6;
+    if (Game.keys['ShiftLeft']) move.y -= spd * 0.6;
+  }
+
+  // Collision: try X then Z separately
+  const pos = Game.camera.position;
+  const radius = 0.4;
+
+  // X
+  pos.x += move.x;
+  if (collides(pos, radius)) pos.x -= move.x;
+
+  // Z
+  pos.z += move.z;
+  if (collides(pos, radius)) pos.z -= move.z;
+
+  // Y (gravity-like in station & haven)
+  if (Game.currentArea !== 'deepspace') {
+    const groundY = 1.7;
+    pos.y = groundY;
+  } else {
+    pos.y += move.y;
+    pos.y = Math.max(-20, Math.min(20, pos.y));
+  }
+
+  // Camera rotation
+  const euler = new THREE.Euler(Game.pitch, Game.yaw, 0, 'YXZ');
+  Game.camera.quaternion.setFromEuler(euler);
+
+  // Interact prompt
+  const near = Game.interactables.some(o => o.position.distanceTo(pos) < 3.5);
+  document.getElementById('interact-prompt').style.display = (near && !Game.dialogueOpen) ? 'block' : 'none';
+}
+
+function collides(pos, r) {
+  playerBox.setFromCenterAndSize(pos, new THREE.Vector3(r*2, 1.4, r*2));
+  for (const obj of Game.objects) {
+    testBox.setFromObject(obj);
+    if (playerBox.intersectsBox(testBox)) return true;
+  }
+  return false;
+}
+
+// ─── UPDATE BULLETS ───────────────────────────────────────────────
+function updateBullets(dt) {
+  // Player bullets
+  for (let i = Game.bullets.length - 1; i >= 0; i--) {
+    const b = Game.bullets[i];
+    b.mesh.position.addScaledVector(b.dir, b.speed);
+    b.life -= dt;
+
+    let hit = false;
+
+    // Hit enemy?
+    for (let j = Game.enemies.length - 1; j >= 0; j--) {
+      const e = Game.enemies[j];
+      if (!e.active) continue;
+      if (b.mesh.position.distanceTo(e.mesh.position) < 0.9) {
+        e.hp--;
+        hit = true;
+        if (e.hp <= 0) killEnemy(j);
+        break;
+      }
+    }
+
+    if (hit || b.life <= 0) {
+      Game.scene.remove(b.mesh);
+      Game.bullets.splice(i, 1);
+    }
+  }
+
+  // Enemy bullets
+  for (let i = Game.enemyBullets.length - 1; i >= 0; i--) {
+    const b = Game.enemyBullets[i];
+    b.mesh.position.addScaledVector(b.dir, b.speed);
+    b.life -= dt;
+
+    const dist = b.mesh.position.distanceTo(Game.camera.position);
+    if (dist < 0.5) {
+      takeDamage(12);
+      Game.scene.remove(b.mesh);
+      Game.enemyBullets.splice(i, 1);
+      continue;
+    }
+
+    if (b.life <= 0) {
+      Game.scene.remove(b.mesh);
+      Game.enemyBullets.splice(i, 1);
+    }
+  }
+}
+
+// ─── ENEMY AI ─────────────────────────────────────────────────────
+function updateEnemies(dt) {
+  const playerPos = Game.camera.position;
+
+  Game.enemies.forEach((e, idx) => {
+    if (!e.active) return;
+    const dist = e.mesh.position.distanceTo(playerPos);
+
+    // Rotate to face player
+    e.mesh.lookAt(playerPos);
+
+    // Move toward player if far
+    if (dist > 3.5 && dist < 50) {
+      const dir = new THREE.Vector3().subVectors(playerPos, e.mesh.position).normalize();
+      e.mesh.position.addScaledVector(dir, e.speed);
+    }
+
+    // Shoot
+    e.shootTimer -= dt;
+    if (e.shootTimer <= 0 && dist < 35) {
+      enemyShoot(e);
+      e.shootTimer = e.shootInterval + Math.random();
+    }
+
+    // Bob (station drones)
+    if (e.type === 'drone') {
+      e.mesh.position.y += Math.sin(Date.now() * 0.002 + idx) * 0.003;
+    }
+  });
+}
+
+function killEnemy(idx) {
+  const e = Game.enemies[idx];
+  e.active = false;
+  // Death flash
+  e.mesh.material.emissiveIntensity = 2;
+  setTimeout(() => Game.scene.remove(e.mesh), 200);
+  Game.enemies.splice(idx, 1);
+  Game.player.kills++;
+  document.getElementById('kill-count').textContent = Game.player.kills;
+  addKillFeed(e.type === 'pirate' ? 'Space Pirate eliminated' : 'Station Drone destroyed');
+}
+
+function addKillFeed(text) {
+  const feed = document.getElementById('kill-feed');
+  const el = document.createElement('div');
+  el.className = 'kill-entry';
+  el.textContent = '✕ ' + text;
+  feed.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ─── DAMAGE ───────────────────────────────────────────────────────
+let damageTimer = 0;
+function takeDamage(amt) {
+  if (Game.isDead) return;
+  if (Game.player.shield > 0) {
+    Game.player.shield = Math.max(0, Game.player.shield - amt);
+  } else {
+    Game.player.health = Math.max(0, Game.player.health - amt);
+  }
+  updateHealthHUD();
+  const hf = document.getElementById('hit-flash');
+  hf.style.opacity = '1';
+  setTimeout(() => { hf.style.opacity = '0'; }, 120);
+  damageTimer = 5; // no regen for 5s
+
+  if (Game.player.health <= 0) die();
+}
+
+function die() {
+  Game.isDead = true;
+  if (document.pointerLockElement) document.exitPointerLock();
+  document.getElementById('death-screen').classList.add('open');
+}
+
+function respawn() {
+  Game.isDead = false;
+  Game.player.health = 100;
+  Game.player.shield = 100;
+  Game.player.ammo = Game.player.maxAmmo;
+  updateHealthHUD();
+  updateAmmoHUD();
+  document.getElementById('death-screen').classList.remove('open');
+  travelTo('haven');
+}
+
+// ─── HUD UPDATES ──────────────────────────────────────────────────
+function updateHealthHUD() {
+  document.getElementById('health-bar').style.width = Game.player.health + '%';
+  document.getElementById('shield-bar').style.width = Game.player.shield + '%';
+  const hb = document.getElementById('health-bar');
+  hb.style.background = Game.player.health > 50
+    ? 'linear-gradient(90deg, #52B043, #7AE060)'
+    : Game.player.health > 25
+    ? 'linear-gradient(90deg, #ffaa00, #ffcc44)'
+    : 'linear-gradient(90deg, #ff2200, #ff6040)';
+}
+
+function updateAmmoHUD() {
+  if (!Game.reloading) {
+    document.getElementById('ammo-current').textContent = Game.player.ammo;
+  }
+  document.getElementById('ammo-max').textContent = Game.player.maxAmmo;
+}
+
+// ─── ANIMATE ──────────────────────────────────────────────────────
+let shieldRegenTimer = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(Game.clock.getDelta(), 0.05);
+
+  // Always render, but skip game logic when paused
+  if (Game.paused || Game.isDead) {
+    Game.renderer.render(Game.scene, Game.camera);
+    return;
+  }
+
+  movePlayer(dt);
+  updateBullets(dt);
+  updateEnemies(dt);
+
+  // Shoot cooldown
+  Game.shootCooldown = Math.max(0, Game.shootCooldown - dt);
+
+  // Shield regen (when not hit)
+  damageTimer -= dt;
+  if (damageTimer <= 0 && Game.player.shield < 100) {
+    Game.player.shield = Math.min(100, Game.player.shield + dt * 5);
+    updateHealthHUD();
+  }
+
+  // Flicker lights
+  Game.scene.children.forEach(c => {
+    if (c.isPointLight && c.userData.flicker) {
+      c.intensity = c.userData.baseInt * (0.7 + Math.sin(Date.now()*0.008 + c.position.z)*0.3 + Math.random()*0.1);
+    }
+  });
+
+  // Rotate debris
+  Game.scene.children.forEach(c => {
+    if (c.isMesh && c.userData.rotSpeed) {
+      c.rotation.x += c.userData.rotSpeed.x;
+      c.rotation.y += c.userData.rotSpeed.y;
+    }
+  });
+
+  Game.renderer.render(Game.scene, Game.camera);
+}
+
+// ─── TITLE STARS ─────────────────────────────────────────────────
+function buildTitleStars() {
+  const container = document.getElementById('title-stars');
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    star.className = 'star-dot';
+    const size = Math.random() * 2 + 0.5;
+    star.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --o:${Math.random()*0.7+0.1};
+      --d:${Math.random()*4+2}s;
+      animation-delay:${Math.random()*4}s;
+    `;
+    container.appendChild(star);
+  }
+}
+
+// ─── START ────────────────────────────────────────────────────────
+function startGame() {
+  document.getElementById('title-screen').style.display = 'none';
+  document.getElementById('hud').style.display = 'block';
+  buildHaven();
+  requestLock();
+  updateHealthHUD();
+  updateAmmoHUD();
+  // Short intro dialogue after 1s
+  setTimeout(() => {
+    if (Game.interactables.length > 0) {
+      // Auto-trigger intro
+    }
+  }, 1000);
+}
+
+function showControls() {
+  document.getElementById('title-screen').style.display = 'none';
+  document.getElementById('controls-screen').style.display = 'flex';
+}
+
+// Boot
+buildTitleStars();
+init();
+</script>
+</body>
+</html>
