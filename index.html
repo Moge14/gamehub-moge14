@@ -7,1439 +7,626 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green: #107C10;
-    --green-bright: #52B043;
-    --green-glow: rgba(16,124,16,0.35);
-    --bg: #080C08;
-    --bg-card: #141A14;
-    --bg-hover: #1C251C;
-    --border: rgba(255,255,255,0.07);
-    --text: #FFFFFF;
-    --muted: #8A9A8A;
-    --dim: #3A4A3A;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ─── AMBIENT BACKGROUND ─────────────────────────────── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 85% 10%, rgba(16,124,16,0.18) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 30% at 10% 90%, rgba(16,124,16,0.08) 0%, transparent 55%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ─── HEADER ─────────────────────────────────────────── */
-  header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 54px;
-    background: rgba(8,12,8,0.88);
-    backdrop-filter: blur(24px);
-    border-bottom: 1px solid rgba(16,124,16,0.22);
-    display: flex;
-    align-items: center;
-    padding: 0 28px;
-    gap: 36px;
-    z-index: 200;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    flex-shrink: 0;
-  }
-
-  .logo-sphere {
-    width: 30px; height: 30px;
-    background: radial-gradient(circle at 35% 35%, #52B043, #107C10 60%, #063606);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 14px rgba(16,124,16,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .logo-sphere::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: 4px;
-    width: 10px; height: 6px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 50%;
-    filter: blur(2px);
-  }
-
-  .logo-cross {
-    position: absolute;
-    width: 18px; height: 18px;
-  }
-
-  .logo-cross::before,
-  .logo-cross::after {
-    content: '';
-    position: absolute;
-    background: rgba(255,255,255,0.6);
-    border-radius: 1px;
-  }
-
-  .logo-cross::before { width: 2px; height: 100%; top: 0; left: 50%; transform: translateX(-50%); }
-  .logo-cross::after  { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
-
-  .logo-word {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: #fff;
-    text-transform: uppercase;
-  }
-
-  nav {
-    display: flex;
-    gap: 2px;
-    flex: 1;
-  }
-
-  .nav-btn {
-    padding: 5px 16px;
-    border-radius: 3px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.18s;
-    color: var(--muted);
-    letter-spacing: 0.3px;
-    border: none;
-    background: none;
-    font-family: 'Barlow', sans-serif;
-  }
-
-  .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
-  .nav-btn.active { color: #fff; background: rgba(16,124,16,0.22); }
-
-  .header-end {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .gp-pill {
-    background: linear-gradient(90deg, #107C10, #52B043);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-  }
-
-  .avatar {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1C3A1C, #107C10);
-    border: 2px solid var(--green-bright);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--green-bright);
-    cursor: pointer;
-  }
-
-  /* ─── MAIN ───────────────────────────────────────────── */
-  main {
-    padding-top: 54px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ─── HERO ───────────────────────────────────────────── */
-  .hero {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    grid-template-rows: 340px;
-    gap: 3px;
-    padding: 3px;
-  }
-
-  .hero-feature {
-    position: relative;
-    border-radius: 6px;
-    overflow: hidden;
-    cursor: pointer;
-    background: #0E1F0E;
-  }
-
-  /* Animated noise texture */
-  .hero-feature::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.6;
-  }
-
-  .hero-bg-art {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(125deg, #071507 0%, #0E280E 35%, #111411 60%, #0A0A14 100%);
-  }
-
-  /* Decorative geometric lines */
-  .hero-lines {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-  }
-
-  .hero-lines::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 450px; height: 450px;
-    border: 1px solid rgba(16,124,16,0.12);
-    border-radius: 50%;
-  }
-
-  .hero-lines::after {
-    content: '';
-    position: absolute;
-    top: 20px; right: -20px;
-    width: 280px; height: 280px;
-    border: 1px solid rgba(16,124,16,0.08);
-    border-radius: 50%;
-  }
-
-  .hero-icon-bg {
-    position: absolute;
-    right: 80px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 180px;
-    opacity: 0.06;
-    line-height: 1;
-    filter: blur(3px);
-  }
-
-  .hero-glow {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 70%;
-    background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
-    z-index: 2;
-  }
-
-  .hero-content {
-    position: absolute;
-    bottom: 30px; left: 32px; right: 32px;
-    z-index: 3;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--green);
-    padding: 3px 10px;
-    border-radius: 2px;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .hero-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 52px;
-    font-weight: 700;
-    line-height: 0.95;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    text-shadow: 0 4px 30px rgba(0,0,0,0.7);
-  }
-
-  .hero-meta {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 18px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  .hero-meta .stars { color: #FFD43B; letter-spacing: -1px; }
-  .hero-meta .dot { width: 3px; height: 3px; background: var(--dim); border-radius: 50%; }
-
-  .hero-desc {
-    font-size: 13px;
-    color: rgba(255,255,255,0.6);
-    line-height: 1.6;
-    max-width: 500px;
-    margin-bottom: 20px;
-  }
-
-  .hero-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    padding: 11px 26px;
-    border-radius: 3px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Barlow', sans-serif;
-    letter-spacing: 0.3px;
-  }
-
-  .btn-primary:hover {
-    background: var(--green-bright);
-    box-shadow: 0 6px 24px rgba(16,124,16,0.45);
-    transform: translateY(-1px);
-  }
-
-  .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 10px 20px;
-    border-radius: 3px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Barlow', sans-serif;
-  }
-
-  .btn-secondary:hover { background: rgba(255,255,255,0.13); }
-
-  /* Hero side stack */
-  .hero-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .hero-mini {
-    flex: 1;
-    position: relative;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .hero-mini:hover { filter: brightness(1.1); }
-
-  .hero-mini-bg {
-    position: absolute;
-    inset: 0;
-  }
-
-  .hero-mini-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
-  }
-
-  .hero-mini-icon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 52px;
-    opacity: 0.18;
-  }
-
-  .hero-mini-label {
-    position: absolute;
-    bottom: 12px; left: 12px; right: 12px;
-    z-index: 2;
-  }
-
-  .hero-mini-name {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.1;
-  }
-
-  .hero-mini-sub {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-  }
-
-  .hero-mini-gp {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 9px;
-    color: var(--green-bright);
-    font-weight: 600;
-    margin-top: 4px;
-    letter-spacing: 0.5px;
-  }
-
-  /* ─── SECTION ────────────────────────────────────────── */
-  .section {
-    padding: 26px 6px 0;
-  }
-
-  .section-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 0 2px;
-  }
-
-  .section-label {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .section-label::before {
-    content: '';
-    width: 3px;
-    height: 16px;
-    background: var(--green-bright);
-    border-radius: 2px;
-    display: inline-block;
-  }
-
-  .see-all {
-    font-size: 12px;
-    color: var(--green-bright);
-    cursor: pointer;
-    letter-spacing: 0.3px;
-    border: none;
-    background: none;
-    font-family: 'Barlow', sans-serif;
-    transition: color 0.15s;
-  }
-
-  .see-all:hover { color: #fff; }
-
-  /* ─── GAME GRID ──────────────────────────────────────── */
-  .grid-6 {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 3px;
-  }
-
-  .grid-4 {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 3px;
-  }
-
-  .game-card {
-    aspect-ratio: 3/4;
-    position: relative;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s;
-    background: var(--bg-card);
-  }
-
-  .game-card:hover {
-    transform: scale(1.055);
-    z-index: 10;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(82,176,67,0.35), 0 0 30px rgba(16,124,16,0.25);
-  }
-
-  .gc-bg {
-    position: absolute;
-    inset: 0;
-  }
-
-  .gc-icon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 60px;
-    opacity: 0.22;
-    filter: blur(1px);
-  }
-
-  .gc-gradient {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 65%;
-    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 100%);
-  }
-
-  .gc-info {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    padding: 10px 9px;
-  }
-
-  .gc-name {
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.25;
-    margin-bottom: 4px;
-  }
-
-  .gc-tags {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .gc-genre {
-    font-size: 9px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .gc-gp {
-    width: 5px; height: 5px;
-    background: var(--green-bright);
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* Play overlay on hover */
-  .gc-play {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(16,124,16,0.1);
-    opacity: 0;
-    transition: opacity 0.18s;
-  }
-
-  .game-card:hover .gc-play { opacity: 1; }
-
-  .gc-play-btn {
-    width: 44px; height: 44px;
-    background: rgba(16,124,16,0.88);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(82,176,67,0.6);
-    box-shadow: 0 0 20px rgba(16,124,16,0.5);
-    font-size: 16px;
-    padding-left: 3px;
-  }
-
-  /* ─── WIDE CARDS ─────────────────────────────────────── */
-  .wide-card {
-    aspect-ratio: 16/9;
-    position: relative;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
-    background: var(--bg-card);
-    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s;
-  }
-
-  .wide-card:hover {
-    transform: scale(1.03);
-    z-index: 5;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(82,176,67,0.3);
-  }
-
-  .wc-bg { position: absolute; inset: 0; }
-  .wc-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 80px; opacity: 0.15; }
-  .wc-gradient { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.25) 0%, transparent 50%, rgba(0,0,0,0.65) 100%); }
-  .wc-content { position: absolute; bottom: 14px; left: 14px; right: 14px; }
-  .wc-name { font-family: 'Rajdhani', sans-serif; font-size: 19px; font-weight: 700; line-height: 1; }
-  .wc-meta { font-size: 11px; color: var(--muted); margin-top: 5px; display: flex; gap: 10px; align-items: center; }
-  .wc-rating { color: #FFD43B; font-size: 10px; }
-  .wc-hours { color: var(--green-bright); }
-
-  /* ─── NOTIFICATION BAR ───────────────────────────────── */
-  .notif {
-    margin: 22px 6px 0;
-    border-radius: 5px;
-    background: linear-gradient(90deg, rgba(16,124,16,0.15), rgba(16,124,16,0.04));
-    border: 1px solid rgba(82,176,67,0.2);
-    padding: 13px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 13px;
-  }
-
-  .notif-icon { font-size: 22px; }
-  .notif-text { flex: 1; line-height: 1.5; }
-  .notif-text strong { color: var(--green-bright); }
-  .notif-text span { color: var(--muted); font-size: 12px; }
-
-  .btn-outline {
-    border: 1px solid var(--green-bright);
-    color: var(--green-bright);
-    background: transparent;
-    padding: 6px 16px;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.18s;
-    font-family: 'Barlow', sans-serif;
-    white-space: nowrap;
-  }
-
-  .btn-outline:hover { background: var(--green-bright); color: #fff; }
-
-  .spacer { height: 60px; }
-
-  /* ─── COLOR THEMES FOR CARDS ─────────────────────────── */
-  .t-teal    { background: linear-gradient(140deg, #052020, #0D3535, #0A1A1A); }
-  .t-navy    { background: linear-gradient(140deg, #060818, #0D1540, #070C22); }
-  .t-crimson { background: linear-gradient(140deg, #1A0505, #350A0A, #1A0808); }
-  .t-amber   { background: linear-gradient(140deg, #1A1000, #352200, #1A1200); }
-  .t-forest  { background: linear-gradient(140deg, #071507, #112511, #0A180A); }
-  .t-violet  { background: linear-gradient(140deg, #140520, #24103A, #0F0818); }
-  .t-slate   { background: linear-gradient(140deg, #0D1420, #1A2535, #0D1220); }
-  .t-copper  { background: linear-gradient(140deg, #1A0C00, #352000, #1C1000); }
-  .t-rose    { background: linear-gradient(140deg, #1A0510, #351025, #1A0815); }
-  .t-ice     { background: linear-gradient(140deg, #071520, #0F2840, #071820); }
-
-  /* ─── MODAL ──────────────────────────────────────────── */
-  .modal-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.88);
-    z-index: 500;
-    backdrop-filter: blur(10px);
-  }
-
-  .modal-backdrop.open { display: flex; align-items: center; justify-content: center; animation: mfade 0.2s ease; }
-
-  @keyframes mfade { from { opacity: 0; } to { opacity: 1; } }
-
-  .modal {
-    background: #0C140C;
-    border: 1px solid rgba(82,176,67,0.25);
-    border-radius: 8px;
-    width: 94vw;
-    max-width: 1160px;
-    max-height: 92vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.9), 0 0 60px rgba(16,124,16,0.12);
-    animation: mslide 0.25s cubic-bezier(0.4,0,0.2,1);
-    overflow: hidden;
-  }
-
-  @keyframes mslide { from { transform: translateY(18px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 22px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    background: rgba(16,124,16,0.06);
-    flex-shrink: 0;
-  }
-
-  .modal-game-icon {
-    width: 42px; height: 42px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
-  }
-
-  .modal-game-title {
-    flex: 1;
-  }
-
-  .modal-game-name {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .modal-game-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 3px;
-    display: flex;
-    gap: 12px;
-  }
-
-  .modal-game-sub .live {
-    color: var(--green-bright);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .live-dot {
-    width: 6px; height: 6px;
-    background: var(--green-bright);
-    border-radius: 50%;
-    animation: pulse 1.4s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .modal-close {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: var(--muted);
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    line-height: 1;
-  }
-
-  .modal-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
-
-  .modal-body {
-    flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Game play area */
-  .game-play-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #050C05;
-    min-height: 480px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Scanlines effect */
-  .game-play-area::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.04) 2px,
-      rgba(0,0,0,0.04) 4px
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .game-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    text-align: center;
-    z-index: 2;
-    position: relative;
-  }
-
-  .gp-icon {
-    font-size: 72px;
-    filter: drop-shadow(0 0 20px rgba(82,176,67,0.3));
-    animation: float 3s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-
-  .gp-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.9);
-  }
-
-  .gp-desc {
-    font-size: 14px;
-    color: var(--muted);
-    max-width: 400px;
-    line-height: 1.6;
-  }
-
-  .gp-launch {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    padding: 13px 32px;
-    border-radius: 4px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Barlow', sans-serif;
-    transition: all 0.2s;
-    box-shadow: 0 0 30px rgba(16,124,16,0.3);
-    letter-spacing: 0.3px;
-  }
-
-  .gp-launch:hover {
-    background: var(--green-bright);
-    box-shadow: 0 0 40px rgba(82,176,67,0.4);
-    transform: scale(1.02);
-  }
-
-  .gp-hint {
-    font-size: 11px;
-    color: var(--dim);
-    letter-spacing: 0.3px;
-  }
-
-  .modal-footer {
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 12px 22px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: rgba(0,0,0,0.3);
-    flex-shrink: 0;
-  }
-
-  .mf-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  .mf-stat-label { font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
-  .mf-stat-val { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 600; }
-  .mf-stat-val.green { color: var(--green-bright); }
-
-  .mf-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.06); }
-
-  .mf-tags {
-    display: flex;
-    gap: 6px;
-    margin-left: auto;
-  }
-
-  .tag {
-    padding: 3px 10px;
-    border-radius: 2px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    background: rgba(255,255,255,0.06);
-    color: var(--muted);
-    border: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .tag.gp { background: rgba(16,124,16,0.2); color: var(--green-bright); border-color: rgba(82,176,67,0.2); }
+    --green:#107C10; --green-bright:#52B043; --bg:#080C08;
+    --bg-card:#141A14; --text:#FFFFFF; --muted:#8A9A8A; --dim:#3A4A3A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 85% 10%,rgba(16,124,16,0.18) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 90%,rgba(16,124,16,0.08) 0%,transparent 55%);pointer-events:none;z-index:0;}
+
+  /* HEADER */
+  header{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(8,12,8,0.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(16,124,16,0.22);display:flex;align-items:center;padding:0 28px;gap:36px;z-index:200;}
+  .logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0;}
+  .logo-sphere{width:30px;height:30px;background:radial-gradient(circle at 35% 35%,#52B043,#107C10 60%,#063606);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(16,124,16,0.55),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden;}
+  .logo-sphere::after{content:'';position:absolute;top:3px;left:4px;width:10px;height:6px;background:rgba(255,255,255,0.25);border-radius:50%;filter:blur(2px);}
+  .logo-cross{position:absolute;width:18px;height:18px;}
+  .logo-cross::before,.logo-cross::after{content:'';position:absolute;background:rgba(255,255,255,0.6);border-radius:1px;}
+  .logo-cross::before{width:2px;height:100%;top:0;left:50%;transform:translateX(-50%);}
+  .logo-cross::after{width:100%;height:2px;top:50%;left:0;transform:translateY(-50%);}
+  .logo-word{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:3px;color:#fff;text-transform:uppercase;}
+  nav{display:flex;gap:2px;flex:1;}
+  .nav-btn{padding:5px 16px;border-radius:3px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.18s;color:var(--muted);letter-spacing:0.3px;border:none;background:none;font-family:'Barlow',sans-serif;}
+  .nav-btn:hover{color:#fff;background:rgba(255,255,255,0.05);}
+  .nav-btn.active{color:#fff;background:rgba(16,124,16,0.22);}
+  .header-end{display:flex;align-items:center;gap:14px;}
+  .gp-pill{background:linear-gradient(90deg,#107C10,#52B043);padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);border:2px solid var(--green-bright);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green-bright);cursor:pointer;}
+
+  /* PAGES */
+  main{padding-top:54px;position:relative;z-index:1;}
+  .page{display:none;} .page.active{display:block;}
+
+  /* HERO */
+  .hero{display:grid;grid-template-columns:1fr 300px;grid-template-rows:340px;gap:3px;padding:3px;}
+  .hero-feature{position:relative;border-radius:6px;overflow:hidden;cursor:pointer;background:#0E1F0E;}
+  .hero-feature::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.6;}
+  .hero-bg-art{position:absolute;inset:0;background:linear-gradient(125deg,#071507 0%,#0E280E 35%,#111411 60%,#0A0A14 100%);}
+  .hero-lines{position:absolute;inset:0;overflow:hidden;}
+  .hero-lines::before{content:'';position:absolute;top:-60px;right:-60px;width:450px;height:450px;border:1px solid rgba(16,124,16,0.12);border-radius:50%;}
+  .hero-lines::after{content:'';position:absolute;top:20px;right:-20px;width:280px;height:280px;border:1px solid rgba(16,124,16,0.08);border-radius:50%;}
+  .hero-icon-bg{position:absolute;right:80px;top:50%;transform:translateY(-50%);font-size:180px;opacity:0.06;line-height:1;filter:blur(3px);}
+  .hero-glow{position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(to top,rgba(0,0,0,0.96) 0%,rgba(0,0,0,0.5) 60%,transparent 100%);z-index:2;}
+  .hero-content{position:absolute;bottom:30px;left:32px;right:32px;z-index:3;}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green);padding:3px 10px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:12px;}
+  .hero-title{font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;line-height:0.95;letter-spacing:1px;margin-bottom:10px;text-shadow:0 4px 30px rgba(0,0,0,0.7);}
+  .hero-meta{display:flex;align-items:center;gap:16px;margin-bottom:18px;font-size:12px;color:var(--muted);}
+  .hero-meta .stars{color:#FFD43B;letter-spacing:-1px;}
+  .hero-meta .dot{width:3px;height:3px;background:var(--dim);border-radius:50%;}
+  .hero-desc{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;max-width:500px;margin-bottom:20px;}
+  .hero-actions{display:flex;gap:10px;align-items:center;}
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#fff;border:none;padding:11px 26px;border-radius:3px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Barlow',sans-serif;letter-spacing:0.3px;}
+  .btn-primary:hover{background:var(--green-bright);box-shadow:0 6px 24px rgba(16,124,16,0.45);transform:translateY(-1px);}
+  .btn-secondary{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.12);padding:10px 20px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'Barlow',sans-serif;}
+  .btn-secondary:hover{background:rgba(255,255,255,0.13);}
+  .hero-stack{display:flex;flex-direction:column;gap:3px;}
+  .hero-mini{flex:1;position:relative;border-radius:5px;overflow:hidden;cursor:pointer;transition:all 0.2s;}
+  .hero-mini:hover{filter:brightness(1.1);}
+  .hero-mini-bg{position:absolute;inset:0;}
+  .hero-mini-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 60%,transparent 100%);}
+  .hero-mini-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;opacity:0.18;}
+  .hero-mini-label{position:absolute;bottom:12px;left:12px;right:12px;z-index:2;}
+  .hero-mini-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;line-height:1.1;}
+  .hero-mini-sub{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.8px;}
+  .hero-mini-gp{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--green-bright);font-weight:600;margin-top:4px;letter-spacing:0.5px;}
+
+  /* SECTIONS */
+  .section{padding:26px 6px 0;}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+  .section-label{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;}
+  .section-label::before{content:'';width:3px;height:16px;background:var(--green-bright);border-radius:2px;display:inline-block;}
+  .see-all{font-size:12px;color:var(--green-bright);cursor:pointer;letter-spacing:0.3px;border:none;background:none;font-family:'Barlow',sans-serif;transition:color 0.15s;}
+  .see-all:hover{color:#fff;}
+
+  /* GRIDS */
+  .grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+  .game-card{aspect-ratio:3/4;position:relative;border-radius:5px;overflow:hidden;cursor:pointer;transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s;background:var(--bg-card);}
+  .game-card:hover{transform:scale(1.055);z-index:10;box-shadow:0 12px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(82,176,67,0.35),0 0 30px rgba(16,124,16,0.25);}
+  .gc-bg{position:absolute;inset:0;}
+  .gc-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px;opacity:0.22;filter:blur(1px);}
+  .gc-gradient{position:absolute;bottom:0;left:0;right:0;height:65%;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,transparent 100%);}
+  .gc-info{position:absolute;bottom:0;left:0;right:0;padding:10px 9px;}
+  .gc-name{font-size:11px;font-weight:600;line-height:1.25;margin-bottom:4px;}
+  .gc-tags{display:flex;align-items:center;gap:5px;}
+  .gc-genre{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .gc-gp{width:5px;height:5px;background:var(--green-bright);border-radius:50%;flex-shrink:0;}
+  .gc-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,124,16,0.1);opacity:0;transition:opacity 0.18s;}
+  .game-card:hover .gc-play{opacity:1;}
+  .gc-play-btn{width:44px;height:44px;background:rgba(16,124,16,0.88);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(82,176,67,0.6);box-shadow:0 0 20px rgba(16,124,16,0.5);font-size:16px;padding-left:3px;}
+  .wide-card{aspect-ratio:16/9;position:relative;border-radius:5px;overflow:hidden;cursor:pointer;background:var(--bg-card);transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s;}
+  .wide-card:hover{transform:scale(1.03);z-index:5;box-shadow:0 12px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(82,176,67,0.3);}
+  .wc-bg{position:absolute;inset:0;} .wc-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:0.15;}
+  .wc-gradient{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.25) 0%,transparent 50%,rgba(0,0,0,0.65) 100%);}
+  .wc-content{position:absolute;bottom:14px;left:14px;right:14px;}
+  .wc-name{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;line-height:1;}
+  .wc-meta{font-size:11px;color:var(--muted);margin-top:5px;display:flex;gap:10px;align-items:center;}
+  .wc-rating{color:#FFD43B;font-size:10px;} .wc-hours{color:var(--green-bright);}
+
+  /* NOTIF */
+  .notif{margin:22px 6px 0;border-radius:5px;background:linear-gradient(90deg,rgba(16,124,16,0.15),rgba(16,124,16,0.04));border:1px solid rgba(82,176,67,0.2);padding:13px 18px;display:flex;align-items:center;gap:14px;font-size:13px;}
+  .notif-icon{font-size:22px;} .notif-text{flex:1;line-height:1.5;}
+  .notif-text strong{color:var(--green-bright);} .notif-text span{color:var(--muted);font-size:12px;}
+  .btn-outline{border:1px solid var(--green-bright);color:var(--green-bright);background:transparent;padding:6px 16px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.18s;font-family:'Barlow',sans-serif;white-space:nowrap;}
+  .btn-outline:hover{background:var(--green-bright);color:#fff;}
+  .spacer{height:60px;}
+
+  /* CARD THEMES */
+  .t-teal{background:linear-gradient(140deg,#052020,#0D3535,#0A1A1A);}
+  .t-navy{background:linear-gradient(140deg,#060818,#0D1540,#070C22);}
+  .t-crimson{background:linear-gradient(140deg,#1A0505,#350A0A,#1A0808);}
+  .t-amber{background:linear-gradient(140deg,#1A1000,#352200,#1A1200);}
+  .t-forest{background:linear-gradient(140deg,#071507,#112511,#0A180A);}
+  .t-violet{background:linear-gradient(140deg,#140520,#24103A,#0F0818);}
+  .t-slate{background:linear-gradient(140deg,#0D1420,#1A2535,#0D1220);}
+  .t-copper{background:linear-gradient(140deg,#1A0C00,#352000,#1C1000);}
+  .t-rose{background:linear-gradient(140deg,#1A0510,#351025,#1A0815);}
+  .t-ice{background:linear-gradient(140deg,#071520,#0F2840,#071820);}
+
+  /* GAME PASS PAGE */
+  .gp-hero{margin:3px;border-radius:6px;padding:48px 40px;background:linear-gradient(135deg,#061506 0%,#0E280E 40%,#061A24 100%);position:relative;overflow:hidden;}
+  .gp-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:500px;height:500px;border:1px solid rgba(82,176,67,0.1);border-radius:50%;}
+  .gp-hero::after{content:'';position:absolute;top:30px;right:30px;width:300px;height:300px;border:1px solid rgba(82,176,67,0.06);border-radius:50%;}
+  .gp-hero-content{position:relative;z-index:2;max-width:560px;}
+  .gp-logo{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(90deg,#107C10,#52B043);padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;}
+  .gp-hero-title{font-family:'Rajdhani',sans-serif;font-size:46px;font-weight:700;line-height:1;margin-bottom:14px;letter-spacing:1px;}
+  .gp-hero-desc{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:24px;}
+  .gp-features{display:flex;gap:24px;margin-bottom:28px;}
+  .gp-feat{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.7);}
+  .gp-feat-dot{width:6px;height:6px;background:var(--green-bright);border-radius:50%;flex-shrink:0;}
+
+  /* LIBRARY PAGE */
+  .lib-header{padding:28px 8px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .lib-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:1px;}
+  .lib-filters{display:flex;gap:6px;}
+  .lib-filter{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.18s;letter-spacing:0.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);font-family:'Barlow',sans-serif;}
+  .lib-filter:hover{border-color:rgba(82,176,67,0.4);color:var(--green-bright);}
+  .lib-filter.active{background:rgba(16,124,16,0.2);border-color:rgba(82,176,67,0.4);color:var(--green-bright);}
+  .lib-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:0 6px;}
+
+  /* ═══ MODAL ═══════════════════════════════════════════════ */
+  .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;backdrop-filter:blur(10px);}
+  .modal-backdrop.open{display:flex;align-items:center;justify-content:center;animation:mfade 0.2s ease;}
+  @keyframes mfade{from{opacity:0}to{opacity:1}}
+  .modal{background:#0C140C;border:1px solid rgba(82,176,67,0.25);border-radius:8px;width:94vw;max-width:1160px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 40px 100px rgba(0,0,0,0.9),0 0 60px rgba(16,124,16,0.12);animation:mslide 0.25s cubic-bezier(0.4,0,0.2,1);overflow:hidden;}
+  @keyframes mslide{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-header{display:flex;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(16,124,16,0.06);flex-shrink:0;}
+  .modal-game-icon{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+  .modal-game-title{flex:1;}
+  .modal-game-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;line-height:1;}
+  .modal-game-sub{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:12px;}
+  .modal-game-sub .live{color:var(--green-bright);display:flex;align-items:center;gap:4px;}
+  .live-dot{width:6px;height:6px;background:var(--green-bright);border-radius:50%;animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+  .modal-actions{display:flex;gap:8px;align-items:center;}
+  .modal-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;line-height:1;}
+  .modal-close:hover{background:rgba(255,255,255,0.12);color:#fff;}
+  .modal-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+
+  /* PLAY AREA — fills modal body completely */
+  .game-play-area{flex:1;position:relative;background:#050C05;overflow:hidden;min-height:0;}
+
+  /* Placeholder (pre-launch) */
+  .game-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;z-index:2;background:#050C05;}
+  .game-placeholder::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;}
+  .ph-icon{font-size:72px;filter:drop-shadow(0 0 20px rgba(82,176,67,0.3));animation:float 3s ease-in-out infinite;position:relative;z-index:1;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .ph-title{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;color:rgba(255,255,255,0.9);position:relative;z-index:1;}
+  .ph-desc{font-size:14px;color:var(--muted);max-width:400px;line-height:1.6;position:relative;z-index:1;}
+  .ph-launch{display:flex;align-items:center;gap:10px;background:var(--green);color:#fff;border:none;padding:13px 32px;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.2s;box-shadow:0 0 30px rgba(16,124,16,0.3);letter-spacing:0.3px;position:relative;z-index:1;}
+  .ph-launch:hover{background:var(--green-bright);box-shadow:0 0 40px rgba(82,176,67,0.4);transform:scale(1.02);}
+  .ph-hint{font-size:11px;color:var(--dim);letter-spacing:0.3px;position:relative;z-index:1;}
+
+  /* Loading overlay */
+  .game-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;z-index:3;}
+  .load-icon{font-size:64px;animation:float 3s ease-in-out infinite;}
+  .load-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
+  .load-bar-wrap{width:340px;max-width:80%;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+  .load-bar{height:100%;width:0%;background:linear-gradient(90deg,#107C10,#52B043);border-radius:2px;transition:width 0.1s;box-shadow:0 0 10px rgba(82,176,67,0.5);}
+  .load-label{font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+
+  /* The iframe — fills entire play area */
+  .game-iframe-wrap{position:absolute;inset:0;z-index:4;display:none;}
+  .game-iframe-wrap iframe{width:100%;height:100%;border:none;display:block;}
+
+  /* Floating return button — sits above the iframe */
+  .return-btn{
+    position:absolute;
+    top:14px; left:14px;
+    z-index:10;
+    display:none;
+    align-items:center;
+    gap:8px;
+    background:rgba(8,12,8,0.88);
+    border:1px solid rgba(82,176,67,0.4);
+    color:#fff;
+    padding:8px 16px;
+    border-radius:4px;
+    font-size:12px;
+    font-weight:600;
+    font-family:'Barlow',sans-serif;
+    letter-spacing:0.5px;
+    cursor:pointer;
+    transition:all 0.2s;
+    backdrop-filter:blur(8px);
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  }
+  .return-btn:hover{background:rgba(16,124,16,0.5);border-color:var(--green-bright);box-shadow:0 4px 20px rgba(16,124,16,0.3);}
+  .return-btn .arrow{font-size:14px;color:var(--green-bright);}
+
+  /* MODAL FOOTER */
+  .modal-footer{border-top:1px solid rgba(255,255,255,0.06);padding:12px 22px;display:flex;align-items:center;gap:20px;background:rgba(0,0,0,0.3);flex-shrink:0;}
+  .mf-stat{display:flex;flex-direction:column;gap:1px;}
+  .mf-stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;}
+  .mf-stat-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;}
+  .mf-stat-val.green{color:var(--green-bright);}
+  .mf-divider{width:1px;height:30px;background:rgba(255,255,255,0.06);}
+  .mf-tags{display:flex;gap:6px;margin-left:auto;}
+  .tag{padding:3px 10px;border-radius:2px;font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.06);}
+  .tag.gp{background:rgba(16,124,16,0.2);color:var(--green-bright);border-color:rgba(82,176,67,0.2);}
 </style>
 </head>
 <body>
 
-<div class="bg-gradient"></div>
-
-<!-- ═══ HEADER ══════════════════════════════════════════════════════ -->
 <header>
-  <div class="logo">
-    <div class="logo-sphere">
-      <div class="logo-cross"></div>
-    </div>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-sphere"><div class="logo-cross"></div></div>
     <span class="logo-word">GameHub</span>
   </div>
-
   <nav>
-    <button class="nav-btn active">Home</button>
-    <button class="nav-btn">My Games</button>
-    <button class="nav-btn">Game Pass</button>
-    <button class="nav-btn">Store</button>
-    <button class="nav-btn">Friends</button>
-    <button class="nav-btn">Community</button>
+    <button class="nav-btn active"   onclick="showPage('home',this)">Home</button>
+    <button class="nav-btn"          onclick="showPage('home',this)">My Games</button>
+    <button class="nav-btn"          onclick="showPage('gamepass',this)">Game Pass</button>
+    <button class="nav-btn"          onclick="showPage('library',this)">Library</button>
+    <button class="nav-btn"          onclick="showPage('home',this)">Store</button>
+    <button class="nav-btn"          onclick="showPage('home',this)">Friends</button>
   </nav>
-
   <div class="header-end">
-    <div class="gp-pill">⚡ Game Pass</div>
+    <div class="gp-pill">&#9889; Game Pass</div>
     <div class="avatar">GH</div>
   </div>
 </header>
 
-<!-- ═══ MAIN ═════════════════════════════════════════════════════════ -->
 <main>
 
-  <!-- HERO -->
+<!-- ══ HOME PAGE ═══════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
   <div class="hero">
-    <div class="hero-feature" onclick="openGame('Stellar Abyss','🚀','t-navy','A deep-space exploration RPG. Chart unknown star systems, build your crew, and uncover the mystery behind the vanishing colonies.','Action RPG','5–8 hrs','★★★★½','94','2.1M')">
-      <div class="hero-bg-art"></div>
-      <div class="hero-lines"></div>
-      <div class="hero-icon-bg">🚀</div>
-      <div class="hero-glow"></div>
+    <div class="hero-feature" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG. Chart unknown star systems and uncover the mystery behind the vanishing colonies.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')">
+      <div class="hero-bg-art"></div><div class="hero-lines"></div>
+      <div class="hero-icon-bg">&#128640;</div><div class="hero-glow"></div>
       <div class="hero-content">
-        <div class="hero-badge">⚡ Now on Game Pass</div>
+        <div class="hero-badge">&#9889; Now on Game Pass</div>
         <div class="hero-title">STELLAR ABYSS</div>
         <div class="hero-meta">
-          <span class="stars">★★★★½</span>
-          <span class="dot"></span>
-          <span>Action RPG</span>
-          <span class="dot"></span>
-          <span>5–8 hrs</span>
-          <span class="dot"></span>
-          <span>2.1M playing</span>
+          <span class="stars">&#9733;&#9733;&#9733;&#9733;&#189;</span>
+          <span class="dot"></span><span>Action RPG</span>
+          <span class="dot"></span><span>5&#8211;8 hrs</span>
+          <span class="dot"></span><span>2.1M playing</span>
         </div>
         <div class="hero-desc">Chart unknown star systems, build your crew, and uncover the mystery behind the vanishing colonies in this deep-space open-world RPG.</div>
         <div class="hero-actions">
-          <button class="btn-primary" onclick="event.stopPropagation(); openGame('Stellar Abyss','🚀','t-navy','A deep-space exploration RPG. Chart unknown star systems, build your crew, and uncover the mystery behind the vanishing colonies.','Action RPG','5–8 hrs','★★★★½','94','2.1M')">▶ &nbsp;Play Now</button>
+          <button class="btn-primary" onclick="event.stopPropagation();openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')">&#9654;&nbsp;Play Now</button>
           <button class="btn-secondary">+ Wishlist</button>
         </div>
       </div>
     </div>
-
     <div class="hero-stack">
-      <div class="hero-mini" onclick="openGame('Iron Citadel','🏰','t-crimson','A dark fortress-defense strategy game with roguelike elements. Each run reshapes the battlefield.','Strategy','3–5 hrs','★★★★','88','980K')">
-        <div class="hero-mini-bg t-crimson"></div>
-        <div class="hero-mini-icon">🏰</div>
+      <div class="hero-mini" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')">
+        <div class="hero-mini-bg t-crimson"></div><div class="hero-mini-icon">&#127984;</div>
         <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-label">
-          <div class="hero-mini-name">Iron Citadel</div>
-          <div class="hero-mini-sub">Strategy · 3–5 hrs</div>
-          <div class="hero-mini-gp">⚡ Game Pass</div>
-        </div>
+        <div class="hero-mini-label"><div class="hero-mini-name">Iron Citadel</div><div class="hero-mini-sub">Strategy &middot; 3&#8211;5 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
-      <div class="hero-mini" onclick="openGame('Neon Drift','🏎️','t-violet','High-octane neon racing through procedurally generated megacity circuits at 300mph.','Racing','2–4 hrs','★★★★','91','1.4M')">
-        <div class="hero-mini-bg t-violet"></div>
-        <div class="hero-mini-icon">🏎️</div>
+      <div class="hero-mini" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')">
+        <div class="hero-mini-bg t-violet"></div><div class="hero-mini-icon">&#127950;</div>
         <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-label">
-          <div class="hero-mini-name">Neon Drift</div>
-          <div class="hero-mini-sub">Racing · 2–4 hrs</div>
-          <div class="hero-mini-gp">⚡ Game Pass</div>
-        </div>
+        <div class="hero-mini-label"><div class="hero-mini-name">Neon Drift</div><div class="hero-mini-sub">Racing &middot; 2&#8211;4 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
-      <div class="hero-mini" onclick="openGame('Verdant Wilds','🌿','t-forest','A meditative survival sim in a lush alien biome. Forage, build, and commune with ancient forest spirits.','Survival','4–7 hrs','★★★★★','96','3.3M')">
-        <div class="hero-mini-bg t-forest"></div>
-        <div class="hero-mini-icon">🌿</div>
+      <div class="hero-mini" onclick="openGame('Verdant Wilds','&#127807;','t-forest','A meditative survival sim.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')">
+        <div class="hero-mini-bg t-forest"></div><div class="hero-mini-icon">&#127807;</div>
         <div class="hero-mini-overlay"></div>
-        <div class="hero-mini-label">
-          <div class="hero-mini-name">Verdant Wilds</div>
-          <div class="hero-mini-sub">Survival · 4–7 hrs</div>
-          <div class="hero-mini-gp">⚡ Game Pass</div>
-        </div>
+        <div class="hero-mini-label"><div class="hero-mini-name">Verdant Wilds</div><div class="hero-mini-sub">Survival &middot; 4&#8211;7 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
     </div>
   </div>
 
-  <!-- NOTIFICATION -->
   <div class="notif">
-    <div class="notif-icon">🎮</div>
-    <div class="notif-text">
-      <strong>6 new games added to Game Pass this week</strong><br>
-      <span>Including Verdant Wilds, Hollow Protocol, and more — all playable now.</span>
-    </div>
-    <button class="btn-outline">See What's New</button>
+    <div class="notif-icon">&#127918;</div>
+    <div class="notif-text"><strong>6 new games added to Game Pass this week</strong><br><span>Including Verdant Wilds, Hollow Protocol, and more &#8212; all playable now.</span></div>
+    <button class="btn-outline" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">See What's New</button>
   </div>
 
-  <!-- MY GAMES -->
   <div class="section">
     <div class="section-head">
-      <div class="section-label">My Games & Apps</div>
-      <button class="see-all">See all →</button>
+      <div class="section-label">My Games &amp; Apps</div>
+      <button class="see-all" onclick="showPage('library',document.querySelectorAll('.nav-btn')[3])">See all &#8594;</button>
     </div>
     <div class="grid-6">
-      <div class="game-card" onclick="openGame('Stellar Abyss','🚀','t-navy','A deep-space exploration RPG.','Action RPG','5–8 hrs','★★★★½','94','2.1M')">
-        <div class="gc-bg t-navy"></div>
-        <div class="gc-icon">🚀</div>
-        <div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info">
-          <div class="gc-name">Stellar Abyss</div>
-          <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action RPG</span></div>
-        </div>
-      </div>
-      <div class="game-card" onclick="openGame('Iron Citadel','🏰','t-crimson','A dark fortress-defense strategy game.','Strategy','3–5 hrs','★★★★','88','980K')">
-        <div class="gc-bg t-crimson"></div>
-        <div class="gc-icon">🏰</div>
-        <div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info">
-          <div class="gc-name">Iron Citadel</div>
-          <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div>
-        </div>
-      </div>
-      <div class="game-card" onclick="openGame('Neon Drift','🏎️','t-violet','High-octane neon racing.','Racing','2–4 hrs','★★★★','91','1.4M')">
-        <div class="gc-bg t-violet"></div>
-        <div class="gc-icon">🏎️</div>
-        <div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info">
-          <div class="gc-name">Neon Drift</div>
-          <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Racing</span></div>
-        </div>
-      </div>
-      <div class="game-card" onclick="openGame('Verdant Wilds','🌿','t-forest','Meditative alien survival.','Survival','4–7 hrs','★★★★★','96','3.3M')">
-        <div class="gc-bg t-forest"></div>
-        <div class="gc-icon">🌿</div>
-        <div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info">
-          <div class="gc-name">Verdant Wilds</div>
-          <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Survival</span></div>
-        </div>
-      </div>
-      <div class="game-card" onclick="openGame('Hollow Protocol','🤖','t-slate','Cyber-noir stealth thriller.','Stealth','3–6 hrs','★★★★','87','760K')">
-        <div class="gc-bg t-slate"></div>
-        <div class="gc-icon">🤖</div>
-        <div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info">
-          <div class="gc-name">Hollow Protocol</div>
-          <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Stealth</span></div>
-        </div>
-      </div>
-      <div class="game-card" onclick="openGame('Ember Forge','⚒️','t-copper','Craft legendary weapons for a world at war.','Crafting RPG','5–9 hrs','★★★★','89','1.1M')">
-        <div class="gc-bg t-copper"></div>
-        <div class="gc-icon">⚒️</div>
-        <div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info">
-          <div class="gc-name">Ember Forge</div>
-          <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Crafting RPG</span></div>
-        </div>
-      </div>
+      <div class="game-card" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')"><div class="gc-bg t-navy"></div><div class="gc-icon">&#128640;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Stellar Abyss</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action RPG</span></div></div></div>
+      <div class="game-card" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#127984;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Iron Citadel</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
+      <div class="game-card" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')"><div class="gc-bg t-violet"></div><div class="gc-icon">&#127950;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Neon Drift</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Racing</span></div></div></div>
+      <div class="game-card" onclick="openGame('Verdant Wilds','&#127807;','t-forest','Meditative alien survival.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')"><div class="gc-bg t-forest"></div><div class="gc-icon">&#127807;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Verdant Wilds</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Survival</span></div></div></div>
+      <div class="game-card" onclick="openGame('Hollow Protocol','&#129302;','t-slate','Cyber-noir stealth thriller.','Stealth','3&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','87','760K','')"><div class="gc-bg t-slate"></div><div class="gc-icon">&#129302;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Hollow Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Stealth</span></div></div></div>
+      <div class="game-card" onclick="openGame('Ember Forge','&#9874;','t-copper','Craft legendary weapons.','Crafting RPG','5&#8211;9 hrs','&#9733;&#9733;&#9733;&#9733;','89','1.1M','')"><div class="gc-bg t-copper"></div><div class="gc-icon">&#9874;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Ember Forge</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Crafting RPG</span></div></div></div>
     </div>
   </div>
-
-  <!-- TRENDING -->
-  <div class="section">
-    <div class="section-head">
-      <div class="section-label">Trending on Game Pass</div>
-      <button class="see-all">Browse all →</button>
-    </div>
-    <div class="grid-4">
-      <div class="wide-card" onclick="openGame('Verdant Wilds','🌿','t-forest','A meditative survival sim in a lush alien biome.','Survival','4–7 hrs','★★★★★','96','3.3M')">
-        <div class="wc-bg t-forest"></div>
-        <div class="wc-icon">🌿</div>
-        <div class="wc-gradient"></div>
-        <div class="wc-content">
-          <div class="wc-name">Verdant Wilds</div>
-          <div class="wc-meta">
-            <span class="wc-rating">★★★★★</span>
-            <span class="wc-hours">4–7 hrs</span>
-            <span>3.3M playing</span>
-          </div>
-        </div>
-      </div>
-      <div class="wide-card" onclick="openGame('Rift Walker','🌀','t-violet','A mind-bending puzzle platformer across fractured dimensions.','Puzzle','3–5 hrs','★★★★','90','870K')">
-        <div class="wc-bg t-violet"></div>
-        <div class="wc-icon">🌀</div>
-        <div class="wc-gradient"></div>
-        <div class="wc-content">
-          <div class="wc-name">Rift Walker</div>
-          <div class="wc-meta">
-            <span class="wc-rating">★★★★</span>
-            <span class="wc-hours">3–5 hrs</span>
-            <span>870K playing</span>
-          </div>
-        </div>
-      </div>
-      <div class="wide-card" onclick="openGame('Hollow Protocol','🤖','t-slate','Cyber-noir stealth thriller in a rain-soaked megacity.','Stealth','3–6 hrs','★★★★','87','760K')">
-        <div class="wc-bg t-slate"></div>
-        <div class="wc-icon">🤖</div>
-        <div class="wc-gradient"></div>
-        <div class="wc-content">
-          <div class="wc-name">Hollow Protocol</div>
-          <div class="wc-meta">
-            <span class="wc-rating">★★★★</span>
-            <span class="wc-hours">3–6 hrs</span>
-            <span>760K playing</span>
-          </div>
-        </div>
-      </div>
-      <div class="wide-card" onclick="openGame('Ember Forge','⚒️','t-copper','Craft legendary weapons for a world at war.','Crafting RPG','5–9 hrs','★★★★','89','1.1M')">
-        <div class="wc-bg t-copper"></div>
-        <div class="wc-icon">⚒️</div>
-        <div class="wc-gradient"></div>
-        <div class="wc-content">
-          <div class="wc-name">Ember Forge</div>
-          <div class="wc-meta">
-            <span class="wc-rating">★★★★</span>
-            <span class="wc-hours">5–9 hrs</span>
-            <span>1.1M playing</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EXPLORE MORE -->
-  <div class="section">
-    <div class="section-head">
-      <div class="section-label">Explore the Library</div>
-      <button class="see-all">Full catalog →</button>
-    </div>
-    <div class="grid-6">
-      <div class="game-card" onclick="openGame('Rift Walker','🌀','t-violet','A mind-bending puzzle platformer across fractured dimensions.','Puzzle','3–5 hrs','★★★★','90','870K')">
-        <div class="gc-bg t-violet"></div><div class="gc-icon">🌀</div><div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info"><div class="gc-name">Rift Walker</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Puzzle</span></div></div>
-      </div>
-      <div class="game-card" onclick="openGame('Deep Trench','🐙','t-teal','Explore the crushing depths of an alien ocean floor.','Exploration','4–6 hrs','★★★★','85','520K')">
-        <div class="gc-bg t-teal"></div><div class="gc-icon">🐙</div><div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info"><div class="gc-name">Deep Trench</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Exploration</span></div></div>
-      </div>
-      <div class="game-card" onclick="openGame('Sandstorm Kings','🏜️','t-amber','Rule a desert empire through trade, war, and diplomacy.','Strategy','6–10 hrs','★★★★','88','640K')">
-        <div class="gc-bg t-amber"></div><div class="gc-icon">🏜️</div><div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info"><div class="gc-name">Sandstorm Kings</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div>
-      </div>
-      <div class="game-card" onclick="openGame('Phantom Bloom','🌸','t-rose','A haunting action-adventure through a ghost-touched cherry blossom world.','Action','3–5 hrs','★★★★½','92','1.8M')">
-        <div class="gc-bg t-rose"></div><div class="gc-icon">🌸</div><div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info"><div class="gc-name">Phantom Bloom</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action</span></div></div>
-      </div>
-      <div class="game-card" onclick="openGame('Glacial Protocol','🧊','t-ice','Cold-war espionage thriller on a frozen alien moon.','Thriller','4–7 hrs','★★★★','86','430K')">
-        <div class="gc-bg t-ice"></div><div class="gc-icon">🧊</div><div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info"><div class="gc-name">Glacial Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Thriller</span></div></div>
-      </div>
-      <div class="game-card" onclick="openGame('Runebound Saga','⚔️','t-crimson','Epic fantasy RPG with 100+ hours of lore and branching story.','RPG','8–12 hrs','★★★★★','97','4.2M')">
-        <div class="gc-bg t-crimson"></div><div class="gc-icon">⚔️</div><div class="gc-gradient"></div>
-        <div class="gc-play"><div class="gc-play-btn">▶</div></div>
-        <div class="gc-info"><div class="gc-name">Runebound Saga</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">RPG</span></div></div>
-      </div>
-    </div>
-  </div>
-
   <div class="spacer"></div>
+</div>
+
+<!-- ══ GAME PASS PAGE ══════════════════════════════════════════════ -->
+<div id="page-gamepass" class="page">
+  <div class="gp-hero">
+    <div class="gp-hero-content">
+      <div class="gp-logo">&#9889; Game Pass</div>
+      <div class="gp-hero-title">Play hundreds of games for one price</div>
+      <div class="gp-hero-desc">Get instant access to over 200 games, including all new GameHub originals on day one. New games added every month.</div>
+      <div class="gp-features">
+        <div class="gp-feat"><div class="gp-feat-dot"></div>200+ games</div>
+        <div class="gp-feat"><div class="gp-feat-dot"></div>New titles monthly</div>
+        <div class="gp-feat"><div class="gp-feat-dot"></div>Day-one originals</div>
+      </div>
+      <button class="btn-primary" style="font-size:15px;padding:13px 32px;">Get Game Pass</button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-head"><div class="section-label">Trending on Game Pass</div><button class="see-all">Browse all &#8594;</button></div>
+    <div class="grid-4">
+      <div class="wide-card" onclick="openGame('Verdant Wilds','&#127807;','t-forest','A meditative survival sim.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')"><div class="wc-bg t-forest"></div><div class="wc-icon">&#127807;</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Verdant Wilds</div><div class="wc-meta"><span class="wc-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="wc-hours">4&#8211;7 hrs</span><span>3.3M playing</span></div></div></div>
+      <div class="wide-card" onclick="openGame('Rift Walker','&#127744;','t-violet','A mind-bending puzzle platformer.','Puzzle','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','90','870K','')"><div class="wc-bg t-violet"></div><div class="wc-icon">&#127744;</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Rift Walker</div><div class="wc-meta"><span class="wc-rating">&#9733;&#9733;&#9733;&#9733;</span><span class="wc-hours">3&#8211;5 hrs</span><span>870K playing</span></div></div></div>
+      <div class="wide-card" onclick="openGame('Hollow Protocol','&#129302;','t-slate','Cyber-noir stealth thriller.','Stealth','3&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','87','760K','')"><div class="wc-bg t-slate"></div><div class="wc-icon">&#129302;</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Hollow Protocol</div><div class="wc-meta"><span class="wc-rating">&#9733;&#9733;&#9733;&#9733;</span><span class="wc-hours">3&#8211;6 hrs</span><span>760K playing</span></div></div></div>
+      <div class="wide-card" onclick="openGame('Ember Forge','&#9874;','t-copper','Craft legendary weapons.','Crafting RPG','5&#8211;9 hrs','&#9733;&#9733;&#9733;&#9733;','89','1.1M','')"><div class="wc-bg t-copper"></div><div class="wc-icon">&#9874;</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Ember Forge</div><div class="wc-meta"><span class="wc-rating">&#9733;&#9733;&#9733;&#9733;</span><span class="wc-hours">5&#8211;9 hrs</span><span>1.1M playing</span></div></div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-head"><div class="section-label">New This Month</div><button class="see-all">All new games &#8594;</button></div>
+    <div class="grid-6">
+      <div class="game-card" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')"><div class="gc-bg t-navy"></div><div class="gc-icon">&#128640;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Stellar Abyss</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action RPG</span></div></div></div>
+      <div class="game-card" onclick="openGame('Phantom Bloom','&#127800;','t-rose','A haunting action-adventure.','Action','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','92','1.8M','')"><div class="gc-bg t-rose"></div><div class="gc-icon">&#127800;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Phantom Bloom</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action</span></div></div></div>
+      <div class="game-card" onclick="openGame('Glacial Protocol','&#129398;','t-ice','Espionage on a frozen moon.','Thriller','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;','86','430K','')"><div class="gc-bg t-ice"></div><div class="gc-icon">&#129398;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Glacial Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Thriller</span></div></div></div>
+      <div class="game-card" onclick="openGame('Sandstorm Kings','&#127964;','t-amber','Rule a desert empire.','Strategy','6&#8211;10 hrs','&#9733;&#9733;&#9733;&#9733;','88','640K','')"><div class="gc-bg t-amber"></div><div class="gc-icon">&#127964;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Sandstorm Kings</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
+      <div class="game-card" onclick="openGame('Deep Trench','&#129425;','t-teal','Explore an alien ocean floor.','Exploration','4&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','85','520K','')"><div class="gc-bg t-teal"></div><div class="gc-icon">&#129425;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Deep Trench</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Exploration</span></div></div></div>
+      <div class="game-card" onclick="openGame('Runebound Saga','&#9876;','t-crimson','Epic fantasy RPG.','RPG','8&#8211;12 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','97','4.2M','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#9876;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Runebound Saga</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">RPG</span></div></div></div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ LIBRARY PAGE ════════════════════════════════════════════════ -->
+<div id="page-library" class="page">
+  <div class="lib-header">
+    <div class="lib-title">My Library</div>
+    <div class="lib-filters">
+      <button class="lib-filter active">All</button>
+      <button class="lib-filter">Recently Played</button>
+      <button class="lib-filter">Installed</button>
+      <button class="lib-filter">Game Pass</button>
+    </div>
+  </div>
+  <div class="lib-grid">
+    <div class="game-card" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')"><div class="gc-bg t-navy"></div><div class="gc-icon">&#128640;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Stellar Abyss</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action RPG</span></div></div></div>
+    <div class="game-card" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#127984;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Iron Citadel</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
+    <div class="game-card" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')"><div class="gc-bg t-violet"></div><div class="gc-icon">&#127950;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Neon Drift</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Racing</span></div></div></div>
+    <div class="game-card" onclick="openGame('Verdant Wilds','&#127807;','t-forest','Meditative alien survival.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')"><div class="gc-bg t-forest"></div><div class="gc-icon">&#127807;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Verdant Wilds</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Survival</span></div></div></div>
+    <div class="game-card" onclick="openGame('Hollow Protocol','&#129302;','t-slate','Cyber-noir stealth thriller.','Stealth','3&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','87','760K','')"><div class="gc-bg t-slate"></div><div class="gc-icon">&#129302;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Hollow Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Stealth</span></div></div></div>
+    <div class="game-card" onclick="openGame('Ember Forge','&#9874;','t-copper','Craft legendary weapons.','Crafting RPG','5&#8211;9 hrs','&#9733;&#9733;&#9733;&#9733;','89','1.1M','')"><div class="gc-bg t-copper"></div><div class="gc-icon">&#9874;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Ember Forge</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Crafting RPG</span></div></div></div>
+    <div class="game-card" onclick="openGame('Rift Walker','&#127744;','t-violet','A mind-bending puzzle platformer.','Puzzle','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','90','870K','')"><div class="gc-bg t-violet"></div><div class="gc-icon">&#127744;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Rift Walker</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Puzzle</span></div></div></div>
+    <div class="game-card" onclick="openGame('Phantom Bloom','&#127800;','t-rose','A haunting action-adventure.','Action','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','92','1.8M','')"><div class="gc-bg t-rose"></div><div class="gc-icon">&#127800;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Phantom Bloom</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action</span></div></div></div>
+    <div class="game-card" onclick="openGame('Runebound Saga','&#9876;','t-crimson','Epic fantasy RPG.','RPG','8&#8211;12 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','97','4.2M','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#9876;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Runebound Saga</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">RPG</span></div></div></div>
+    <div class="game-card" onclick="openGame('Deep Trench','&#129425;','t-teal','Explore an alien ocean floor.','Exploration','4&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','85','520K','')"><div class="gc-bg t-teal"></div><div class="gc-icon">&#129425;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Deep Trench</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Exploration</span></div></div></div>
+    <div class="game-card" onclick="openGame('Sandstorm Kings','&#127964;','t-amber','Rule a desert empire.','Strategy','6&#8211;10 hrs','&#9733;&#9733;&#9733;&#9733;','88','640K','')"><div class="gc-bg t-amber"></div><div class="gc-icon">&#127964;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Sandstorm Kings</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
+    <div class="game-card" onclick="openGame('Glacial Protocol','&#129398;','t-ice','Espionage on a frozen moon.','Thriller','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;','86','430K','')"><div class="gc-bg t-ice"></div><div class="gc-icon">&#129398;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Glacial Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Thriller</span></div></div></div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
 </main>
 
-<!-- ═══ GAME MODAL ════════════════════════════════════════════════════ -->
+<!-- ══ MODAL ═══════════════════════════════════════════════════════ -->
 <div class="modal-backdrop" id="modal" onclick="closeIfBackdrop(event)">
   <div class="modal">
+
     <div class="modal-header">
-      <div class="modal-game-icon" id="m-icon-wrap">
-        <span id="m-icon">🚀</span>
-      </div>
+      <div class="modal-game-icon" id="m-icon-wrap"><span id="m-icon">&#128640;</span></div>
       <div class="modal-game-title">
         <div class="modal-game-name" id="m-name">Game Title</div>
         <div class="modal-game-sub">
-          <span id="m-genre">Genre</span>
-          <span>·</span>
-          <span id="m-hours">Hours</span>
-          <span>·</span>
+          <span id="m-genre">Genre</span><span>&middot;</span>
+          <span id="m-hours">Hours</span><span>&middot;</span>
           <span class="live"><div class="live-dot"></div><span id="m-players">0</span> playing now</span>
         </div>
       </div>
       <div class="modal-actions">
-        <button class="btn-primary" id="m-play-btn" style="padding:8px 20px; font-size:13px;">▶ &nbsp;Launch</button>
-        <button class="btn-secondary" style="padding:7px 14px; font-size:13px;">+ Add to Library</button>
-        <button class="modal-close" onclick="closeModal()">✕</button>
+        <button class="btn-primary" id="m-play-btn" style="padding:8px 20px;font-size:13px;">&#9654;&nbsp;Launch</button>
+        <button class="btn-secondary" style="padding:7px 14px;font-size:13px;">+ Add to Library</button>
+        <button class="modal-close" onclick="closeModal()">&#10005;</button>
       </div>
     </div>
 
     <div class="modal-body">
       <div class="game-play-area" id="m-play-area">
+
+        <!-- Pre-launch placeholder -->
         <div class="game-placeholder" id="m-placeholder">
-          <div class="gp-icon" id="m-big-icon">🚀</div>
-          <div class="gp-title" id="m-ph-title">Ready to Launch</div>
-          <div class="gp-desc" id="m-ph-desc">Game description goes here.</div>
-          <button class="gp-launch" id="m-launch-btn">▶ &nbsp;&nbsp;Launch Game</button>
-          <div class="gp-hint">Your game will load in this window</div>
+          <div class="ph-icon" id="m-ph-icon">&#128640;</div>
+          <div class="ph-title" id="m-ph-title">Ready to Launch</div>
+          <div class="ph-desc" id="m-ph-desc">Game description goes here.</div>
+          <button class="ph-launch" id="m-launch-btn">&#9654;&nbsp;&nbsp;Launch Game</button>
+          <div class="ph-hint">Your game will load in this window</div>
         </div>
+
+        <!-- Loading overlay -->
+        <div class="game-loading" id="m-loading" style="display:none;">
+          <div class="load-icon" id="m-load-icon">&#128640;</div>
+          <div class="load-title" id="m-load-title">Loading...</div>
+          <div class="load-bar-wrap"><div class="load-bar" id="m-load-bar"></div></div>
+          <div class="load-label" id="m-load-label">Loading assets...</div>
+        </div>
+
+        <!-- Full-screen iframe container -->
+        <div class="game-iframe-wrap" id="m-iframe-wrap">
+          <!-- iframe injected here by JS -->
+        </div>
+
+        <!-- Floating return button (shown above iframe) -->
+        <button class="return-btn" id="m-return-btn" onclick="returnToLauncher()">
+          <span class="arrow">&#8592;</span> Return to GameHub
+        </button>
+
       </div>
     </div>
 
     <div class="modal-footer">
-      <div class="mf-stat">
-        <div class="mf-stat-label">Rating</div>
-        <div class="mf-stat-val" id="m-rating">★★★★</div>
-      </div>
+      <div class="mf-stat"><div class="mf-stat-label">Rating</div><div class="mf-stat-val" id="m-rating">&#9733;&#9733;&#9733;&#9733;</div></div>
       <div class="mf-divider"></div>
-      <div class="mf-stat">
-        <div class="mf-stat-label">Metacritic</div>
-        <div class="mf-stat-val green" id="m-meta">90</div>
-      </div>
+      <div class="mf-stat"><div class="mf-stat-label">Metacritic</div><div class="mf-stat-val green" id="m-meta">90</div></div>
       <div class="mf-divider"></div>
-      <div class="mf-stat">
-        <div class="mf-stat-label">Playtime</div>
-        <div class="mf-stat-val" id="m-time">0h 0m</div>
-      </div>
+      <div class="mf-stat"><div class="mf-stat-label">Playtime</div><div class="mf-stat-val" id="m-time">0h 0m</div></div>
       <div class="mf-divider"></div>
-      <div class="mf-stat">
-        <div class="mf-stat-label">Achievements</div>
-        <div class="mf-stat-val">0 / 30</div>
-      </div>
+      <div class="mf-stat"><div class="mf-stat-label">Achievements</div><div class="mf-stat-val">0 / 30</div></div>
       <div class="mf-tags">
-        <span class="tag gp">⚡ Game Pass</span>
+        <span class="tag gp">&#9889; Game Pass</span>
         <span class="tag" id="m-genre-tag">Genre</span>
         <span class="tag">Multiplayer</span>
       </div>
     </div>
+
   </div>
 </div>
 
 <script>
-  let currentGame = null;
-  let sessionStart = null;
-  let timerInterval = null;
-
-  function openGame(name, icon, theme, desc, genre, hours, rating, meta, players) {
-    currentGame = { name, icon, theme, desc, genre, hours, rating, meta, players };
-
-    document.getElementById('m-icon').textContent = icon;
-    document.getElementById('m-big-icon').textContent = icon;
-    document.getElementById('m-icon-wrap').className = 'modal-game-icon ' + theme;
-    document.getElementById('m-icon-wrap').style.background = '';
-    document.getElementById('m-name').textContent = name;
-    document.getElementById('m-genre').textContent = genre;
-    document.getElementById('m-hours').textContent = hours;
-    document.getElementById('m-players').textContent = players;
-    document.getElementById('m-ph-title').textContent = name;
-    document.getElementById('m-ph-desc').textContent = desc;
-    document.getElementById('m-rating').textContent = rating;
-    document.getElementById('m-meta').textContent = meta;
-    document.getElementById('m-genre-tag').textContent = genre;
-    document.getElementById('m-time').textContent = '0h 0m';
-
-    // Reset play area
-    const area = document.getElementById('m-play-area');
-    document.getElementById('m-placeholder').style.display = 'flex';
-
-    document.getElementById('modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-
-    // Wire launch button
-    document.getElementById('m-launch-btn').onclick = () => launchGame(name, icon, theme, desc);
-    document.getElementById('m-play-btn').onclick = () => launchGame(name, icon, theme, desc);
+// ── NAV ──────────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
+  window.scrollTo(0, 0);
+}
 
-  function launchGame(name, icon, theme, desc) {
-    const placeholder = document.getElementById('m-placeholder');
-    const area = document.getElementById('m-play-area');
-
-    // Animate launch
-    placeholder.style.transition = 'opacity 0.3s';
-    placeholder.style.opacity = '0';
-
-    setTimeout(() => {
-      placeholder.style.display = 'none';
-
-      // Create the "game running" view
-      const gameView = document.createElement('div');
-      gameView.id = 'game-running-view';
-      gameView.style.cssText = `
-        width: 100%; height: 100%;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        gap: 18px; position: relative;
-      `;
-
-      gameView.innerHTML = `
-        <div style="text-align:center; z-index:2; position:relative;">
-          <div style="font-size:80px; animation: float 3s ease-in-out infinite; display:block; margin-bottom:16px;">${icon}</div>
-          <div style="font-family:'Rajdhani',sans-serif; font-size:26px; font-weight:700; margin-bottom:8px; color:#fff;">${name}</div>
-          <div style="font-size:13px; color:#52B043; display:flex; align-items:center; gap:8px; justify-content:center;">
-            <div style="width:8px;height:8px;background:#52B043;border-radius:50%;animation:pulse 1.4s infinite;"></div>
-            Game Running
-          </div>
-          <div style="font-size:12px; color:#3A4A3A; margin-top:20px; max-width:420px; line-height:1.6;">${desc}</div>
-        </div>
-        <div style="
-          width: 80%; max-width: 600px;
-          height: 3px;
-          background: rgba(255,255,255,0.06);
-          border-radius: 2px;
-          overflow: hidden;
-          position: relative;
-          z-index:2;
-        ">
-          <div id="progress-bar" style="
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #107C10, #52B043);
-            border-radius: 2px;
-            transition: width 0.1s;
-            box-shadow: 0 0 10px rgba(82,176,67,0.5);
-          "></div>
-        </div>
-        <div id="loading-label" style="font-size:11px; color:#3A4A3A; z-index:2; position:relative; letter-spacing:1px; text-transform:uppercase;">Loading assets…</div>
-        <div style="
-          position:absolute; inset:0;
-          background: radial-gradient(ellipse at center, rgba(16,124,16,0.06) 0%, transparent 70%);
-          pointer-events:none;
-        "></div>
-      `;
-
-      area.appendChild(gameView);
-
-      // Fake loading bar
-      let progress = 0;
-      const labels = ['Loading assets…', 'Building world…', 'Spawning entities…', 'Almost ready…', 'Starting game…'];
-      let li = 0;
-      const bar = gameView.querySelector('#progress-bar');
-      const lbl = gameView.querySelector('#loading-label');
-
-      const loadInterval = setInterval(() => {
-        progress += Math.random() * 8 + 2;
-        if (progress > 100) progress = 100;
-        bar.style.width = progress + '%';
-
-        const newLi = Math.floor((progress / 100) * labels.length);
-        if (newLi < labels.length && newLi !== li) { li = newLi; lbl.textContent = labels[li]; }
-
-        if (progress >= 100) {
-          clearInterval(loadInterval);
-          lbl.textContent = '✓ Game Ready';
-          lbl.style.color = '#52B043';
-
-          // Show "game is live" iframe placeholder
-          setTimeout(() => {
-            gameView.innerHTML = `
-              <div style="
-                width:100%; height:100%;
-                display:flex; flex-direction:column;
-                align-items:center; justify-content:center;
-                gap:14px;
-                background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-              ">
-                <div style="font-size:56px;">${icon}</div>
-                <div style="font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700;">${name} — Game Area</div>
-                <div style="font-size:13px; color:#52B043; display:flex; align-items:center; gap:8px;">
-                  <div style="width:8px;height:8px;background:#52B043;border-radius:50%;animation:pulse 1.4s infinite;"></div>
-                  Live Session Active
-                </div>
-                <div style="
-                  width: 680px; max-width: 90%;
-                  height: 260px;
-                  border: 1px dashed rgba(82,176,67,0.25);
-                  border-radius: 6px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  color: rgba(255,255,255,0.12);
-                  font-size: 13px;
-                  letter-spacing: 1px;
-                  background: rgba(0,0,0,0.3);
-                  position: relative;
-                  overflow: hidden;
-                ">
-                  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(16,124,16,0.05), transparent 70%);"></div>
-                  <span style="z-index:1;">GAME CANVAS — CONNECT YOUR GAME HERE</span>
-                </div>
-                <div style="font-size:11px; color:#3A4A3A; letter-spacing:0.5px;">Plug your game's &lt;canvas&gt; or &lt;iframe&gt; into this area</div>
-              </div>
-            `;
-          }, 600);
-
-          // Start session timer
-          sessionStart = Date.now();
-          timerInterval = setInterval(updateTimer, 1000);
-        }
-      }, 100);
-
-    }, 300);
-  }
-
-  function updateTimer() {
-    if (!sessionStart) return;
-    const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-    const h = Math.floor(elapsed / 3600);
-    const m = Math.floor((elapsed % 3600) / 60);
-    const s = elapsed % 60;
-    document.getElementById('m-time').textContent =
-      (h > 0 ? h + 'h ' : '') + (m > 0 || h > 0 ? m + 'm ' : '') + s + 's';
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.remove('open');
-    document.body.style.overflow = '';
-    clearInterval(timerInterval);
-    sessionStart = null;
-    // Clean up game view
-    const gv = document.getElementById('game-running-view');
-    if (gv) gv.remove();
-    document.getElementById('m-placeholder').style.opacity = '1';
-    document.getElementById('m-placeholder').style.display = 'flex';
-  }
-
-  function closeIfBackdrop(e) {
-    if (e.target === document.getElementById('modal')) closeModal();
-  }
-
-  // Nav highlight
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
+document.querySelectorAll('.lib-filter').forEach(f => {
+  f.addEventListener('click', () => {
+    document.querySelectorAll('.lib-filter').forEach(x => x.classList.remove('active'));
+    f.classList.add('active');
   });
+});
+
+// ── MODAL STATE ──────────────────────────────────────────────────
+let sessionStart = null;
+let timerInterval = null;
+let currentGameSlug = '';
+
+function openGame(name, icon, theme, desc, genre, hours, rating, meta, players, slug) {
+  currentGameSlug = slug || '';
+
+  // Populate header
+  document.getElementById('m-icon').textContent = icon;
+  document.getElementById('m-ph-icon').textContent = icon;
+  document.getElementById('m-load-icon').textContent = icon;
+  document.getElementById('m-icon-wrap').className = 'modal-game-icon ' + theme;
+  document.getElementById('m-name').textContent = name;
+  document.getElementById('m-genre').textContent = genre;
+  document.getElementById('m-hours').textContent = hours;
+  document.getElementById('m-players').textContent = players;
+  document.getElementById('m-ph-title').textContent = name;
+  document.getElementById('m-ph-desc').textContent = desc;
+  document.getElementById('m-load-title').textContent = name;
+  document.getElementById('m-rating').textContent = rating;
+  document.getElementById('m-meta').textContent = meta;
+  document.getElementById('m-genre-tag').textContent = genre;
+  document.getElementById('m-time').textContent = '0h 0m';
+
+  // Reset to placeholder state
+  document.getElementById('m-placeholder').style.display = 'flex';
+  document.getElementById('m-loading').style.display = 'none';
+  document.getElementById('m-iframe-wrap').style.display = 'none';
+  document.getElementById('m-iframe-wrap').innerHTML = '';
+  document.getElementById('m-return-btn').style.display = 'none';
+
+  // Wire buttons
+  document.getElementById('m-launch-btn').onclick = () => launchGame(name, icon, slug);
+  document.getElementById('m-play-btn').onclick   = () => launchGame(name, icon, slug);
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── LAUNCH ───────────────────────────────────────────────────────
+function launchGame(name, icon, slug) {
+  // Fade out placeholder
+  const ph = document.getElementById('m-placeholder');
+  ph.style.transition = 'opacity 0.25s';
+  ph.style.opacity = '0';
+
+  setTimeout(() => {
+    ph.style.display = 'none';
+    ph.style.opacity = '1';
+
+    // Show loading screen
+    const loading = document.getElementById('m-loading');
+    const bar     = document.getElementById('m-load-bar');
+    const lbl     = document.getElementById('m-load-label');
+    loading.style.display = 'flex';
+    bar.style.width = '0%';
+
+    const labels = ['Loading assets...', 'Building world...', 'Spawning entities...', 'Almost ready...', 'Launching...'];
+    let progress = 0, li = 0;
+
+    const interval = setInterval(() => {
+      progress += Math.random() * 9 + 3;
+      if (progress > 100) progress = 100;
+      bar.style.width = progress + '%';
+      const newLi = Math.min(Math.floor((progress / 100) * labels.length), labels.length - 1);
+      if (newLi !== li) { li = newLi; lbl.textContent = labels[li]; }
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        lbl.textContent = '&#10003; Ready';
+        lbl.style.color = '#52B043';
+
+        setTimeout(() => {
+          loading.style.display = 'none';
+          showGameFrame(slug, icon, name);
+        }, 400);
+      }
+    }, 90);
+  }, 260);
+}
+
+function showGameFrame(slug, icon, name) {
+  const wrap = document.getElementById('m-iframe-wrap');
+  const returnBtn = document.getElementById('m-return-btn');
+
+  if (slug) {
+    // Real game — load via iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = slug + '/index.html';
+    iframe.allow = 'pointer-lock';
+    wrap.appendChild(iframe);
+  } else {
+    // Placeholder for games not yet built
+    wrap.innerHTML = `
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;">
+        <div style="font-size:64px;">${icon}</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;">${name}</div>
+        <div style="font-size:13px;color:#52B043;display:flex;align-items:center;gap:8px;">
+          <div style="width:8px;height:8px;background:#52B043;border-radius:50%;"></div>
+          Game Coming Soon
+        </div>
+        <div style="font-size:12px;color:#3A4A3A;margin-top:8px;letter-spacing:1px;">This game is not yet available</div>
+      </div>`;
+  }
+
+  wrap.style.display = 'block';
+  returnBtn.style.display = 'flex';
+
+  // Start session timer
+  clearInterval(timerInterval);
+  sessionStart = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+function returnToLauncher() {
+  // Go back to placeholder without closing modal
+  const wrap = document.getElementById('m-iframe-wrap');
+  const returnBtn = document.getElementById('m-return-btn');
+  const ph = document.getElementById('m-placeholder');
+
+  wrap.style.display = 'none';
+  wrap.innerHTML = '';
+  returnBtn.style.display = 'none';
+  ph.style.display = 'flex';
+
+  clearInterval(timerInterval);
+  sessionStart = null;
+}
+
+function updateTimer() {
+  if (!sessionStart) return;
+  const s = Math.floor((Date.now() - sessionStart) / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  document.getElementById('m-time').textContent =
+    (h > 0 ? h + 'h ' : '') + (m > 0 || h > 0 ? m + 'm ' : '') + sec + 's';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+  clearInterval(timerInterval);
+  sessionStart = null;
+  // Clean up
+  document.getElementById('m-iframe-wrap').style.display = 'none';
+  document.getElementById('m-iframe-wrap').innerHTML = '';
+  document.getElementById('m-return-btn').style.display = 'none';
+  document.getElementById('m-placeholder').style.display = 'flex';
+  document.getElementById('m-loading').style.display = 'none';
+}
+
+function closeIfBackdrop(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
 </script>
 </body>
 </html>
