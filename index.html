@@ -14,7 +14,7 @@
   body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
   body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 85% 10%,rgba(16,124,16,0.18) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 90%,rgba(16,124,16,0.08) 0%,transparent 55%);pointer-events:none;z-index:0;}
 
-  /* HEADER */
+  /* ── HEADER ── */
   header{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(8,12,8,0.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(16,124,16,0.22);display:flex;align-items:center;padding:0 28px;gap:36px;z-index:200;}
   .logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0;}
   .logo-sphere{width:30px;height:30px;background:radial-gradient(circle at 35% 35%,#52B043,#107C10 60%,#063606);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(16,124,16,0.55),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden;}
@@ -30,13 +30,26 @@
   .nav-btn.active{color:#fff;background:rgba(16,124,16,0.22);}
   .header-end{display:flex;align-items:center;gap:14px;}
   .gp-pill{background:linear-gradient(90deg,#107C10,#52B043);padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;}
-  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);border:2px solid var(--green-bright);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green-bright);cursor:pointer;}
 
-  /* PAGES */
+  /* Avatar / sign-in button */
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);border:2px solid var(--green-bright);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green-bright);cursor:pointer;position:relative;}
+  .avatar-menu{position:absolute;top:38px;right:0;background:#0D160D;border:1px solid rgba(82,176,67,0.25);border-radius:6px;min-width:190px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.8);display:none;z-index:300;}
+  .avatar:hover .avatar-menu,.avatar-menu:hover{display:block;}
+  .avatar-menu-header{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .avatar-menu-name{font-weight:700;font-size:13px;color:#fff;}
+  .avatar-menu-sub{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:0.5px;}
+  .avatar-menu-item{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;font-family:'Barlow',sans-serif;}
+  .avatar-menu-item:hover{background:rgba(255,255,255,0.05);color:#fff;}
+  .avatar-menu-item.danger:hover{background:rgba(255,60,60,0.08);color:#FF8080;}
+  .avatar-menu-divider{height:1px;background:rgba(255,255,255,0.06);margin:2px 0;}
+  .sign-in-btn{padding:5px 14px;border-radius:3px;border:1px solid rgba(82,176,67,0.4);background:transparent;color:var(--green-bright);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.18s;font-family:'Barlow',sans-serif;letter-spacing:0.3px;}
+  .sign-in-btn:hover{background:rgba(82,176,67,0.1);border-color:var(--green-bright);}
+
+  /* ── PAGES ── */
   main{padding-top:54px;position:relative;z-index:1;}
   .page{display:none;} .page.active{display:block;}
 
-  /* HERO */
+  /* ── HERO ── */
   .hero{display:grid;grid-template-columns:1fr 300px;grid-template-rows:340px;gap:3px;padding:3px;}
   .hero-feature{position:relative;border-radius:6px;overflow:hidden;cursor:pointer;background:#0E1F0E;}
   .hero-feature::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.6;}
@@ -69,7 +82,7 @@
   .hero-mini-sub{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.8px;}
   .hero-mini-gp{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--green-bright);font-weight:600;margin-top:4px;letter-spacing:0.5px;}
 
-  /* SECTIONS */
+  /* ── SECTIONS ── */
   .section{padding:26px 6px 0;}
   .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
   .section-label{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;}
@@ -77,7 +90,7 @@
   .see-all{font-size:12px;color:var(--green-bright);cursor:pointer;letter-spacing:0.3px;border:none;background:none;font-family:'Barlow',sans-serif;transition:color 0.15s;}
   .see-all:hover{color:#fff;}
 
-  /* GRIDS */
+  /* ── GRIDS ── */
   .grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;}
   .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
   .game-card{aspect-ratio:3/4;position:relative;border-radius:5px;overflow:hidden;cursor:pointer;transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s;background:var(--bg-card);}
@@ -93,6 +106,11 @@
   .gc-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,124,16,0.1);opacity:0;transition:opacity 0.18s;}
   .game-card:hover .gc-play{opacity:1;}
   .gc-play-btn{width:44px;height:44px;background:rgba(16,124,16,0.88);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(82,176,67,0.6);box-shadow:0 0 20px rgba(16,124,16,0.5);font-size:16px;padding-left:3px;}
+  /* Lock overlay on cards */
+  .gc-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);gap:6px;opacity:0;transition:opacity 0.18s;}
+  .game-card:hover .gc-lock{opacity:1;}
+  .gc-lock-icon{font-size:22px;}
+  .gc-lock-text{font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.7);text-transform:uppercase;}
   .wide-card{aspect-ratio:16/9;position:relative;border-radius:5px;overflow:hidden;cursor:pointer;background:var(--bg-card);transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s;}
   .wide-card:hover{transform:scale(1.03);z-index:5;box-shadow:0 12px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(82,176,67,0.3);}
   .wc-bg{position:absolute;inset:0;} .wc-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:0.15;}
@@ -102,7 +120,7 @@
   .wc-meta{font-size:11px;color:var(--muted);margin-top:5px;display:flex;gap:10px;align-items:center;}
   .wc-rating{color:#FFD43B;font-size:10px;} .wc-hours{color:var(--green-bright);}
 
-  /* NOTIF */
+  /* ── NOTIF ── */
   .notif{margin:22px 6px 0;border-radius:5px;background:linear-gradient(90deg,rgba(16,124,16,0.15),rgba(16,124,16,0.04));border:1px solid rgba(82,176,67,0.2);padding:13px 18px;display:flex;align-items:center;gap:14px;font-size:13px;}
   .notif-icon{font-size:22px;} .notif-text{flex:1;line-height:1.5;}
   .notif-text strong{color:var(--green-bright);} .notif-text span{color:var(--muted);font-size:12px;}
@@ -110,7 +128,7 @@
   .btn-outline:hover{background:var(--green-bright);color:#fff;}
   .spacer{height:60px;}
 
-  /* CARD THEMES */
+  /* ── CARD THEMES ── */
   .t-teal{background:linear-gradient(140deg,#052020,#0D3535,#0A1A1A);}
   .t-navy{background:linear-gradient(140deg,#060818,#0D1540,#070C22);}
   .t-crimson{background:linear-gradient(140deg,#1A0505,#350A0A,#1A0808);}
@@ -122,7 +140,7 @@
   .t-rose{background:linear-gradient(140deg,#1A0510,#351025,#1A0815);}
   .t-ice{background:linear-gradient(140deg,#071520,#0F2840,#071820);}
 
-  /* GAME PASS PAGE */
+  /* ── GAME PASS PAGE ── */
   .gp-hero{margin:3px;border-radius:6px;padding:48px 40px;background:linear-gradient(135deg,#061506 0%,#0E280E 40%,#061A24 100%);position:relative;overflow:hidden;}
   .gp-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:500px;height:500px;border:1px solid rgba(82,176,67,0.1);border-radius:50%;}
   .gp-hero::after{content:'';position:absolute;top:30px;right:30px;width:300px;height:300px;border:1px solid rgba(82,176,67,0.06);border-radius:50%;}
@@ -134,7 +152,7 @@
   .gp-feat{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.7);}
   .gp-feat-dot{width:6px;height:6px;background:var(--green-bright);border-radius:50%;flex-shrink:0;}
 
-  /* LIBRARY PAGE */
+  /* ── LIBRARY PAGE ── */
   .lib-header{padding:28px 8px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .lib-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:1px;}
   .lib-filters{display:flex;gap:6px;}
@@ -142,18 +160,79 @@
   .lib-filter:hover{border-color:rgba(82,176,67,0.4);color:var(--green-bright);}
   .lib-filter.active{background:rgba(16,124,16,0.2);border-color:rgba(82,176,67,0.4);color:var(--green-bright);}
   .lib-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:0 6px;}
+  .lib-empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:13px;grid-column:1/-1;}
+  .lib-empty strong{display:block;font-size:18px;color:rgba(255,255,255,0.5);margin-bottom:8px;}
 
-  /* ═══ MODAL ═══════════════════════════════════════════════ */
+  /* ── PROFILE PAGE ── */
+  .profile-wrap{padding:24px 8px;}
+  .profile-hero{background:linear-gradient(135deg,#061506,#0E280E);border-radius:8px;padding:32px;display:flex;align-items:center;gap:28px;margin-bottom:20px;border:1px solid rgba(82,176,67,0.12);}
+  .profile-avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);border:3px solid var(--green-bright);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--green-bright);flex-shrink:0;}
+  .profile-info{flex:1;}
+  .profile-username{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;letter-spacing:1px;}
+  .profile-joined{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:0.5px;}
+  .profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+  .profile-stat{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:16px;text-align:center;}
+  .profile-stat-val{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green-bright);}
+  .profile-stat-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-top:4px;}
+  .profile-section-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+  .profile-section-title::before{content:'';width:3px;height:16px;background:var(--green-bright);border-radius:2px;display:inline-block;}
+  .recent-game-row{display:flex;align-items:center;gap:14px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:5px;border:1px solid rgba(255,255,255,0.05);margin-bottom:4px;}
+  .rg-icon{width:38px;height:38px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .rg-name{font-size:13px;font-weight:600;flex:1;}
+  .rg-time{font-size:11px;color:var(--muted);}
+  .rg-play{padding:5px 14px;background:var(--green);border:none;border-radius:3px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:background 0.15s;}
+  .rg-play:hover{background:var(--green-bright);}
+
+  /* ── AUTH MODAL ── */
+  .auth-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:600;backdrop-filter:blur(12px);align-items:center;justify-content:center;}
+  .auth-backdrop.open{display:flex;animation:mfade 0.18s ease;}
+  @keyframes mfade{from{opacity:0}to{opacity:1}}
+  .auth-box{background:#0C160C;border:1px solid rgba(82,176,67,0.25);border-radius:10px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.9);animation:aslide 0.22s cubic-bezier(0.4,0,0.2,1);}
+  @keyframes aslide{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .auth-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .auth-tab{flex:1;padding:14px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:none;font-family:'Barlow',sans-serif;transition:all 0.15s;border-bottom:2px solid transparent;}
+  .auth-tab.active{color:#fff;border-bottom-color:var(--green-bright);}
+  .auth-body{padding:28px 28px 24px;}
+  .auth-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;margin-bottom:6px;}
+  .auth-sub{font-size:12px;color:var(--muted);margin-bottom:24px;line-height:1.5;}
+  .auth-field{margin-bottom:14px;}
+  .auth-label{font-size:10px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px;display:block;}
+  .auth-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:10px 12px;color:#fff;font-size:13px;font-family:'Barlow',sans-serif;outline:none;transition:border-color 0.15s;}
+  .auth-input:focus{border-color:rgba(82,176,67,0.5);background:rgba(255,255,255,0.06);}
+  .auth-input.error{border-color:rgba(255,80,80,0.6);}
+  .auth-error{font-size:11px;color:#FF8080;margin-top:4px;display:none;}
+  .auth-hint{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;}
+  .auth-btn{width:100%;padding:12px;background:var(--green);border:none;border-radius:4px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.18s;margin-top:8px;letter-spacing:0.3px;}
+  .auth-btn:hover{background:var(--green-bright);box-shadow:0 6px 20px rgba(16,124,16,0.4);}
+  .auth-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--dim);font-size:11px;}
+  .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06);}
+  .auth-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+  .auth-close:hover{background:rgba(255,255,255,0.1);color:#fff;}
+  .auth-backdrop{position:relative;}
+  .auth-box{position:relative;}
+  .strength-bar{height:3px;border-radius:2px;margin-top:6px;transition:all 0.3s;background:rgba(255,255,255,0.08);}
+  .strength-fill{height:100%;border-radius:2px;transition:all 0.3s;width:0%;}
+  .strength-label{font-size:9px;color:var(--muted);margin-top:3px;}
+
+  /* ── TOAST NOTIFICATIONS ── */
+  #toast-container{position:fixed;bottom:24px;right:24px;z-index:900;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+  .toast{background:#0D1A0D;border:1px solid rgba(82,176,67,0.3);border-radius:6px;padding:12px 16px;font-size:12px;color:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:toastin 0.25s ease;min-width:240px;}
+  .toast.error{border-color:rgba(255,80,80,0.35);background:#1A0D0D;}
+  .toast.success{border-color:rgba(82,176,67,0.4);}
+  .toast-icon{font-size:16px;flex-shrink:0;}
+  @keyframes toastin{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  /* ── GAME MODAL ── */
   .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;backdrop-filter:blur(10px);}
   .modal-backdrop.open{display:flex;align-items:center;justify-content:center;animation:mfade 0.2s ease;}
-  @keyframes mfade{from{opacity:0}to{opacity:1}}
   .modal{background:#0C140C;border:1px solid rgba(82,176,67,0.25);border-radius:8px;width:94vw;max-width:1160px;height:92vh;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 40px 100px rgba(0,0,0,0.9),0 0 60px rgba(16,124,16,0.12);animation:mslide 0.25s cubic-bezier(0.4,0,0.2,1);overflow:hidden;}
   @keyframes mslide{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
   .modal-header{display:flex;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(16,124,16,0.06);flex-shrink:0;}
   .modal-game-icon{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
   .modal-game-title{flex:1;}
   .modal-game-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;line-height:1;}
-  .modal-game-sub{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:12px;}
+  .modal-game-sub{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:12px;align-items:center;}
   .modal-game-sub .live{color:var(--green-bright);display:flex;align-items:center;gap:4px;}
   .live-dot{width:6px;height:6px;background:var(--green-bright);border-radius:50%;animation:pulse 1.4s infinite;}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
@@ -161,11 +240,7 @@
   .modal-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;line-height:1;}
   .modal-close:hover{background:rgba(255,255,255,0.12);color:#fff;}
   .modal-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;height:0;}
-
-  /* PLAY AREA — fills modal body completely */
   .game-play-area{flex:1;position:relative;background:#050C05;overflow:hidden;min-height:0;height:100%;}
-
-  /* Placeholder (pre-launch) */
   .game-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;z-index:2;background:#050C05;}
   .game-placeholder::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;}
   .ph-icon{font-size:72px;filter:drop-shadow(0 0 20px rgba(82,176,67,0.3));animation:float 3s ease-in-out infinite;position:relative;z-index:1;}
@@ -175,45 +250,17 @@
   .ph-launch{display:flex;align-items:center;gap:10px;background:var(--green);color:#fff;border:none;padding:13px 32px;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.2s;box-shadow:0 0 30px rgba(16,124,16,0.3);letter-spacing:0.3px;position:relative;z-index:1;}
   .ph-launch:hover{background:var(--green-bright);box-shadow:0 0 40px rgba(82,176,67,0.4);transform:scale(1.02);}
   .ph-hint{font-size:11px;color:var(--dim);letter-spacing:0.3px;position:relative;z-index:1;}
-
-  /* Loading overlay */
   .game-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;z-index:3;}
   .load-icon{font-size:64px;animation:float 3s ease-in-out infinite;}
   .load-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
   .load-bar-wrap{width:340px;max-width:80%;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
   .load-bar{height:100%;width:0%;background:linear-gradient(90deg,#107C10,#52B043);border-radius:2px;transition:width 0.1s;box-shadow:0 0 10px rgba(82,176,67,0.5);}
   .load-label{font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
-
-  /* The iframe — fills entire play area */
   .game-iframe-wrap{position:absolute;inset:0;z-index:4;display:none;}
   .game-iframe-wrap iframe{width:100%;height:100%;border:none;display:block;}
-
-  /* Floating return button — sits above the iframe */
-  .return-btn{
-    position:absolute;
-    top:14px; left:14px;
-    z-index:10;
-    display:none;
-    align-items:center;
-    gap:8px;
-    background:rgba(8,12,8,0.88);
-    border:1px solid rgba(82,176,67,0.4);
-    color:#fff;
-    padding:8px 16px;
-    border-radius:4px;
-    font-size:12px;
-    font-weight:600;
-    font-family:'Barlow',sans-serif;
-    letter-spacing:0.5px;
-    cursor:pointer;
-    transition:all 0.2s;
-    backdrop-filter:blur(8px);
-    box-shadow:0 4px 20px rgba(0,0,0,0.5);
-  }
-  .return-btn:hover{background:rgba(16,124,16,0.5);border-color:var(--green-bright);box-shadow:0 4px 20px rgba(16,124,16,0.3);}
+  .return-btn{position:absolute;top:14px;left:14px;z-index:10;display:none;align-items:center;gap:8px;background:rgba(8,12,8,0.88);border:1px solid rgba(82,176,67,0.4);color:#fff;padding:8px 16px;border-radius:4px;font-size:12px;font-weight:600;font-family:'Barlow',sans-serif;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+  .return-btn:hover{background:rgba(16,124,16,0.5);border-color:var(--green-bright);}
   .return-btn .arrow{font-size:14px;color:var(--green-bright);}
-
-  /* MODAL FOOTER */
   .modal-footer{border-top:1px solid rgba(255,255,255,0.06);padding:12px 22px;display:flex;align-items:center;gap:20px;background:rgba(0,0,0,0.3);flex-shrink:0;}
   .mf-stat{display:flex;flex-direction:column;gap:1px;}
   .mf-stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;}
@@ -223,32 +270,91 @@
   .mf-tags{display:flex;gap:6px;margin-left:auto;}
   .tag{padding:3px 10px;border-radius:2px;font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.06);}
   .tag.gp{background:rgba(16,124,16,0.2);color:var(--green-bright);border-color:rgba(82,176,67,0.2);}
+  /* Add to library btn in modal header */
+  .lib-add-btn{padding:7px 14px;border:1px solid rgba(82,176,67,0.35);background:transparent;color:var(--green-bright);font-size:12px;font-weight:600;border-radius:3px;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.15s;}
+  .lib-add-btn:hover{background:rgba(82,176,67,0.1);}
+  .lib-add-btn.added{border-color:rgba(255,255,255,0.15);color:var(--muted);}
 </style>
 </head>
 <body>
 
+<!-- ══ AUTH MODAL ═══════════════════════════════════════════════ -->
+<div class="auth-backdrop" id="auth-modal">
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"    onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tab-register" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="auth-login" class="auth-body">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to access your library, progress, and achievements.</div>
+      <div class="auth-field">
+        <label class="auth-label">Username</label>
+        <input class="auth-input" id="login-user" type="text" placeholder="Enter your username" autocomplete="username" spellcheck="false">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="login-pass" type="password" placeholder="Enter your password" autocomplete="current-password">
+        <div class="auth-error" id="login-error">Invalid username or password.</div>
+      </div>
+      <button class="auth-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="auth-register" class="auth-body" style="display:none;">
+      <div class="auth-title">Create your account</div>
+      <div class="auth-sub">Your account is saved locally on this device.</div>
+      <div class="auth-field">
+        <label class="auth-label">Username</label>
+        <input class="auth-input" id="reg-user" type="text" placeholder="Choose a username" maxlength="20" autocomplete="username" spellcheck="false">
+        <div class="auth-error" id="reg-user-error">Username already taken.</div>
+        <div class="auth-hint">3–20 characters, letters and numbers only.</div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="reg-pass" type="password" placeholder="Choose a password" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <div class="strength-label" id="strength-label">Enter a password</div>
+        <div class="auth-error" id="reg-pass-error">Password must be at least 6 characters.</div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Confirm Password</label>
+        <input class="auth-input" id="reg-pass2" type="password" placeholder="Repeat your password" autocomplete="new-password">
+        <div class="auth-error" id="reg-pass2-error">Passwords do not match.</div>
+      </div>
+      <button class="auth-btn" id="register-btn" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST CONTAINER ═══════════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ══ HEADER ════════════════════════════════════════════════════ -->
 <header>
   <div class="logo" onclick="showPage('home')">
     <div class="logo-sphere"><div class="logo-cross"></div></div>
     <span class="logo-word">GameHub</span>
   </div>
   <nav>
-    <button class="nav-btn active"   onclick="showPage('home',this)">Home</button>
-    <button class="nav-btn"          onclick="showPage('home',this)">My Games</button>
-    <button class="nav-btn"          onclick="showPage('gamepass',this)">Game Pass</button>
-    <button class="nav-btn"          onclick="showPage('library',this)">Library</button>
-    <button class="nav-btn"          onclick="showPage('home',this)">Store</button>
-    <button class="nav-btn"          onclick="showPage('home',this)">Friends</button>
+    <button class="nav-btn active"  onclick="showPage('home',this)">Home</button>
+    <button class="nav-btn"         onclick="showPage('home',this)">My Games</button>
+    <button class="nav-btn"         onclick="showPage('gamepass',this)">Game Pass</button>
+    <button class="nav-btn"         onclick="showPage('library',this)">Library</button>
+    <button class="nav-btn"         onclick="showPage('home',this)">Store</button>
+    <button class="nav-btn"         onclick="showPage('home',this)">Friends</button>
   </nav>
   <div class="header-end">
     <div class="gp-pill">&#9889; Game Pass</div>
-    <div class="avatar">GH</div>
+    <div id="header-auth-area"></div>
   </div>
 </header>
 
 <main>
 
-<!-- ══ HOME PAGE ═══════════════════════════════════════════════════ -->
+<!-- ══ HOME PAGE ═════════════════════════════════════════════════ -->
 <div id="page-home" class="page active">
   <div class="hero">
     <div class="hero-feature" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG. Chart unknown star systems and uncover the mystery behind the vanishing colonies.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')">
@@ -272,18 +378,15 @@
     </div>
     <div class="hero-stack">
       <div class="hero-mini" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')">
-        <div class="hero-mini-bg t-crimson"></div><div class="hero-mini-icon">&#127984;</div>
-        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-bg t-crimson"></div><div class="hero-mini-icon">&#127984;</div><div class="hero-mini-overlay"></div>
         <div class="hero-mini-label"><div class="hero-mini-name">Iron Citadel</div><div class="hero-mini-sub">Strategy &middot; 3&#8211;5 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
       <div class="hero-mini" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')">
-        <div class="hero-mini-bg t-violet"></div><div class="hero-mini-icon">&#127950;</div>
-        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-bg t-violet"></div><div class="hero-mini-icon">&#127950;</div><div class="hero-mini-overlay"></div>
         <div class="hero-mini-label"><div class="hero-mini-name">Neon Drift</div><div class="hero-mini-sub">Racing &middot; 2&#8211;4 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
       <div class="hero-mini" onclick="openGame('Verdant Wilds','&#127807;','t-forest','A meditative survival sim.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')">
-        <div class="hero-mini-bg t-forest"></div><div class="hero-mini-icon">&#127807;</div>
-        <div class="hero-mini-overlay"></div>
+        <div class="hero-mini-bg t-forest"></div><div class="hero-mini-icon">&#127807;</div><div class="hero-mini-overlay"></div>
         <div class="hero-mini-label"><div class="hero-mini-name">Verdant Wilds</div><div class="hero-mini-sub">Survival &middot; 4&#8211;7 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
     </div>
@@ -292,7 +395,7 @@
   <div class="notif">
     <div class="notif-icon">&#127918;</div>
     <div class="notif-text"><strong>6 new games added to Game Pass this week</strong><br><span>Including Verdant Wilds, Hollow Protocol, and more &#8212; all playable now.</span></div>
-    <button class="btn-outline" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">See What's New</button>
+    <button class="btn-outline" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">See What&#8217;s New</button>
   </div>
 
   <div class="section">
@@ -312,7 +415,7 @@
   <div class="spacer"></div>
 </div>
 
-<!-- ══ GAME PASS PAGE ══════════════════════════════════════════════ -->
+<!-- ══ GAME PASS PAGE ════════════════════════════════════════════ -->
 <div id="page-gamepass" class="page">
   <div class="gp-hero">
     <div class="gp-hero-content">
@@ -350,40 +453,64 @@
   <div class="spacer"></div>
 </div>
 
-<!-- ══ LIBRARY PAGE ════════════════════════════════════════════════ -->
+<!-- ══ LIBRARY PAGE ══════════════════════════════════════════════ -->
 <div id="page-library" class="page">
   <div class="lib-header">
     <div class="lib-title">My Library</div>
     <div class="lib-filters">
-      <button class="lib-filter active">All</button>
-      <button class="lib-filter">Recently Played</button>
-      <button class="lib-filter">Installed</button>
-      <button class="lib-filter">Game Pass</button>
+      <button class="lib-filter active" onclick="filterLibrary('all',this)">All</button>
+      <button class="lib-filter" onclick="filterLibrary('recent',this)">Recently Played</button>
+      <button class="lib-filter" onclick="filterLibrary('installed',this)">Installed</button>
     </div>
   </div>
-  <div class="lib-grid">
-    <div class="game-card" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')"><div class="gc-bg t-navy"></div><div class="gc-icon">&#128640;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Stellar Abyss</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action RPG</span></div></div></div>
-    <div class="game-card" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#127984;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Iron Citadel</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
-    <div class="game-card" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')"><div class="gc-bg t-violet"></div><div class="gc-icon">&#127950;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Neon Drift</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Racing</span></div></div></div>
-    <div class="game-card" onclick="openGame('Verdant Wilds','&#127807;','t-forest','Meditative alien survival.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')"><div class="gc-bg t-forest"></div><div class="gc-icon">&#127807;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Verdant Wilds</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Survival</span></div></div></div>
-    <div class="game-card" onclick="openGame('Hollow Protocol','&#129302;','t-slate','Cyber-noir stealth thriller.','Stealth','3&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','87','760K','')"><div class="gc-bg t-slate"></div><div class="gc-icon">&#129302;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Hollow Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Stealth</span></div></div></div>
-    <div class="game-card" onclick="openGame('Ember Forge','&#9874;','t-copper','Craft legendary weapons.','Crafting RPG','5&#8211;9 hrs','&#9733;&#9733;&#9733;&#9733;','89','1.1M','')"><div class="gc-bg t-copper"></div><div class="gc-icon">&#9874;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Ember Forge</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Crafting RPG</span></div></div></div>
-    <div class="game-card" onclick="openGame('Rift Walker','&#127744;','t-violet','A mind-bending puzzle platformer.','Puzzle','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','90','870K','')"><div class="gc-bg t-violet"></div><div class="gc-icon">&#127744;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Rift Walker</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Puzzle</span></div></div></div>
-    <div class="game-card" onclick="openGame('Phantom Bloom','&#127800;','t-rose','A haunting action-adventure.','Action','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','92','1.8M','')"><div class="gc-bg t-rose"></div><div class="gc-icon">&#127800;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Phantom Bloom</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action</span></div></div></div>
-    <div class="game-card" onclick="openGame('Runebound Saga','&#9876;','t-crimson','Epic fantasy RPG.','RPG','8&#8211;12 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','97','4.2M','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#9876;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Runebound Saga</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">RPG</span></div></div></div>
-    <div class="game-card" onclick="openGame('Deep Trench','&#129425;','t-teal','Explore an alien ocean floor.','Exploration','4&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','85','520K','')"><div class="gc-bg t-teal"></div><div class="gc-icon">&#129425;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Deep Trench</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Exploration</span></div></div></div>
-    <div class="game-card" onclick="openGame('Sandstorm Kings','&#127964;','t-amber','Rule a desert empire.','Strategy','6&#8211;10 hrs','&#9733;&#9733;&#9733;&#9733;','88','640K','')"><div class="gc-bg t-amber"></div><div class="gc-icon">&#127964;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Sandstorm Kings</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
-    <div class="game-card" onclick="openGame('Glacial Protocol','&#129398;','t-ice','Espionage on a frozen moon.','Thriller','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;','86','430K','')"><div class="gc-bg t-ice"></div><div class="gc-icon">&#129398;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Glacial Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Thriller</span></div></div></div>
+  <div class="lib-grid" id="library-grid">
+    <!-- Populated by JS -->
   </div>
   <div class="spacer"></div>
 </div>
 
+<!-- ══ PROFILE PAGE ══════════════════════════════════════════════ -->
+<div id="page-profile" class="page">
+  <div class="profile-wrap">
+    <div class="profile-hero">
+      <div class="profile-avatar-big" id="profile-avatar-big">GH</div>
+      <div class="profile-info">
+        <div class="profile-username" id="profile-username-display">Player</div>
+        <div class="profile-joined" id="profile-joined">Joined —</div>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="profile-stat-val" id="ps-games">0</div>
+        <div class="profile-stat-label">Games in Library</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val" id="ps-hours">0h</div>
+        <div class="profile-stat-label">Total Playtime</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val" id="ps-sessions">0</div>
+        <div class="profile-stat-label">Sessions</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val" id="ps-last">—</div>
+        <div class="profile-stat-label">Last Active</div>
+      </div>
+    </div>
+    <div class="profile-section-title">Recent Activity</div>
+    <div id="profile-recent"></div>
+    <div style="margin-top:24px;display:flex;gap:10px;">
+      <button class="btn-outline" onclick="showAuthModal()">Change Password</button>
+      <button class="btn-outline" style="border-color:rgba(255,80,80,0.4);color:#FF8080;" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
 </main>
 
-<!-- ══ MODAL ═══════════════════════════════════════════════════════ -->
+<!-- ══ GAME MODAL ════════════════════════════════════════════════ -->
 <div class="modal-backdrop" id="modal" onclick="closeIfBackdrop(event)">
   <div class="modal">
-
     <div class="modal-header">
       <div class="modal-game-icon" id="m-icon-wrap"><span id="m-icon">&#128640;</span></div>
       <div class="modal-game-title">
@@ -395,51 +522,38 @@
         </div>
       </div>
       <div class="modal-actions">
+        <button class="lib-add-btn" id="m-lib-btn" onclick="toggleLibrary()">+ Add to Library</button>
         <button class="btn-primary" id="m-play-btn" style="padding:8px 20px;font-size:13px;">&#9654;&nbsp;Launch</button>
-        <button class="btn-secondary" style="padding:7px 14px;font-size:13px;">+ Add to Library</button>
         <button class="modal-close" onclick="closeModal()">&#10005;</button>
       </div>
     </div>
-
     <div class="modal-body">
       <div class="game-play-area" id="m-play-area">
-
-        <!-- Pre-launch placeholder -->
         <div class="game-placeholder" id="m-placeholder">
           <div class="ph-icon" id="m-ph-icon">&#128640;</div>
           <div class="ph-title" id="m-ph-title">Ready to Launch</div>
           <div class="ph-desc" id="m-ph-desc">Game description goes here.</div>
           <button class="ph-launch" id="m-launch-btn">&#9654;&nbsp;&nbsp;Launch Game</button>
-          <div class="ph-hint">Your game will load in this window</div>
+          <div class="ph-hint" id="m-ph-hint">Your game will load in this window</div>
         </div>
-
-        <!-- Loading overlay -->
         <div class="game-loading" id="m-loading" style="display:none;">
           <div class="load-icon" id="m-load-icon">&#128640;</div>
           <div class="load-title" id="m-load-title">Loading...</div>
           <div class="load-bar-wrap"><div class="load-bar" id="m-load-bar"></div></div>
           <div class="load-label" id="m-load-label">Loading assets...</div>
         </div>
-
-        <!-- Full-screen iframe container -->
-        <div class="game-iframe-wrap" id="m-iframe-wrap">
-          <!-- iframe injected here by JS -->
-        </div>
-
-        <!-- Floating return button (shown above iframe) -->
+        <div class="game-iframe-wrap" id="m-iframe-wrap"></div>
         <button class="return-btn" id="m-return-btn" onclick="returnToLauncher()">
           <span class="arrow">&#8592;</span> Return to GameHub
         </button>
-
       </div>
     </div>
-
     <div class="modal-footer">
       <div class="mf-stat"><div class="mf-stat-label">Rating</div><div class="mf-stat-val" id="m-rating">&#9733;&#9733;&#9733;&#9733;</div></div>
       <div class="mf-divider"></div>
       <div class="mf-stat"><div class="mf-stat-label">Metacritic</div><div class="mf-stat-val green" id="m-meta">90</div></div>
       <div class="mf-divider"></div>
-      <div class="mf-stat"><div class="mf-stat-label">Playtime</div><div class="mf-stat-val" id="m-time">0h 0m</div></div>
+      <div class="mf-stat"><div class="mf-stat-label">Your Playtime</div><div class="mf-stat-val" id="m-time">0h 0m</div></div>
       <div class="mf-divider"></div>
       <div class="mf-stat"><div class="mf-stat-label">Achievements</div><div class="mf-stat-val">0 / 30</div></div>
       <div class="mf-tags">
@@ -448,12 +562,471 @@
         <span class="tag">Multiplayer</span>
       </div>
     </div>
-
   </div>
 </div>
 
+<!-- ══ JAVASCRIPT ════════════════════════════════════════════════ -->
 <script>
-// ── NAV ──────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+//  GAMEHUB — Auth + Storage System
+//  Accounts stored in localStorage as:
+//    gh_accounts   → { username: { passHash, salt, created, profile } }
+//    gh_session    → { username, loginTime }
+//    gh_profile_<username> → { library:[], playtime:{}, sessions, lastActive, recentGames:[] }
+// ════════════════════════════════════════════════════════════════
+
+// ── CRYPTO: Hash password with PBKDF2 via SubtleCrypto ──────────
+async function hashPassword(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
+    keyMaterial, 256
+  );
+  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function generateSalt() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── STORAGE HELPERS ──────────────────────────────────────────────
+const LS = {
+  get:    k       => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set:    (k, v)  => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  remove: k       => { try { localStorage.removeItem(k); } catch {} }
+};
+
+function getAccounts()       { return LS.get('gh_accounts') || {}; }
+function saveAccounts(a)     { LS.set('gh_accounts', a); }
+function getSession()        { return LS.get('gh_session'); }
+function saveSession(u)      { LS.set('gh_session', { username: u, loginTime: Date.now() }); }
+function clearSession()      { LS.remove('gh_session'); }
+function getProfile(u)       { return LS.get('gh_profile_' + u) || createProfile(); }
+function saveProfile(u, p)   { LS.set('gh_profile_' + u, p); }
+
+function createProfile() {
+  return { library: [], playtime: {}, sessions: 0, lastActive: null, recentGames: [] };
+}
+
+// ── SESSION STATE ────────────────────────────────────────────────
+let currentUser = null;   // username string or null
+let currentProfile = null;
+
+function loadSession() {
+  const s = getSession();
+  if (!s) return;
+  const accounts = getAccounts();
+  if (accounts[s.username]) {
+    currentUser = s.username;
+    currentProfile = getProfile(s.username);
+  } else {
+    clearSession();
+  }
+}
+
+// ── AUTH MODAL ───────────────────────────────────────────────────
+let authMode = 'login';
+
+function showAuthModal(mode) {
+  authMode = mode || 'login';
+  switchAuthTab(authMode);
+  clearAuthErrors();
+  document.getElementById('auth-modal').classList.add('open');
+}
+
+function hideAuthModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+
+document.getElementById('auth-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('auth-modal')) hideAuthModal();
+});
+
+function switchAuthTab(tab) {
+  authMode = tab;
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('auth-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+  clearAuthErrors();
+}
+
+function clearAuthErrors() {
+  document.querySelectorAll('.auth-error').forEach(e => e.style.display = 'none');
+  document.querySelectorAll('.auth-input').forEach(e => e.classList.remove('error'));
+}
+
+function showAuthError(id, inputId) {
+  const err = document.getElementById(id);
+  if (err) err.style.display = 'block';
+  if (inputId) document.getElementById(inputId)?.classList.add('error');
+}
+
+// ── PASSWORD STRENGTH ────────────────────────────────────────────
+function checkPasswordStrength(pw) {
+  const fill  = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if (pw.length >= 6)  score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const configs = [
+    { pct:'0%', color:'transparent', label:'Enter a password' },
+    { pct:'20%', color:'#FF4040', label:'Very weak' },
+    { pct:'40%', color:'#FF8040', label:'Weak' },
+    { pct:'60%', color:'#FFCC00', label:'Fair' },
+    { pct:'80%', color:'#52B043', label:'Good' },
+    { pct:'100%', color:'#7AE060', label:'Strong' },
+  ];
+  const c = configs[score] || configs[0];
+  fill.style.width = c.pct;
+  fill.style.background = c.color;
+  label.textContent = c.label;
+  label.style.color = c.color;
+}
+
+// ── REGISTER ─────────────────────────────────────────────────────
+async function doRegister() {
+  clearAuthErrors();
+  const username = document.getElementById('reg-user').value.trim();
+  const pass     = document.getElementById('reg-pass').value;
+  const pass2    = document.getElementById('reg-pass2').value;
+
+  let valid = true;
+  if (!/^[A-Za-z0-9]{3,20}$/.test(username)) {
+    showAuthError('reg-user-error','reg-user');
+    document.getElementById('reg-user-error').textContent = 'Username must be 3–20 letters/numbers only.';
+    valid = false;
+  }
+  if (pass.length < 6) {
+    showAuthError('reg-pass-error','reg-pass');
+    valid = false;
+  }
+  if (pass !== pass2) {
+    showAuthError('reg-pass2-error','reg-pass2');
+    valid = false;
+  }
+  if (!valid) return;
+
+  const accounts = getAccounts();
+  if (accounts[username]) {
+    showAuthError('reg-user-error','reg-user');
+    document.getElementById('reg-user-error').textContent = 'Username already taken.';
+    return;
+  }
+
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+
+  const salt = generateSalt();
+  const hash = await hashPassword(pass, salt);
+
+  accounts[username] = {
+    passHash: hash,
+    salt,
+    created: Date.now(),
+    displayName: username
+  };
+  saveAccounts(accounts);
+
+  const profile = createProfile();
+  profile.sessions = 1;
+  profile.lastActive = Date.now();
+  saveProfile(username, profile);
+
+  currentUser    = username;
+  currentProfile = profile;
+  saveSession(username);
+
+  btn.disabled = false; btn.textContent = 'Create Account';
+  hideAuthModal();
+  renderHeader();
+  showToast('✓ Account created! Welcome, ' + username, 'success');
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────
+async function doLogin() {
+  clearAuthErrors();
+  const username = document.getElementById('login-user').value.trim();
+  const pass     = document.getElementById('login-pass').value;
+
+  if (!username || !pass) {
+    showAuthError('login-error','login-user');
+    return;
+  }
+
+  const accounts = getAccounts();
+  const account  = accounts[username];
+  if (!account) {
+    showAuthError('login-error','login-user');
+    return;
+  }
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
+  const hash = await hashPassword(pass, account.salt);
+  if (hash !== account.passHash) {
+    btn.disabled = false; btn.textContent = 'Sign In';
+    showAuthError('login-error','login-pass');
+    return;
+  }
+
+  currentUser    = username;
+  currentProfile = getProfile(username);
+  currentProfile.sessions++;
+  currentProfile.lastActive = Date.now();
+  saveProfile(username, currentProfile);
+  saveSession(username);
+
+  btn.disabled = false; btn.textContent = 'Sign In';
+  document.getElementById('login-pass').value = '';
+  hideAuthModal();
+  renderHeader();
+  renderLibrary();
+  showToast('Welcome back, ' + username + '!', 'success');
+}
+
+// ── SIGN OUT ─────────────────────────────────────────────────────
+function doSignOut() {
+  if (currentProfile) saveProfile(currentUser, currentProfile);
+  currentUser    = null;
+  currentProfile = null;
+  clearSession();
+  renderHeader();
+  renderLibrary();
+  showPage('home');
+  showToast('Signed out successfully.', 'success');
+}
+
+// ── HEADER RENDER ─────────────────────────────────────────────────
+function renderHeader() {
+  const area = document.getElementById('header-auth-area');
+  if (currentUser) {
+    const initials = currentUser.substring(0,2).toUpperCase();
+    area.innerHTML = `
+      <div class="avatar" tabindex="0">
+        ${initials}
+        <div class="avatar-menu">
+          <div class="avatar-menu-header">
+            <div class="avatar-menu-name">${currentUser}</div>
+            <div class="avatar-menu-sub">GameHub Member</div>
+          </div>
+          <button class="avatar-menu-item" onclick="showPage('profile')">👤 &nbsp;View Profile</button>
+          <button class="avatar-menu-item" onclick="showPage('library',document.querySelectorAll('.nav-btn')[3])">📚 &nbsp;My Library</button>
+          <div class="avatar-menu-divider"></div>
+          <button class="avatar-menu-item danger" onclick="doSignOut()">↩ &nbsp;Sign Out</button>
+        </div>
+      </div>`;
+  } else {
+    area.innerHTML = `<button class="sign-in-btn" onclick="showAuthModal('login')">Sign In</button>`;
+  }
+}
+
+// ── LIBRARY SYSTEM ───────────────────────────────────────────────
+function isInLibrary(gameName) {
+  if (!currentProfile) return false;
+  return currentProfile.library.some(g => g.name === gameName);
+}
+
+function addToLibrary(game) {
+  if (!currentUser) { showAuthModal('login'); return false; }
+  if (isInLibrary(game.name)) return true;
+  currentProfile.library.push({ ...game, addedAt: Date.now(), playtime: 0 });
+  saveProfile(currentUser, currentProfile);
+  renderLibrary();
+  return true;
+}
+
+function removeFromLibrary(gameName) {
+  if (!currentProfile) return;
+  currentProfile.library = currentProfile.library.filter(g => g.name !== gameName);
+  saveProfile(currentUser, currentProfile);
+  renderLibrary();
+}
+
+function toggleLibrary() {
+  if (!currentUser) { closeModal(); showAuthModal('login'); return; }
+  const game = currentModalGame;
+  if (!game) return;
+  if (isInLibrary(game.name)) {
+    removeFromLibrary(game.name);
+    updateLibBtn(false);
+    showToast('Removed from library.', 'success');
+  } else {
+    addToLibrary(game);
+    updateLibBtn(true);
+    showToast('Added to library!', 'success');
+  }
+}
+
+function updateLibBtn(inLib) {
+  const btn = document.getElementById('m-lib-btn');
+  if (!btn) return;
+  if (inLib) {
+    btn.textContent = '✓ In Library';
+    btn.classList.add('added');
+  } else {
+    btn.textContent = '+ Add to Library';
+    btn.classList.remove('added');
+  }
+}
+
+// ── PLAYTIME TRACKING ────────────────────────────────────────────
+let sessionStart = null;
+let timerInterval = null;
+let currentModalGame = null;
+let sessionPlaytime = 0; // seconds this session
+
+function startPlaytimeTracking(gameName) {
+  sessionStart = Date.now();
+  sessionPlaytime = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!sessionStart) return;
+    const s = Math.floor((Date.now() - sessionStart) / 1000);
+    sessionPlaytime = s;
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    document.getElementById('m-time').textContent =
+      (h > 0 ? h + 'h ' : '') + (m > 0 || h > 0 ? m + 'm ' : '') + sec + 's';
+  }, 1000);
+}
+
+function stopPlaytimeTracking(gameName) {
+  clearInterval(timerInterval);
+  if (!sessionStart || !currentUser || !gameName) return;
+  const seconds = Math.floor((Date.now() - sessionStart) / 1000);
+  sessionStart = null;
+  if (seconds < 5) return; // ignore very short sessions
+
+  // Update profile playtime
+  if (!currentProfile.playtime[gameName]) currentProfile.playtime[gameName] = 0;
+  currentProfile.playtime[gameName] += seconds;
+  currentProfile.lastActive = Date.now();
+
+  // Update library entry
+  const libGame = currentProfile.library.find(g => g.name === gameName);
+  if (libGame) libGame.playtime = (libGame.playtime || 0) + seconds;
+
+  // Recent games
+  const existing = currentProfile.recentGames.findIndex(g => g.name === gameName);
+  if (existing !== -1) currentProfile.recentGames.splice(existing, 1);
+  currentProfile.recentGames.unshift({ ...currentModalGame, lastPlayed: Date.now() });
+  if (currentProfile.recentGames.length > 6) currentProfile.recentGames.pop();
+
+  saveProfile(currentUser, currentProfile);
+  renderLibrary();
+}
+
+function fmtPlaytime(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return h + 'h ' + m + 'm';
+  if (m > 0) return m + 'm';
+  return seconds + 's';
+}
+
+// ── LIBRARY RENDER ────────────────────────────────────────────────
+const ALL_GAMES = [
+  { name:'Stellar Abyss', icon:'&#128640;', theme:'t-navy', desc:'A deep-space exploration RPG.', genre:'Action RPG', hours:'5&#8211;8 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#189;', meta:'94', players:'2.1M', slug:'stellar-abyss' },
+  { name:'Iron Citadel', icon:'&#127984;', theme:'t-crimson', desc:'A dark fortress-defense strategy game.', genre:'Strategy', hours:'3&#8211;5 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'88', players:'980K', slug:'' },
+  { name:'Neon Drift', icon:'&#127950;', theme:'t-violet', desc:'High-octane neon racing.', genre:'Racing', hours:'2&#8211;4 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'91', players:'1.4M', slug:'' },
+  { name:'Verdant Wilds', icon:'&#127807;', theme:'t-forest', desc:'Meditative alien survival.', genre:'Survival', hours:'4&#8211;7 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#9733;', meta:'96', players:'3.3M', slug:'' },
+  { name:'Hollow Protocol', icon:'&#129302;', theme:'t-slate', desc:'Cyber-noir stealth thriller.', genre:'Stealth', hours:'3&#8211;6 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'87', players:'760K', slug:'' },
+  { name:'Ember Forge', icon:'&#9874;', theme:'t-copper', desc:'Craft legendary weapons.', genre:'Crafting RPG', hours:'5&#8211;9 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'89', players:'1.1M', slug:'' },
+  { name:'Rift Walker', icon:'&#127744;', theme:'t-violet', desc:'A mind-bending puzzle platformer.', genre:'Puzzle', hours:'3&#8211;5 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'90', players:'870K', slug:'' },
+  { name:'Phantom Bloom', icon:'&#127800;', theme:'t-rose', desc:'A haunting action-adventure.', genre:'Action', hours:'3&#8211;5 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#189;', meta:'92', players:'1.8M', slug:'' },
+  { name:'Runebound Saga', icon:'&#9876;', theme:'t-crimson', desc:'Epic fantasy RPG.', genre:'RPG', hours:'8&#8211;12 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#9733;', meta:'97', players:'4.2M', slug:'' },
+  { name:'Deep Trench', icon:'&#129425;', theme:'t-teal', desc:'Explore an alien ocean floor.', genre:'Exploration', hours:'4&#8211;6 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'85', players:'520K', slug:'' },
+  { name:'Sandstorm Kings', icon:'&#127964;', theme:'t-amber', desc:'Rule a desert empire.', genre:'Strategy', hours:'6&#8211;10 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'88', players:'640K', slug:'' },
+  { name:'Glacial Protocol', icon:'&#129398;', theme:'t-ice', desc:'Espionage on a frozen moon.', genre:'Thriller', hours:'4&#8211;7 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'86', players:'430K', slug:'' },
+];
+
+let libFilter = 'all';
+
+function filterLibrary(f, btn) {
+  libFilter = f;
+  document.querySelectorAll('.lib-filter').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderLibrary();
+}
+
+function renderLibrary() {
+  const grid = document.getElementById('library-grid');
+  if (!currentUser) {
+    grid.innerHTML = `<div class="lib-empty"><strong>Sign in to see your library</strong>Create an account to save games and track your progress.</div>`;
+    return;
+  }
+  let games = currentProfile.library;
+  if (libFilter === 'recent') {
+    games = (currentProfile.recentGames || []).map(rg => currentProfile.library.find(g => g.name === rg.name)).filter(Boolean);
+  } else if (libFilter === 'installed') {
+    games = games.filter(g => g.slug);
+  }
+  if (games.length === 0) {
+    grid.innerHTML = `<div class="lib-empty"><strong>No games here yet</strong>${libFilter === 'all' ? 'Browse the store and add games to your library.' : 'No games match this filter.'}</div>`;
+    return;
+  }
+  grid.innerHTML = games.map(g => {
+    const pt = currentProfile.playtime[g.name] || 0;
+    const ptStr = pt > 0 ? fmtPlaytime(pt) : '0h';
+    return `<div class="game-card" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc}','${g.genre}','${g.hours}','${g.rating}','${g.meta}','${g.players}','${g.slug||''}')">
+      <div class="gc-bg ${g.theme}"></div>
+      <div class="gc-icon">${g.icon}</div>
+      <div class="gc-gradient"></div>
+      <div class="gc-play"><div class="gc-play-btn">&#9654;</div></div>
+      <div class="gc-info">
+        <div class="gc-name">${g.name}</div>
+        <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">${ptStr} played</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PROFILE PAGE RENDER ───────────────────────────────────────────
+function renderProfilePage() {
+  if (!currentUser) return;
+  const p = currentProfile;
+  document.getElementById('profile-avatar-big').textContent = currentUser.substring(0,2).toUpperCase();
+  document.getElementById('profile-username-display').textContent = currentUser;
+  const accounts = getAccounts();
+  const acc = accounts[currentUser];
+  document.getElementById('profile-joined').textContent = acc ? 'Joined ' + new Date(acc.created).toLocaleDateString('en-GB', {month:'long', year:'numeric'}) : '';
+
+  document.getElementById('ps-games').textContent = p.library.length;
+  const totalSec = Object.values(p.playtime).reduce((a,b) => a+b, 0);
+  document.getElementById('ps-hours').textContent = fmtPlaytime(totalSec);
+  document.getElementById('ps-sessions').textContent = p.sessions || 0;
+  document.getElementById('ps-last').textContent = p.lastActive
+    ? new Date(p.lastActive).toLocaleDateString('en-GB')
+    : '—';
+
+  const recent = document.getElementById('profile-recent');
+  const rg = p.recentGames || [];
+  if (rg.length === 0) {
+    recent.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">No recent activity yet.</div>';
+  } else {
+    recent.innerHTML = rg.map(g => {
+      const pt = p.playtime[g.name] || 0;
+      return `<div class="recent-game-row">
+        <div class="rg-icon ${g.theme}">${g.icon}</div>
+        <div class="rg-name">${g.name}</div>
+        <div class="rg-time">${fmtPlaytime(pt)} played</div>
+        <button class="rg-play" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc}','${g.genre}','${g.hours}','${g.rating}','${g.meta}','${g.players}','${g.slug||''}')">Play</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── NAV ───────────────────────────────────────────────────────────
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
@@ -461,9 +1034,161 @@ function showPage(id, btn) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
-  window.scrollTo(0, 0);
+  if (id === 'library') renderLibrary();
+  if (id === 'profile') renderProfilePage();
+  window.scrollTo(0,0);
 }
 
+// ── GAME MODAL ────────────────────────────────────────────────────
+function openGame(name, icon, theme, desc, genre, hours, rating, meta, players, slug) {
+  currentModalGame = { name, icon, theme, desc, genre, hours, rating, meta, players, slug: slug||'' };
+
+  document.getElementById('m-icon').innerHTML = icon;
+  document.getElementById('m-ph-icon').innerHTML = icon;
+  document.getElementById('m-load-icon').innerHTML = icon;
+  document.getElementById('m-icon-wrap').className = 'modal-game-icon ' + theme;
+  document.getElementById('m-name').textContent = name;
+  document.getElementById('m-genre').textContent = genre;
+  document.getElementById('m-hours').innerHTML = hours;
+  document.getElementById('m-players').textContent = players;
+  document.getElementById('m-ph-title').textContent = name;
+  document.getElementById('m-ph-desc').textContent = desc;
+  document.getElementById('m-load-title').textContent = name;
+  document.getElementById('m-rating').innerHTML = rating;
+  document.getElementById('m-meta').textContent = meta;
+  document.getElementById('m-genre-tag').textContent = genre;
+  document.getElementById('m-time').textContent = '—';
+
+  // Show user's playtime for this game
+  if (currentUser && currentProfile) {
+    const pt = currentProfile.playtime[name] || 0;
+    if (pt > 0) document.getElementById('m-time').textContent = fmtPlaytime(pt);
+  }
+
+  // Library button state
+  const inLib = isInLibrary(name);
+  updateLibBtn(inLib);
+
+  // Launch button behaviour: require sign-in for actual games
+  const launchFn = () => {
+    if (!currentUser) {
+      closeModal();
+      showAuthModal('login');
+      showToast('Sign in to play games.', 'error');
+      return;
+    }
+    // Auto-add to library when launching
+    if (!isInLibrary(name)) addToLibrary(currentModalGame);
+    updateLibBtn(true);
+    launchGame(name, icon, slug);
+  };
+
+  document.getElementById('m-launch-btn').onclick = launchFn;
+  document.getElementById('m-play-btn').onclick   = launchFn;
+
+  // Hint for signed-out users
+  document.getElementById('m-ph-hint').textContent = currentUser
+    ? 'Your game will load in this window'
+    : 'Sign in to play — it\'s free!';
+
+  // Reset state
+  document.getElementById('m-placeholder').style.display = 'flex';
+  document.getElementById('m-loading').style.display     = 'none';
+  document.getElementById('m-iframe-wrap').style.display = 'none';
+  document.getElementById('m-iframe-wrap').innerHTML     = '';
+  document.getElementById('m-return-btn').style.display  = 'none';
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function launchGame(name, icon, slug) {
+  const ph = document.getElementById('m-placeholder');
+  ph.style.transition = 'opacity 0.22s'; ph.style.opacity = '0';
+  setTimeout(() => {
+    ph.style.display = 'none'; ph.style.opacity = '1';
+    const loading = document.getElementById('m-loading');
+    const bar     = document.getElementById('m-load-bar');
+    const lbl     = document.getElementById('m-load-label');
+    loading.style.display = 'flex';
+    bar.style.width = '0%';
+    const labels = ['Loading assets...', 'Building world...', 'Spawning entities...', 'Almost ready...', 'Launching...'];
+    let progress = 0, li = 0;
+    const interval = setInterval(() => {
+      progress += Math.random()*9+3;
+      if (progress > 100) progress = 100;
+      bar.style.width = progress + '%';
+      const nli = Math.min(Math.floor((progress/100)*labels.length), labels.length-1);
+      if (nli !== li) { li = nli; lbl.textContent = labels[li]; }
+      if (progress >= 100) {
+        clearInterval(interval);
+        lbl.style.color = '#52B043'; lbl.textContent = '✓ Ready';
+        setTimeout(() => { loading.style.display = 'none'; showGameFrame(slug, icon, name); }, 400);
+      }
+    }, 90);
+  }, 240);
+}
+
+function showGameFrame(slug, icon, name) {
+  const wrap      = document.getElementById('m-iframe-wrap');
+  const returnBtn = document.getElementById('m-return-btn');
+  if (slug) {
+    const iframe = document.createElement('iframe');
+    iframe.src = slug + '/index.html';
+    iframe.allow = 'pointer-lock';
+    wrap.appendChild(iframe);
+  } else {
+    wrap.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;">
+      <div style="font-size:64px;">${icon}</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;">${name}</div>
+      <div style="font-size:13px;color:#52B043;display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;background:#52B043;border-radius:50%;"></div>Game Coming Soon</div>
+    </div>`;
+  }
+  wrap.style.display      = 'block';
+  returnBtn.style.display = 'flex';
+  startPlaytimeTracking(name);
+}
+
+function returnToLauncher() {
+  stopPlaytimeTracking(currentModalGame?.name);
+  const wrap = document.getElementById('m-iframe-wrap');
+  const rb   = document.getElementById('m-return-btn');
+  wrap.style.display = 'none'; wrap.innerHTML = '';
+  rb.style.display   = 'none';
+  document.getElementById('m-placeholder').style.display = 'flex';
+  // Update displayed playtime
+  if (currentUser && currentModalGame) {
+    const pt = currentProfile.playtime[currentModalGame.name] || 0;
+    if (pt > 0) document.getElementById('m-time').textContent = fmtPlaytime(pt);
+  }
+}
+
+function closeModal() {
+  stopPlaytimeTracking(currentModalGame?.name);
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('m-iframe-wrap').style.display = 'none';
+  document.getElementById('m-iframe-wrap').innerHTML     = '';
+  document.getElementById('m-return-btn').style.display  = 'none';
+  document.getElementById('m-placeholder').style.display = 'flex';
+  document.getElementById('m-loading').style.display     = 'none';
+}
+
+function closeIfBackdrop(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────
+function showToast(msg, type) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type || 'success');
+  toast.innerHTML = `<span class="toast-icon">${type === 'error' ? '⚠' : '✓'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.transition = 'opacity 0.4s'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
+}
+
+// ── LIBRARY FILTER BUTTONS ────────────────────────────────────────
 document.querySelectorAll('.lib-filter').forEach(f => {
   f.addEventListener('click', () => {
     document.querySelectorAll('.lib-filter').forEach(x => x.classList.remove('active'));
@@ -471,162 +1196,21 @@ document.querySelectorAll('.lib-filter').forEach(f => {
   });
 });
 
-// ── MODAL STATE ──────────────────────────────────────────────────
-let sessionStart = null;
-let timerInterval = null;
-let currentGameSlug = '';
-
-function openGame(name, icon, theme, desc, genre, hours, rating, meta, players, slug) {
-  currentGameSlug = slug || '';
-
-  // Populate header
-  document.getElementById('m-icon').textContent = icon;
-  document.getElementById('m-ph-icon').textContent = icon;
-  document.getElementById('m-load-icon').textContent = icon;
-  document.getElementById('m-icon-wrap').className = 'modal-game-icon ' + theme;
-  document.getElementById('m-name').textContent = name;
-  document.getElementById('m-genre').textContent = genre;
-  document.getElementById('m-hours').textContent = hours;
-  document.getElementById('m-players').textContent = players;
-  document.getElementById('m-ph-title').textContent = name;
-  document.getElementById('m-ph-desc').textContent = desc;
-  document.getElementById('m-load-title').textContent = name;
-  document.getElementById('m-rating').textContent = rating;
-  document.getElementById('m-meta').textContent = meta;
-  document.getElementById('m-genre-tag').textContent = genre;
-  document.getElementById('m-time').textContent = '0h 0m';
-
-  // Reset to placeholder state
-  document.getElementById('m-placeholder').style.display = 'flex';
-  document.getElementById('m-loading').style.display = 'none';
-  document.getElementById('m-iframe-wrap').style.display = 'none';
-  document.getElementById('m-iframe-wrap').innerHTML = '';
-  document.getElementById('m-return-btn').style.display = 'none';
-
-  // Wire buttons
-  document.getElementById('m-launch-btn').onclick = () => launchGame(name, icon, slug);
-  document.getElementById('m-play-btn').onclick   = () => launchGame(name, icon, slug);
-
-  document.getElementById('modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-// ── LAUNCH ───────────────────────────────────────────────────────
-function launchGame(name, icon, slug) {
-  // Fade out placeholder
-  const ph = document.getElementById('m-placeholder');
-  ph.style.transition = 'opacity 0.25s';
-  ph.style.opacity = '0';
-
-  setTimeout(() => {
-    ph.style.display = 'none';
-    ph.style.opacity = '1';
-
-    // Show loading screen
-    const loading = document.getElementById('m-loading');
-    const bar     = document.getElementById('m-load-bar');
-    const lbl     = document.getElementById('m-load-label');
-    loading.style.display = 'flex';
-    bar.style.width = '0%';
-
-    const labels = ['Loading assets...', 'Building world...', 'Spawning entities...', 'Almost ready...', 'Launching...'];
-    let progress = 0, li = 0;
-
-    const interval = setInterval(() => {
-      progress += Math.random() * 9 + 3;
-      if (progress > 100) progress = 100;
-      bar.style.width = progress + '%';
-      const newLi = Math.min(Math.floor((progress / 100) * labels.length), labels.length - 1);
-      if (newLi !== li) { li = newLi; lbl.textContent = labels[li]; }
-
-      if (progress >= 100) {
-        clearInterval(interval);
-        lbl.textContent = '&#10003; Ready';
-        lbl.style.color = '#52B043';
-
-        setTimeout(() => {
-          loading.style.display = 'none';
-          showGameFrame(slug, icon, name);
-        }, 400);
-      }
-    }, 90);
-  }, 260);
-}
-
-function showGameFrame(slug, icon, name) {
-  const wrap = document.getElementById('m-iframe-wrap');
-  const returnBtn = document.getElementById('m-return-btn');
-
-  if (slug) {
-    // Real game — load via iframe
-    const iframe = document.createElement('iframe');
-    iframe.src = slug + '/index.html';
-    iframe.allow = 'pointer-lock';
-    wrap.appendChild(iframe);
-  } else {
-    // Placeholder for games not yet built
-    wrap.innerHTML = `
-      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;">
-        <div style="font-size:64px;">${icon}</div>
-        <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;">${name}</div>
-        <div style="font-size:13px;color:#52B043;display:flex;align-items:center;gap:8px;">
-          <div style="width:8px;height:8px;background:#52B043;border-radius:50%;"></div>
-          Game Coming Soon
-        </div>
-        <div style="font-size:12px;color:#3A4A3A;margin-top:8px;letter-spacing:1px;">This game is not yet available</div>
-      </div>`;
+// ── KEYBOARD: close modals ────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('auth-modal').classList.contains('open')) hideAuthModal();
   }
+});
 
-  wrap.style.display = 'block';
-  returnBtn.style.display = 'flex';
+// ── ENTER KEY for auth forms ──────────────────────────────────────
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('reg-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
 
-  // Start session timer
-  clearInterval(timerInterval);
-  sessionStart = Date.now();
-  timerInterval = setInterval(updateTimer, 1000);
-}
-
-function returnToLauncher() {
-  // Go back to placeholder without closing modal
-  const wrap = document.getElementById('m-iframe-wrap');
-  const returnBtn = document.getElementById('m-return-btn');
-  const ph = document.getElementById('m-placeholder');
-
-  wrap.style.display = 'none';
-  wrap.innerHTML = '';
-  returnBtn.style.display = 'none';
-  ph.style.display = 'flex';
-
-  clearInterval(timerInterval);
-  sessionStart = null;
-}
-
-function updateTimer() {
-  if (!sessionStart) return;
-  const s = Math.floor((Date.now() - sessionStart) / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  document.getElementById('m-time').textContent =
-    (h > 0 ? h + 'h ' : '') + (m > 0 || h > 0 ? m + 'm ' : '') + sec + 's';
-}
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-  document.body.style.overflow = '';
-  clearInterval(timerInterval);
-  sessionStart = null;
-  // Clean up
-  document.getElementById('m-iframe-wrap').style.display = 'none';
-  document.getElementById('m-iframe-wrap').innerHTML = '';
-  document.getElementById('m-return-btn').style.display = 'none';
-  document.getElementById('m-placeholder').style.display = 'flex';
-  document.getElementById('m-loading').style.display = 'none';
-}
-
-function closeIfBackdrop(e) {
-  if (e.target === document.getElementById('modal')) closeModal();
-}
+// ── BOOT ──────────────────────────────────────────────────────────
+loadSession();
+renderHeader();
+renderLibrary();
 </script>
 </body>
 </html>
