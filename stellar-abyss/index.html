@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stellar Abyss</title>
+<title>Stellar Abyss - Optimized</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #000; color: #fff; font-family: 'Courier New', monospace; overflow: hidden; width: 100vw; height: 100vh; }
@@ -34,8 +34,6 @@
   #hit-flash  { position: absolute; inset: 0; background: rgba(255,0,0,0.22); opacity: 0; pointer-events: none; transition: opacity 0.06s; }
   #shoot-flash{ position: absolute; inset: 0; background: rgba(255,255,150,0.05); opacity: 0; pointer-events: none; }
   #heal-flash { position: absolute; inset: 0; background: rgba(0,255,100,0.13); opacity: 0; pointer-events: none; transition: opacity 0.35s; }
-
-  /* Screen shake handled via JS on canvas container */
 
   /* ── BOTTOM LEFT: HP/Shield bars ── */
   #stats-panel {
@@ -140,7 +138,15 @@
     text-shadow: 0 0 8px rgba(82,176,67,0.5);
   }
 
-  /* ═══ SCREENS ════════════════════════════════════════════════ */
+  /* ── Controller indicator ── */
+  #controller-status {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; letter-spacing: 2px; color: rgba(100,255,100,0.5);
+    background: rgba(0,5,20,0.5); padding: 4px 12px; border-radius: 3px;
+    display: none;
+  }
+
+  /* ═══ SCREENS ═══════════════════════════════════════════════ */
   .screen { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 40% 40%, #030d18 0%, #000 100%); }
   .screen-title { font-size: 52px; font-weight: bold; letter-spacing: 8px; color: #52B043; text-shadow: 0 0 40px rgba(82,176,67,0.5), 0 0 80px rgba(82,176,67,0.2); margin-bottom: 8px; text-transform: uppercase; }
   .screen-sub { font-size: 12px; letter-spacing: 3.5px; color: rgba(150,200,255,0.4); margin-bottom: 50px; }
@@ -215,10 +221,16 @@
 <div class="screen" id="controls-screen" style="display:none;">
   <div class="screen-title" style="font-size:26px; margin-bottom:24px;">Controls</div>
   <div class="controls-hint">
+    <strong>KEYBOARD & MOUSE:</strong><br>
     WASD / Arrows — Move &nbsp;|&nbsp; Mouse — Look &nbsp;|&nbsp; Click — Shoot<br>
     1 2 3 4 — Switch weapon &nbsp;|&nbsp; Scroll — Cycle weapon &nbsp;|&nbsp; R — Reload<br>
     E — Interact &nbsp;|&nbsp; M — Nav Map &nbsp;|&nbsp; B / ESC — Pause<br>
-    Space / Shift — Up / Down (Deep Space) &nbsp;|&nbsp; F — Pick up item
+    Space / Shift — Up / Down (Deep Space) &nbsp;|&nbsp; F — Pick up item<br><br>
+    <strong>GAMEPAD:</strong><br>
+    Left Stick — Move &nbsp;|&nbsp; Right Stick — Look &nbsp;|&nbsp; RT/R2 — Shoot<br>
+    D-Pad / Bumpers — Switch weapon &nbsp;|&nbsp; X / ◻ — Reload<br>
+    A / ✕ — Interact/Pick up &nbsp;|&nbsp; Y / △ — Nav Map &nbsp;|&nbsp; Start — Pause<br>
+    LT/L2 — Up &nbsp;|&nbsp; LB/L1 — Down (Deep Space)
   </div>
   <button class="menu-btn" style="margin-top:36px;" onclick="document.getElementById('controls-screen').style.display='none'; document.getElementById('title-screen').style.display='flex';">← Back</button>
 </div>
@@ -246,14 +258,14 @@
       <div class="nc-status danger">⚠ Hostile</div>
     </div>
   </div>
-  <div class="nav-close" onclick="closeMap()">[ M ] or [ ESC ] Close</div>
+  <div class="nav-close" onclick="closeMap()">[ M / Y / ESC ] Close</div>
 </div>
 
 <!-- DIALOGUE -->
 <div id="dialogue-box">
   <div id="dialogue-speaker">Unknown</div>
   <div id="dialogue-text"></div>
-  <div id="dialogue-continue">[ E ] Continue</div>
+  <div id="dialogue-continue">[ E / A ] Continue</div>
 </div>
 
 <!-- INTERACT PROMPT -->
@@ -317,6 +329,7 @@
 
   <div id="kill-feed"></div>
   <div id="pickup-notif"></div>
+  <div id="controller-status">🎮 Controller Connected</div>
 </div>
 
 <!-- DEATH SCREEN -->
@@ -343,10 +356,16 @@
   <div style="text-align:center;">
     <div class="screen-title" style="font-size:22px; margin-bottom:28px;">Controls</div>
     <div class="controls-hint">
+      <strong>KEYBOARD & MOUSE:</strong><br>
       WASD / Arrows — Move &nbsp;|&nbsp; Mouse — Look &nbsp;|&nbsp; Click — Shoot<br>
       1 2 3 4 — Switch weapon &nbsp;|&nbsp; Scroll — Cycle weapon &nbsp;|&nbsp; R — Reload<br>
       E — Interact &nbsp;|&nbsp; M — Nav Map &nbsp;|&nbsp; B / ESC — Pause<br>
-      Space / Shift — Up / Down (Deep Space) &nbsp;|&nbsp; F — Pick up item
+      Space / Shift — Up / Down (Deep Space) &nbsp;|&nbsp; F — Pick up item<br><br>
+      <strong>GAMEPAD:</strong><br>
+      Left Stick — Move &nbsp;|&nbsp; Right Stick — Look &nbsp;|&nbsp; RT/R2 — Shoot<br>
+      D-Pad / Bumpers — Switch weapon &nbsp;|&nbsp; X / ◻ — Reload<br>
+      A / ✕ — Interact/Pick up &nbsp;|&nbsp; Y / △ — Nav Map &nbsp;|&nbsp; Start — Pause<br>
+      LT/L2 — Up &nbsp;|&nbsp; LB/L1 — Down (Deep Space)
     </div>
     <button class="menu-btn" style="margin-top:32px;" onclick="closePauseControls()">Back</button>
   </div>
@@ -357,10 +376,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════════
-//  STELLAR ABYSS  —  Visual Overhaul
+//  STELLAR ABYSS — OPTIMIZED + FULL CONTROLLER SUPPORT
+//  Performance: Object pooling, reduced geometry, optimized lights
+//  Controller: Full gamepad support for Xbox/PlayStation controllers
 // ═══════════════════════════════════════════════════════════════════
 
-// ── WEAPON DEFINITIONS ───────────────────────────────────────────
 const WEAPONS = [
   { id:0, name:'PLASMA RIFLE',    icon:'⚡', ammo:30, maxAmmo:30, reloadTime:1.6, cooldown:0.12, damage:1, speed:0.9, spread:0,    bulletColor:0x00ffcc, bulletSize:0.055, pellets:1, unlocked:true  },
   { id:1, name:'SCATTER CANNON',  icon:'🔫', ammo:20, maxAmmo:20, reloadTime:2.2, cooldown:0.55, damage:1, speed:0.7, spread:0.14,  bulletColor:0xff8800, bulletSize:0.065, pellets:6, unlocked:true  },
@@ -380,27 +400,144 @@ const Game = {
   reloading:false, shootCooldown:0,
   objects:[],
   minimapCtx:null,
-  weaponMesh:null, weaponBob:0, weaponBobDir:1, weaponSwayX:0, weaponSwayY:0,
+  weaponMesh:null, weaponBob:0, weaponSwayX:0, weaponSwayY:0,
   screenShake:0,
   particles:[],
+  bulletPool:[], particlePool:[], enemyBulletPool:[],
+  gamepad:null, gamepadIndex:null,
+  gamepadAxes: {leftX:0, leftY:0, rightX:0, rightY:0},
+  gamepadButtons: {},
+  lastGamepadButtons: {},
 };
+
+// ── CONTROLLER SUPPORT ───────────────────────────────────────────
+window.addEventListener('gamepadconnected', (e) => {
+  Game.gamepad = e.gamepad;
+  Game.gamepadIndex = e.gamepad.index;
+  console.log('🎮 Gamepad connected:', e.gamepad.id);
+  const el = document.getElementById('controller-status');
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+});
+
+window.addEventListener('gamepaddisconnected', (e) => {
+  if (e.gamepad.index === Game.gamepadIndex) {
+    Game.gamepad = null;
+    Game.gamepadIndex = null;
+    console.log('🎮 Gamepad disconnected');
+  }
+});
+
+function updateGamepad() {
+  if (Game.gamepadIndex === null) return;
+  
+  const gamepads = navigator.getGamepads();
+  const gp = gamepads[Game.gamepadIndex];
+  if (!gp) return;
+  
+  Game.lastGamepadButtons = {...Game.gamepadButtons};
+  
+  const deadzone = 0.15;
+  Game.gamepadAxes.leftX = Math.abs(gp.axes[0]) > deadzone ? gp.axes[0] : 0;
+  Game.gamepadAxes.leftY = Math.abs(gp.axes[1]) > deadzone ? gp.axes[1] : 0;
+  Game.gamepadAxes.rightX = Math.abs(gp.axes[2]) > deadzone ? gp.axes[2] : 0;
+  Game.gamepadAxes.rightY = Math.abs(gp.axes[3]) > deadzone ? gp.axes[3] : 0;
+  
+  Game.gamepadButtons = {
+    a: gp.buttons[0]?.pressed,
+    b: gp.buttons[1]?.pressed,
+    x: gp.buttons[2]?.pressed,
+    y: gp.buttons[3]?.pressed,
+    lb: gp.buttons[4]?.pressed,
+    rb: gp.buttons[5]?.pressed,
+    lt: gp.buttons[6]?.pressed || (gp.buttons[6]?.value > 0.5),
+    rt: gp.buttons[7]?.pressed || (gp.buttons[7]?.value > 0.5),
+    start: gp.buttons[9]?.pressed,
+    dpadUp: gp.buttons[12]?.pressed,
+    dpadDown: gp.buttons[13]?.pressed,
+    dpadLeft: gp.buttons[14]?.pressed,
+    dpadRight: gp.buttons[15]?.pressed,
+  };
+  
+  handleGamepadInput();
+}
+
+function buttonJustPressed(button) {
+  return Game.gamepadButtons[button] && !Game.lastGamepadButtons[button];
+}
+
+function handleGamepadInput() {
+  if (Game.isDead) {
+    if (buttonJustPressed('a')) respawn();
+    return;
+  }
+  
+  if (Game.paused) {
+    if (buttonJustPressed('a') || buttonJustPressed('start')) resumeGame();
+    return;
+  }
+  
+  if (buttonJustPressed('start')) {
+    if (!Game.dialogueOpen && !Game.mapOpen) pauseGame();
+  }
+  
+  if (Game.dialogueOpen) {
+    if (buttonJustPressed('a')) advanceDialogue();
+    return;
+  }
+  
+  if (Game.mapOpen) {
+    if (buttonJustPressed('y') || buttonJustPressed('b')) closeMap();
+    return;
+  }
+  
+  if (Game.gamepadButtons.rt && !Game.reloading && Game.shootCooldown <= 0) {
+    shoot();
+  }
+  
+  if (buttonJustPressed('a')) handleInteract();
+  if (buttonJustPressed('x')) startReload();
+  if (buttonJustPressed('y') && Game.locked) toggleMap();
+  
+  if (buttonJustPressed('dpadUp') || buttonJustPressed('rb')) cycleWeapon(1);
+  if (buttonJustPressed('dpadDown')) cycleWeapon(-1);
+  if (buttonJustPressed('dpadLeft')) {
+    let next = Game.player.weaponIndex - 1;
+    while (next >= 0 && !WEAPONS[next].unlocked) next--;
+    if (next >= 0) switchWeapon(next);
+  }
+  if (buttonJustPressed('dpadRight')) {
+    let next = Game.player.weaponIndex + 1;
+    while (next < 4 && !WEAPONS[next].unlocked) next++;
+    if (next < 4) switchWeapon(next);
+  }
+}
+
+function cycleWeapon(dir) {
+  let next = Game.player.weaponIndex;
+  for (let i = 0; i < 4; i++) {
+    next = (next + dir + 4) % 4;
+    if (WEAPONS[next].unlocked) {
+      switchWeapon(next);
+      break;
+    }
+  }
+}
 
 // ── INIT ─────────────────────────────────────────────────────────
 function init() {
-  // Main scene
   Game.scene = new THREE.Scene();
   Game.scene.fog = new THREE.FogExp2(0x000005, 0.035);
   Game.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.05, 800);
 
-  Game.renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+  Game.renderer = new THREE.WebGLRenderer({ antialias:false, alpha:false, powerPreference:'high-performance' });
   Game.renderer.setSize(window.innerWidth, window.innerHeight);
-  Game.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  Game.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   Game.renderer.shadowMap.enabled = true;
-  Game.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  Game.renderer.shadowMap.type = THREE.BasicShadowMap;
   Game.renderer.autoClear = false;
   document.getElementById('canvas-container').appendChild(Game.renderer.domElement);
 
-  // Weapon scene — rendered on top, no depth conflict with world
   Game.weaponScene  = new THREE.Scene();
   Game.weaponCamera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.01, 20);
   Game.weaponCamera.position.set(0,0,0);
@@ -417,19 +554,68 @@ function init() {
   buildWeaponModels();
   buildStarfield();
   setupControls();
+  initObjectPools();
   animate();
 }
 
-// ── STARFIELD ────────────────────────────────────────────────────
+// ── OBJECT POOLING ───────────────────────────────────────────────
+function initObjectPools() {
+  for (let i = 0; i < 50; i++) {
+    const geo = new THREE.CylinderGeometry(0.05, 0.055, 0.25, 6);
+    geo.rotateX(Math.PI/2);
+    const mat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, transparent: true, opacity: 0.9 });
+    const bullet = new THREE.Mesh(geo, mat);
+    bullet.visible = false;
+    Game.bulletPool.push(bullet);
+  }
+  
+  for (let i = 0; i < 100; i++) {
+    const geo = new THREE.SphereGeometry(0.05, 4, 4);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
+    const particle = new THREE.Mesh(geo, mat);
+    particle.visible = false;
+    Game.particlePool.push(particle);
+  }
+  
+  for (let i = 0; i < 30; i++) {
+    const geo = new THREE.SphereGeometry(0.09, 4, 4);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xff4400 });
+    const eb = new THREE.Mesh(geo, mat);
+    eb.visible = false;
+    Game.enemyBulletPool.push(eb);
+  }
+}
+
+function getBulletFromPool() {
+  for (let b of Game.bulletPool) {
+    if (!b.visible) return b;
+  }
+  return null;
+}
+
+function getParticleFromPool() {
+  for (let p of Game.particlePool) {
+    if (!p.visible) return p;
+  }
+  return null;
+}
+
+function getEnemyBulletFromPool() {
+  for (let eb of Game.enemyBulletPool) {
+    if (!eb.visible) return eb;
+  }
+  return null;
+}
+
+// ── STARFIELD (Reduced) ──────────────────────────────────────────
 function buildStarfield() {
   const existing = Game.scene.children.filter(c => c.isPoints);
   existing.forEach(s => Game.scene.remove(s));
 
-  // Two layers for parallax feel
   for (let layer = 0; layer < 2; layer++) {
     const geo = new THREE.BufferGeometry();
     const verts = [];
-    const count = layer === 0 ? 3000 : 1000;
+    const count = layer === 0 ? 1000 : 500;
     const range = layer === 0 ? 600 : 300;
     for (let i = 0; i < count; i++) {
       verts.push((Math.random()-.5)*range, (Math.random()-.5)*range, (Math.random()-.5)*range);
@@ -441,9 +627,8 @@ function buildStarfield() {
   }
 }
 
-// ── WEAPON MODELS ─────────────────────────────────────────────────
+// ── WEAPON MODELS (Simplified) ───────────────────────────────────
 function buildWeaponModels() {
-  // We'll build one per weapon and swap visibility
   const mat_metal = new THREE.MeshStandardMaterial({ color:0x1a2030, roughness:0.35, metalness:0.85 });
   const mat_accent = new THREE.MeshStandardMaterial({ color:0x00ddbb, roughness:0.2, metalness:0.9, emissive:0x003322, emissiveIntensity:0.3 });
   const mat_orange = new THREE.MeshStandardMaterial({ color:0xff5500, roughness:0.3, metalness:0.7, emissive:0x441100, emissiveIntensity:0.3 });
@@ -451,98 +636,46 @@ function buildWeaponModels() {
   const mat_red    = new THREE.MeshStandardMaterial({ color:0xcc1100, roughness:0.3, metalness:0.7, emissive:0x330000, emissiveIntensity:0.4 });
   const mat_dark   = new THREE.MeshStandardMaterial({ color:0x0a0c10, roughness:0.5, metalness:0.7 });
 
-  // Weapon lighting in weapon scene
   const wl1 = new THREE.DirectionalLight(0xffffff, 1.8); wl1.position.set(1,2,2); Game.weaponScene.add(wl1);
   const wl2 = new THREE.AmbientLight(0x334455, 1.2); Game.weaponScene.add(wl2);
   const wl3 = new THREE.PointLight(0x00ffcc, 0.8, 3); wl3.position.set(-0.5, 0.3, 0.5); Game.weaponScene.add(wl3);
 
   function makeWeapon0() {
-    // PLASMA RIFLE — sleek sci-fi rifle
     const g = new THREE.Group();
-    // Main body
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.55), mat_metal); g.add(body);
-    // Top rail
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.50), mat_dark); rail.position.set(0, 0.045, -0.02); g.add(rail);
-    // Barrel
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.018, 0.30, 8), mat_dark); barrel.rotation.x = Math.PI/2; barrel.position.set(0, 0.02, -0.42); g.add(barrel);
-    // Barrel tip glow ring
-    const tip = new THREE.Mesh(new THREE.TorusGeometry(0.022, 0.005, 8, 16), mat_accent); tip.rotation.x = Math.PI/2; tip.position.set(0, 0.02, -0.57); g.add(tip);
-    // Energy cell (glowing)
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.018, 0.30, 6), mat_dark); barrel.rotation.x = Math.PI/2; barrel.position.set(0, 0.02, -0.42); g.add(barrel);
+    const tip = new THREE.Mesh(new THREE.TorusGeometry(0.022, 0.005, 6, 12), mat_accent); tip.rotation.x = Math.PI/2; tip.position.set(0, 0.02, -0.57); g.add(tip);
     const cell = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.12), mat_accent); cell.position.set(0, -0.045, 0.05); g.add(cell);
-    // Grip
     const grip = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.12, 0.06), mat_dark); grip.position.set(0, -0.09, 0.15); grip.rotation.x = -0.18; g.add(grip);
-    // Scope
-    const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.1, 8), mat_dark); scope.rotation.x = Math.PI/2; scope.position.set(0, 0.058, -0.05); g.add(scope);
-    // Side fins
-    for (let s of [-1,1]) {
-      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.025, 0.18), mat_accent); fin.position.set(s*0.043, 0.01, -0.08); g.add(fin);
-    }
     return g;
   }
 
   function makeWeapon1() {
-    // SCATTER CANNON — chunky shotgun
     const g = new THREE.Group();
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.10, 0.40), mat_metal); g.add(body);
-    // Double barrel
     for (let s of [-0.025, 0.025]) {
-      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.020, 0.28, 8), mat_dark); b.rotation.x = Math.PI/2; b.position.set(s, 0.012, -0.34); g.add(b);
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.020, 0.28, 6), mat_dark); b.rotation.x = Math.PI/2; b.position.set(s, 0.012, -0.34); g.add(b);
     }
-    // Pump handle
-    const pump = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.045, 0.12), new THREE.MeshStandardMaterial({color:0x2a1a0a,roughness:0.9,metalness:0.1})); pump.position.set(0, -0.03, -0.05); g.add(pump);
-    // Stock
-    const stock = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.075, 0.18), mat_dark); stock.position.set(0, -0.01, 0.28); g.add(stock);
-    // Grip
     const grip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.13, 0.065), mat_dark); grip.position.set(0, -0.10, 0.10); grip.rotation.x = -0.2; g.add(grip);
-    // Accent rings on barrels
-    for (let z of [-0.28, -0.42]) {
-      for (let s of [-0.025, 0.025]) {
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.022, 0.004, 6, 12), mat_orange); ring.rotation.x = Math.PI/2; ring.position.set(s, 0.012, z); g.add(ring);
-      }
-    }
     return g;
   }
 
   function makeWeapon2() {
-    // RAIL SNIPER — long precision rifle
     const g = new THREE.Group();
-    // Long body
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.065, 0.72), mat_metal); g.add(body);
-    // Long barrel
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.014, 0.50, 8), mat_dark); barrel.rotation.x = Math.PI/2; barrel.position.set(0, 0.015, -0.61); g.add(barrel);
-    // Scope (big)
-    const scopeBody = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.22, 8), mat_dark); scopeBody.rotation.x = Math.PI/2; scopeBody.position.set(0, 0.055, -0.08); g.add(scopeBody);
-    const scopeLens = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.01, 8), new THREE.MeshStandardMaterial({color:0x002244,emissive:0x002244,emissiveIntensity:1,metalness:0,roughness:0})); scopeLens.rotation.x = Math.PI/2; scopeLens.position.set(0, 0.055, -0.19); g.add(scopeLens);
-    // Bipod legs
-    for (let s of [-0.04, 0.04]) {
-      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.08, 0.008), mat_dark); leg.position.set(s, -0.07, -0.28); g.add(leg);
-    }
-    // Energy rail (yellow glow strip)
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.014, 0.50, 6), mat_dark); barrel.rotation.x = Math.PI/2; barrel.position.set(0, 0.015, -0.61); g.add(barrel);
     const rail = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.008, 0.62), mat_yellow); rail.position.set(0.034, 0, 0); g.add(rail);
-    // Grip
     const grip = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 0.055), mat_dark); grip.position.set(0, -0.10, 0.18); grip.rotation.x = -0.15; g.add(grip);
     return g;
   }
 
   function makeWeapon3() {
-    // ROCKET LAUNCHER — big tube launcher
     const g = new THREE.Group();
-    // Main tube
-    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.65, 10), mat_metal); tube.rotation.x = Math.PI/2; g.add(tube);
-    // Front bell
-    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.09, 0.06, 10), mat_dark); bell.rotation.x = Math.PI/2; bell.position.set(0, 0, -0.35); g.add(bell);
-    // Back exhaust
-    const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.060, 0.05, 10), mat_dark); exhaust.rotation.x = Math.PI/2; exhaust.position.set(0, 0, 0.355); g.add(exhaust);
-    // Grip
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.65, 8), mat_metal); tube.rotation.x = Math.PI/2; g.add(tube);
     const grip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.14, 0.06), mat_dark); grip.position.set(0, -0.12, 0.05); g.add(grip);
-    // Shoulder rest
-    const rest = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.22), mat_dark); rest.position.set(0, 0.075, 0.18); g.add(rest);
-    // Warning stripes
-    for (let z of [-0.25, -0.1, 0.05]) {
-      const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.067, 0.067, 0.012, 10), mat_red); stripe.rotation.x = Math.PI/2; stripe.position.set(0, 0, z); g.add(stripe);
+    for (let z of [-0.25, 0.05]) {
+      const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.067, 0.067, 0.012, 8), mat_red); stripe.rotation.x = Math.PI/2; stripe.position.set(0, 0, z); g.add(stripe);
     }
-    // Sight
-    const sight = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.03, 0.025), mat_dark); sight.position.set(0, 0.077, -0.15); g.add(sight);
     return g;
   }
 
@@ -556,12 +689,11 @@ function buildWeaponModels() {
 }
 
 function positionWeapon(idx) {
-  // Default resting positions per weapon type
   const configs = [
-    { x:0.22,  y:-0.19, z:-0.40 },  // plasma rifle
-    { x:0.22,  y:-0.20, z:-0.35 },  // scatter cannon
-    { x:0.18,  y:-0.18, z:-0.45 },  // rail sniper
-    { x:0.20,  y:-0.22, z:-0.38 },  // rocket launcher
+    { x:0.22,  y:-0.19, z:-0.40 },
+    { x:0.22,  y:-0.20, z:-0.35 },
+    { x:0.18,  y:-0.18, z:-0.45 },
+    { x:0.20,  y:-0.22, z:-0.38 },
   ];
   const cfg = configs[idx];
   Game.weaponModels.forEach((m, i) => {
@@ -597,12 +729,7 @@ function setupControls() {
 
   document.addEventListener('wheel', e => {
     if (!Game.locked || Game.paused) return;
-    const dir = e.deltaY > 0 ? 1 : -1;
-    let next = Game.player.weaponIndex;
-    for (let i = 0; i < 4; i++) {
-      next = (next+dir+4)%4;
-      if (WEAPONS[next].unlocked) { switchWeapon(next); break; }
-    }
+    cycleWeapon(e.deltaY > 0 ? 1 : -1);
   });
 
   document.addEventListener('mousemove', e => {
@@ -610,7 +737,6 @@ function setupControls() {
     Game.yaw   -= e.movementX * 0.0018;
     Game.pitch -= e.movementY * 0.0018;
     Game.pitch = Math.max(-Math.PI/2.3, Math.min(Math.PI/2.3, Game.pitch));
-    // Weapon sway
     Game.weaponSwayX += e.movementX * 0.0003;
     Game.weaponSwayY += e.movementY * 0.0003;
   });
@@ -674,7 +800,6 @@ function shoot() {
   Game.shootCooldown = w.cooldown;
   updateWeaponHUD();
 
-  // Muzzle flash on weapon model
   if (Game.weaponMesh) {
     const origY = Game.weaponMesh.position.y;
     Game.weaponMesh.position.y += 0.008;
@@ -702,15 +827,24 @@ function shoot() {
 }
 
 function spawnBullet(dir, color, size, speed, damage, isRocket, life) {
-  // Trail geometry for visual effect
-  const geo = new THREE.CylinderGeometry(size*0.3, size, isRocket?0.3:0.25, 6);
-  geo.rotateX(Math.PI/2);
-  const mat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.9 });
-  const bullet = new THREE.Mesh(geo, mat);
+  const bullet = getBulletFromPool();
+  if (!bullet) return;
+  
+  bullet.material.color.setHex(color);
+  bullet.scale.set(size*6, size*6, isRocket?6:5);
   bullet.position.copy(Game.camera.position).addScaledVector(dir, 0.6);
-  const light = new THREE.PointLight(color, isRocket?4:2.5, isRocket?7:3.5);
-  bullet.add(light);
-  Game.scene.add(bullet);
+  bullet.visible = true;
+  
+  if (!bullet.userData.light) {
+    const light = new THREE.PointLight(color, isRocket?4:2.5, isRocket?7:3.5);
+    bullet.add(light);
+    bullet.userData.light = light;
+  }
+  bullet.userData.light.color.setHex(color);
+  bullet.userData.light.intensity = isRocket?4:2.5;
+  
+  if (!bullet.parent) Game.scene.add(bullet);
+  
   Game.bullets.push({ mesh:bullet, dir, speed, life, damage, isRocket });
 }
 
@@ -741,17 +875,24 @@ function startReload() {
 // ── PARTICLES ────────────────────────────────────────────────────
 function spawnParticles(pos, color, count, spread, speed, life) {
   for (let i=0; i<count; i++) {
-    const geo = new THREE.SphereGeometry(0.04+Math.random()*0.06, 4, 4);
-    const mat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.9 });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.copy(pos);
+    const p = getParticleFromPool();
+    if (!p) break;
+    
+    p.material.color.setHex(color);
+    p.material.opacity = 0.9;
+    p.position.copy(pos);
+    p.scale.set(1, 1, 1);
+    p.visible = true;
+    
     const vel = new THREE.Vector3(
       (Math.random()-.5)*spread,
       (Math.random()-.5)*spread,
       (Math.random()-.5)*spread
     ).normalize().multiplyScalar(speed * (0.5+Math.random()*0.5));
-    Game.scene.add(mesh);
-    Game.particles.push({ mesh, vel, life, maxLife:life });
+    
+    if (!p.parent) Game.scene.add(p);
+    
+    Game.particles.push({ mesh:p, vel, life, maxLife:life });
   }
 }
 
@@ -762,15 +903,26 @@ function updateParticles(dt) {
     p.life -= dt;
     p.mesh.material.opacity = Math.max(0, p.life/p.maxLife * 0.9);
     p.mesh.scale.multiplyScalar(0.97);
-    if (p.life <= 0) { Game.scene.remove(p.mesh); Game.particles.splice(i,1); }
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      Game.particles.splice(i,1);
+    }
   }
 }
 
 // ── AREAS ────────────────────────────────────────────────────────
 function clearArea() {
   const toRemove = [];
-  Game.scene.children.forEach(c => { if (!c.isPoints) toRemove.push(c); });
+  Game.scene.children.forEach(c => { 
+    if (!c.isPoints && Game.bulletPool.indexOf(c)===-1 && Game.particlePool.indexOf(c)===-1 && Game.enemyBulletPool.indexOf(c)===-1) 
+      toRemove.push(c); 
+  });
   toRemove.forEach(c => Game.scene.remove(c));
+  
+  Game.bullets.forEach(b => b.mesh.visible = false);
+  Game.enemyBullets.forEach(b => b.mesh.visible = false);
+  Game.particles.forEach(p => p.mesh.visible = false);
+  
   Game.enemies=[]; Game.bullets=[]; Game.enemyBullets=[]; Game.interactables=[]; Game.objects=[]; Game.items=[]; Game.particles=[];
   clearInterval(reloadInterval);
   Game.reloading = false;
@@ -778,258 +930,42 @@ function clearArea() {
   buildStarfield();
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  AREA 1: SAFE HAVEN — Full space hangar rework
-// ─────────────────────────────────────────────────────────────────
 function buildHaven() {
   clearArea();
   Game.scene.fog = new THREE.FogExp2(0x000812, 0.022);
   Game.scene.background = new THREE.Color(0x000812);
 
-  // Lighting rig
-  Game.scene.add(new THREE.AmbientLight(0x0a1828, 0.9));
-  const sun = new THREE.DirectionalLight(0x4466aa, 0.6); sun.position.set(20,30,10); sun.castShadow=true; sun.shadow.mapSize.width=2048; sun.shadow.mapSize.height=2048; Game.scene.add(sun);
+  Game.scene.add(new THREE.AmbientLight(0x0a1828, 1.0));
+  const sun = new THREE.DirectionalLight(0x4466aa, 0.7); 
+  sun.position.set(20,30,10); 
+  sun.castShadow=true; 
+  sun.shadow.mapSize.width=1024;
+  sun.shadow.mapSize.height=1024;
+  Game.scene.add(sun);
 
   const M = (c, r=0.5, m=0.5) => new THREE.MeshStandardMaterial({ color:c, roughness:r, metalness:m });
 
-  // ── FLOOR — large circular hangar deck ──
-  const floorGeo = new THREE.CylinderGeometry(32, 32, 0.4, 48);
+  const floorGeo = new THREE.CylinderGeometry(32, 32, 0.4, 32);
   const floor = new THREE.Mesh(floorGeo, M(0x050d18, 0.85, 0.4));
   floor.position.y = -0.2; floor.receiveShadow = true; Game.scene.add(floor);
 
-  // Floor detail — concentric rings
-  for (let r of [5,10,16,22,28]) {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.05, 4, 60), new THREE.MeshBasicMaterial({ color: r===10?0x004466:0x001828 }));
+  for (let r of [10,22]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.05, 4, 40), new THREE.MeshBasicMaterial({ color: r===10?0x004466:0x001828 }));
     ring.rotation.x = Math.PI/2; ring.position.y=0.01; Game.scene.add(ring);
   }
-  // Landing pad markings
-  const padMat = new THREE.MeshBasicMaterial({ color:0x00334d });
-  for (let ang=0; ang<Math.PI*2; ang+=Math.PI/4) {
-    const mark = new THREE.Mesh(new THREE.BoxGeometry(0.08,0.01,3), padMat);
-    mark.position.set(Math.cos(ang)*10, 0.01, Math.sin(ang)*10); mark.rotation.y=ang; Game.scene.add(mark);
-  }
 
-  // ── CEILING ──
-  const ceilGeo = new THREE.CylinderGeometry(30, 30, 0.5, 48);
-  const ceil = new THREE.Mesh(ceilGeo, M(0x040a14, 0.9, 0.4)); ceil.position.y=10; Game.scene.add(ceil);
-  // Ceiling structural ribs
-  for (let a=0; a<Math.PI*2; a+=Math.PI/6) {
-    const rib = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.3, 29), M(0x060e1c, 0.8, 0.6));
-    rib.position.y=9.8; rib.rotation.y=a; Game.scene.add(rib);
-  }
-
-  // ── OUTER WALLS — segmented panels ──
-  for (let i=0; i<24; i++) {
-    const ang = (i/24)*Math.PI*2;
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(8.2, 10, 0.35), M(0x060e1c, 0.8, 0.5));
+  for (let i=0; i<16; i++) {
+    const ang = (i/16)*Math.PI*2;
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(12.2, 10, 0.35), M(0x060e1c, 0.8, 0.5));
     panel.position.set(Math.cos(ang)*29.5, 5, Math.sin(ang)*29.5);
     panel.rotation.y = -ang; panel.castShadow=true; Game.scene.add(panel); Game.objects.push(panel);
-    // Panel edge lights (every 3rd panel)
-    if (i%3===0) {
-      const pl = new THREE.PointLight(0x0044aa, 0.4, 6);
-      pl.position.set(Math.cos(ang)*28.5, 2+Math.random()*4, Math.sin(ang)*28.5);
-      Game.scene.add(pl);
-    }
   }
 
-  // ── HANGAR BAY — giant window opening (South) ──
-  // Huge force-field window — glowing rectangle
-  const windowGeo = new THREE.PlaneGeometry(22, 9);
-  const windowMat = new THREE.MeshBasicMaterial({ color:0x001833, transparent:true, opacity:0.35, side:THREE.DoubleSide });
-  const win = new THREE.Mesh(windowGeo, windowMat); win.position.set(0, 5, -28.8); Game.scene.add(win);
-  // Window frame
-  for (let frame of [[22.4,0.25,0.25],[22.4,0.25,0.25],[0.25,9.5,0.25],[0.25,9.5,0.25]]) {
-    const fw = new THREE.Mesh(new THREE.BoxGeometry(...frame), M(0x0a2040, 0.5, 0.8));
-    Game.scene.add(fw);
-  }
-  const frameT = new THREE.Mesh(new THREE.BoxGeometry(22.4,0.25,0.25), M(0x0a2040,0.5,0.8)); frameT.position.set(0,9.6,-29.2); Game.scene.add(frameT);
-  const frameB = new THREE.Mesh(new THREE.BoxGeometry(22.4,0.25,0.25), M(0x0a2040,0.5,0.8)); frameB.position.set(0,0.6,-29.2); Game.scene.add(frameB);
-  const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.25,9.5,0.25), M(0x0a2040,0.5,0.8)); frameL.position.set(-11.2,5,-29.2); Game.scene.add(frameL);
-  const frameR = new THREE.Mesh(new THREE.BoxGeometry(0.25,9.5,0.25), M(0x0a2040,0.5,0.8)); frameR.position.set(11.2,5,-29.2); Game.scene.add(frameR);
-  // Window glow strip
-  const glowStrip = new THREE.PointLight(0x0066cc, 1.5, 18);
-  glowStrip.position.set(0,5,-27); Game.scene.add(glowStrip);
-  // Stars visible through window
-  const starsGeo = new THREE.SphereGeometry(200, 16, 16);
-  const starsMat = new THREE.MeshBasicMaterial({ color:0x000820, side:THREE.BackSide });
-  Game.scene.add(new THREE.Mesh(starsGeo, starsMat));
-
-  // ── SUPPORT PILLARS — 6 around the ring ──
-  for (let i=0; i<6; i++) {
-    const ang = (i/6)*Math.PI*2;
-    const r = 18;
-    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 10, 10), M(0x080f1e, 0.6, 0.7));
-    pillar.position.set(Math.cos(ang)*r, 5, Math.sin(ang)*r);
-    pillar.castShadow=true; Game.scene.add(pillar); Game.objects.push(pillar);
-    // Pillar base
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.3, 10), M(0x0a1525, 0.7, 0.6));
-    base.position.set(Math.cos(ang)*r, 0.15, Math.sin(ang)*r); Game.scene.add(base);
-    // Pillar light band
-    const pLight = new THREE.Mesh(new THREE.TorusGeometry(0.65, 0.04, 6, 20), new THREE.MeshBasicMaterial({ color:0x002244 }));
-    pLight.rotation.x=Math.PI/2; pLight.position.set(Math.cos(ang)*r, 1.5, Math.sin(ang)*r); Game.scene.add(pLight);
-    const pl = new THREE.PointLight(0x003366, 0.5, 5); pl.position.set(Math.cos(ang)*r, 1.5, Math.sin(ang)*r); Game.scene.add(pl);
-  }
-
-  // ── CATWALKS — elevated walkways ──
-  // Main catwalk crossing at height 3.5
-  const catwalkMat = M(0x0a1424, 0.7, 0.6);
-  const catwalk1 = new THREE.Mesh(new THREE.BoxGeometry(40, 0.18, 2.4), catwalkMat);
-  catwalk1.position.set(0, 3.5, 0); Game.scene.add(catwalk1); Game.objects.push(catwalk1);
-  // Catwalk railing
-  for (let x=-18; x<=18; x+=2) {
-    const post = new THREE.Mesh(new THREE.BoxGeometry(0.06,0.7,0.06), M(0x0d1e30,0.6,0.7));
-    post.position.set(x, 4.1, 1.1); Game.scene.add(post);
-    const postR = post.clone(); postR.position.z=-1.1; Game.scene.add(postR);
-  }
-  const railL = new THREE.Mesh(new THREE.BoxGeometry(40,0.05,0.05), M(0x0d1e30,0.6,0.7)); railL.position.set(0,4.48,1.1); Game.scene.add(railL);
-  const railR = railL.clone(); railR.position.z=-1.1; Game.scene.add(railR);
-  // Catwalk lights underneath
-  for (let x=-15; x<=15; x+=6) {
-    const cl = new THREE.PointLight(0x002244, 0.7, 8); cl.position.set(x, 3.4, 0); Game.scene.add(cl);
-  }
-
-  // Side catwalks
-  for (let side of [-1,1]) {
-    const sc = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.18, 30), catwalkMat);
-    sc.position.set(side*12, 3.5, -2); Game.scene.add(sc); Game.objects.push(sc);
-    // Stairs up to catwalk
-    for (let s=0; s<7; s++) {
-      const step = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 0.5), M(0x0a1828,0.8,0.5));
-      step.position.set(side*12, s*0.5+0.25, 11-s*0.5); Game.scene.add(step);
-    }
-  }
-
-  // ── DOCKED SHIPS — detailed ──
-  function buildShip(x, z, col, scale) {
-    const g = new THREE.Group();
-    // Main hull
-    const hull = new THREE.Mesh(new THREE.BoxGeometry(4*scale, 1.2*scale, 9*scale), M(col, 0.4, 0.7));
-    g.add(hull);
-    // Cockpit
-    const cockpit = new THREE.Mesh(new THREE.CylinderGeometry(0.5*scale, 0.8*scale, 1.0*scale, 8), M(0x001122, 0.2, 0.8));
-    cockpit.position.set(0, 0.9*scale, -3.5*scale); cockpit.rotation.x=0.2; g.add(cockpit);
-    // Wings
-    for (let s of [-1,1]) {
-      const wing = new THREE.Mesh(new THREE.BoxGeometry(5*scale, 0.1*scale, 3.5*scale), M(col, 0.5, 0.6));
-      wing.position.set(s*4.0*scale, -0.2*scale, 0.5*scale); wing.rotation.z=s*0.1; g.add(wing);
-      // Engine pod on wing
-      const eng = new THREE.Mesh(new THREE.CylinderGeometry(0.35*scale, 0.5*scale, 1.8*scale, 8), M(0x0a0a18, 0.3, 0.8));
-      eng.rotation.x=Math.PI/2; eng.position.set(s*5.5*scale, -0.2*scale, 1.2*scale); g.add(eng);
-      const engGlow = new THREE.Mesh(new THREE.CircleGeometry(0.34*scale, 8), new THREE.MeshBasicMaterial({color:0x0044ff, side:THREE.DoubleSide}));
-      engGlow.rotation.x=Math.PI/2; engGlow.position.set(s*5.5*scale, -0.2*scale, 2.1*scale); g.add(engGlow);
-      const eLight = new THREE.PointLight(0x0044ff, 1.5*scale, 4*scale); eLight.position.copy(engGlow.position); g.add(eLight);
-    }
-    // Tail engine
-    const tailEng = new THREE.Mesh(new THREE.CylinderGeometry(0.6*scale, 0.8*scale, 1.0*scale, 8), M(0x080814, 0.3, 0.8));
-    tailEng.rotation.x=Math.PI/2; tailEng.position.set(0, 0, 4.5*scale); g.add(tailEng);
-    const tailGlow = new THREE.Mesh(new THREE.CircleGeometry(0.55*scale,8), new THREE.MeshBasicMaterial({color:0x4488ff,side:THREE.DoubleSide}));
-    tailGlow.rotation.x=Math.PI/2; tailGlow.position.set(0, 0, 5.1*scale); g.add(tailGlow);
-    const tLight = new THREE.PointLight(0x2255ff, 2*scale, 6*scale); tLight.position.copy(tailGlow.position); g.add(tLight);
-    // Landing gear struts
-    for (let lx of [-1,1]) for (let lz of [-1,1]) {
-      const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.05*scale, 0.05*scale, 0.8*scale, 6), M(0x0d1828,0.6,0.7));
-      strut.position.set(lx*1.5*scale, -0.85*scale, lz*2.5*scale); g.add(strut);
-      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.18*scale,0.18*scale,0.05*scale,8), M(0x0a1020,0.7,0.6));
-      foot.position.set(lx*1.5*scale, -1.23*scale, lz*2.5*scale); g.add(foot);
-    }
-    // Nav lights blinking
-    const navL = new THREE.PointLight(0xff0000, 0.8, 3); navL.position.set(-6*scale,0,0); navL.userData.flicker=true; navL.userData.baseInt=0.8; navL.userData.flickerSpeed=3; g.add(navL);
-    const navR = new THREE.PointLight(0x00ff00, 0.8, 3); navR.position.set( 6*scale,0,0); navR.userData.flicker=true; navR.userData.baseInt=0.8; navR.userData.flickerSpeed=4; g.add(navR);
-    g.position.set(x, 0.85*scale+0.5, z);
-    Game.scene.add(g); Game.objects.push(hull);
-    return g;
-  }
-  buildShip(14, -8, 0x0d1828, 1);
-  buildShip(-16, -6, 0x121420, 0.85);
-  buildShip(5, -20, 0x0a1218, 0.7);
-
-  // ── COMMAND CENTRE — raised platform ──
-  const cmdPlatform = new THREE.Mesh(new THREE.CylinderGeometry(5, 5.2, 0.4, 12), M(0x080f1e, 0.7, 0.5));
-  cmdPlatform.position.set(0, 0.2, -8); Game.scene.add(cmdPlatform);
-  // Central holographic table
-  const tableBase = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.2, 0.85, 8), M(0x0a1825, 0.4, 0.8));
-  tableBase.position.set(0, 1.25, -8); Game.scene.add(tableBase);
-  const tableTop  = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.08, 8), M(0x0d2035, 0.2, 0.9));
-  tableTop.position.set(0, 1.69, -8); Game.scene.add(tableTop);
-  // Holographic display (glowing torus above table)
-  const holo = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.04, 8, 32), new THREE.MeshBasicMaterial({color:0x00ccff, transparent:true, opacity:0.7}));
-  holo.rotation.x=Math.PI/2; holo.position.set(0, 2.2, -8); holo.userData.rotSpeed={x:0,y:0.008};
-  Game.scene.add(holo);
-  const holo2 = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.025, 6, 24), new THREE.MeshBasicMaterial({color:0x0088ff, transparent:true, opacity:0.5}));
-  holo2.rotation.x=Math.PI/2; holo2.position.set(0, 2.5, -8); holo2.userData.rotSpeed={x:0,y:-0.012};
-  Game.scene.add(holo2);
-  const holoLight = new THREE.PointLight(0x0088ff, 2, 7); holoLight.position.set(0, 2.4, -8); Game.scene.add(holoLight);
-
-  // ── SUPPLY AREA — crates & equipment ──
-  // Stacked crates
-  function addCrate(x, y, z, sx=1, sy=1, sz=1) {
-    const c = new THREE.Mesh(new THREE.BoxGeometry(1.1*sx, 1.0*sy, 1.1*sz), M(0x0c1a28, 0.8, 0.5));
-    c.position.set(x, y, z); c.castShadow=true; Game.scene.add(c); Game.objects.push(c);
-    // Crate edge stripes
-    const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.12*sx, 0.06, 1.12*sz), new THREE.MeshBasicMaterial({color:0x003344}));
-    stripe.position.set(x, y+0.47, z); Game.scene.add(stripe);
-  }
-  [[8,0.5,4],[9.1,0.5,4],[8,1.5,4],[8,0.5,5.1],[-8,0.5,5],[-9.1,0.5,5],[-8,1.5,5],[-7,0.5,5]].forEach(([x,y,z]) => addCrate(x,y,z));
-  // Large cargo containers
-  for (let i=0; i<4; i++) {
-    const cx = -10+i*6; const container = new THREE.Mesh(new THREE.BoxGeometry(4.5, 2.2, 2.0), M(0x080e18, 0.8, 0.6));
-    container.position.set(cx, 1.1, 12); container.castShadow=true; Game.scene.add(container); Game.objects.push(container);
-    const cl = new THREE.PointLight(0x001133, 0.3, 5); cl.position.set(cx, 2.5, 12); Game.scene.add(cl);
-  }
-
-  // ── WALL CONSOLES — interactive terminals ──
-  const conMat = M(0x0a1520, 0.4, 0.8);
-  for (let [x,z,ry] of [[-22,0,Math.PI/2],[22,0,-Math.PI/2],[0,22,Math.PI]]) {
-    const con = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.0, 0.25), conMat);
-    con.position.set(x*0.98, 2, z*0.98); con.rotation.y=ry; Game.scene.add(con);
-    // Screen glow
-    const screen = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.4), new THREE.MeshBasicMaterial({color:0x000d22, transparent:true, opacity:0.9, side:THREE.DoubleSide}));
-    screen.position.set(x*0.965, 2.1, z*0.965); screen.rotation.y=ry; Game.scene.add(screen);
-    const conL = new THREE.PointLight(0x0055aa, 0.6, 5); conL.position.set(x*0.95, 2.2, z*0.95); Game.scene.add(conL);
-  }
-
-  // ── OVERHEAD LIGHTING RIGS ──
-  const rigPositions = [[-8,-8],[8,-8],[0,0],[-8,8],[8,8],[0,-16]];
-  rigPositions.forEach(([x,z]) => {
-    // Rig frame
-    const rig = new THREE.Mesh(new THREE.BoxGeometry(3, 0.15, 3), M(0x06101a, 0.7, 0.7));
-    rig.position.set(x, 9.5, z); Game.scene.add(rig);
-    // Spotlight cluster
-    for (let [ox,oz] of [[-0.8,-0.8],[0.8,-0.8],[-0.8,0.8],[0.8,0.8]]) {
-      const spot = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.2, 0.3, 6), M(0x0a0a14, 0.3, 0.9));
-      spot.position.set(x+ox, 9.3, z+oz); Game.scene.add(spot);
-    }
-    const light = new THREE.PointLight(0x335577, 1.2, 20); light.position.set(x, 9.0, z); Game.scene.add(light);
-  });
-
-  // ── EMERGENCY LIGHTING STRIPS along floor ──
-  for (let ang=0; ang<Math.PI*2; ang+=Math.PI/8) {
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 1.5), new THREE.MeshBasicMaterial({color:0x001a2a}));
-    strip.position.set(Math.cos(ang)*24, 0.02, Math.sin(ang)*24); strip.rotation.y=ang; Game.scene.add(strip);
-  }
-
-  // ── NPC: Commander Voss — with proper humanoid shape ──
   const npcGroup = new THREE.Group();
-  // Torso
-  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.28), M(0x1a2d4a, 0.6, 0.5)); torso.position.set(0,0,0); npcGroup.add(torso);
-  // Chest insignia
-  const insignia = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.12, 0.005), new THREE.MeshBasicMaterial({color:0xffcc00})); insignia.position.set(0,0.1,0.142); npcGroup.add(insignia);
-  // Head
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.34, 0.30), M(0xc8a882, 0.7, 0)); head.position.set(0,0.5,0); npcGroup.add(head);
-  // Helmet
-  const helmet = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.2, 0.34), M(0x1a2d4a, 0.5, 0.5)); helmet.position.set(0,0.64,0); npcGroup.add(helmet);
-  // Visor
-  const visor = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.1, 0.01), new THREE.MeshBasicMaterial({color:0x004488, transparent:true, opacity:0.8})); visor.position.set(0,0.62,0.17); npcGroup.add(visor);
-  // Arms
-  for (let s of [-1,1]) {
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.6, 0.2), M(0x1a2d4a, 0.6, 0.5)); arm.position.set(s*0.37, -0.02, 0); npcGroup.add(arm);
-    const hand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.18), M(0xc8a882, 0.7, 0)); hand.position.set(s*0.37, -0.38, 0); npcGroup.add(hand);
-  }
-  // Legs
-  for (let s of [-1,1]) {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.65, 0.22), M(0x111e2e, 0.7, 0.4)); leg.position.set(s*0.14, -0.64, 0); npcGroup.add(leg);
-    const boot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.28), M(0x08101a, 0.8, 0.5)); boot.position.set(s*0.14, -1.0, 0.03); npcGroup.add(boot);
-  }
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.28), M(0x1a2d4a, 0.6, 0.5));
+  npcGroup.add(torso);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.34, 0.30), M(0xc8a882, 0.7, 0));
+  head.position.set(0,0.5,0); npcGroup.add(head);
   npcGroup.position.set(0, 1.02, -8);
   npcGroup.userData = {
     isNPC:true, name:'COMMANDER VOSS',
@@ -1045,10 +981,7 @@ function buildHaven() {
   };
   Game.scene.add(npcGroup);
   Game.interactables.push(npcGroup);
-  // NPC ambient light
-  const npcLight = new THREE.PointLight(0x4488cc, 1.2, 8); npcLight.position.set(0, 3, -8); Game.scene.add(npcLight);
 
-  // Items
   spawnItem('health', 5, 0, -2);
   spawnItem('shield', -5, 0, -2);
   spawnItem('ammo', 0, 0, 5);
@@ -1059,34 +992,15 @@ function buildHaven() {
   spawnAt(0, 1.7, 10);
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  AREA 2: DEEP SPACE
-// ─────────────────────────────────────────────────────────────────
 function buildDeepSpace() {
   clearArea();
   Game.scene.fog = new THREE.FogExp2(0x000000, 0.008);
   Game.scene.background = new THREE.Color(0x000000);
   Game.scene.add(new THREE.AmbientLight(0x050510, 0.5));
-  const distant = new THREE.DirectionalLight(0xffeecc, 0.3); distant.position.set(-50,30,-80); Game.scene.add(distant);
 
-  // Gas giant
-  const planet = new THREE.Mesh(new THREE.SphereGeometry(50,32,32), new THREE.MeshStandardMaterial({color:0x2a1a4a,emissive:0x120830,emissiveIntensity:0.35,roughness:1}));
-  planet.position.set(-150,-70,-260); Game.scene.add(planet);
-  const rings = new THREE.Mesh(new THREE.TorusGeometry(68,5,4,64), new THREE.MeshStandardMaterial({color:0x4a2a5a,roughness:1,emissive:0x1a0a2a,emissiveIntensity:0.2}));
-  rings.position.copy(planet.position); rings.rotation.x=Math.PI/4; Game.scene.add(rings);
-
-  // Nebula lights
-  [0xff3300,0x4400ff,0x00ddaa,0x8800ff,0xff0066].forEach((col,i) => {
-    const nl = new THREE.PointLight(col, 0.45, 90);
-    const ang = (i/5)*Math.PI*2;
-    nl.position.set(Math.cos(ang)*70, (Math.random()-.5)*35, Math.sin(ang)*70-30);
-    Game.scene.add(nl);
-  });
-
-  // Asteroid belt
-  for (let i=0; i<90; i++) {
+  for (let i=0; i<40; i++) {
     const size = Math.random()*2.8+0.35;
-    const geo = Math.random()>0.5 ? new THREE.DodecahedronGeometry(size,0) : new THREE.BoxGeometry(size,size*0.7,size*0.9);
+    const geo = new THREE.DodecahedronGeometry(size, 0);
     const gv = 0.07+Math.random()*0.14;
     const rock = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({color:new THREE.Color(gv,gv*0.9,gv*1.1),roughness:0.95,metalness:0.25}));
     const ang=Math.random()*Math.PI*2, r=14+Math.random()*50;
@@ -1096,32 +1010,12 @@ function buildDeepSpace() {
     Game.scene.add(rock); Game.objects.push(rock);
   }
 
-  // Derelict ship hulk
-  const hullMat = new THREE.MeshStandardMaterial({color:0x0c0c14,roughness:0.7,metalness:0.6});
-  const hulk = new THREE.Mesh(new THREE.BoxGeometry(10,2.5,24),hullMat); hulk.position.set(20,0,-25); Game.scene.add(hulk); Game.objects.push(hulk);
-  const wing1 = new THREE.Mesh(new THREE.BoxGeometry(16,0.18,6),hullMat); wing1.position.set(20,0.5,-22); Game.scene.add(wing1); Game.objects.push(wing1);
-  const wing2 = wing1.clone(); wing2.position.z=-28; Game.scene.add(wing2); Game.objects.push(wing2);
-  const wreckL1 = new THREE.PointLight(0xff3300,2.5,16); wreckL1.position.set(20,2,-25); wreckL1.userData.flicker=true; wreckL1.userData.baseInt=2.5; Game.scene.add(wreckL1);
-  const wreckL2 = new THREE.PointLight(0xff6600,1.5,8); wreckL2.position.set(24,0,-20); Game.scene.add(wreckL2);
-
-  // Second derelict
-  const hulk2 = new THREE.Mesh(new THREE.BoxGeometry(5,1.8,14),hullMat); hulk2.position.set(-24,2,18); Game.scene.add(hulk2); Game.objects.push(hulk2);
-  const h2L = new THREE.PointLight(0x5500ff,1.2,10); h2L.position.set(-24,3,18); Game.scene.add(h2L);
-
-  // Space mines
-  for (let i=0; i<10; i++) {
-    const mine = new THREE.Mesh(new THREE.SphereGeometry(0.35,8,8), new THREE.MeshBasicMaterial({color:0xff2200}));
-    const ang=Math.random()*Math.PI*2, r=8+Math.random()*22;
-    mine.position.set(Math.cos(ang)*r,(Math.random()-.5)*10,Math.sin(ang)*r);
-    const ml=new THREE.PointLight(0xff2200,1.8,5); mine.add(ml);
-    mine.userData.rotSpeed={x:0,y:0.012}; Game.scene.add(mine); Game.objects.push(mine);
-  }
-
   for (let i=0; i<4; i++) spawnEnemy('pirate','deepspace');
   for (let i=0; i<2; i++) spawnEnemy('heavy','deepspace');
 
-  spawnItem('ammo',8,2,0); spawnItem('ammo',-5,-3,8);
-  spawnItem('health',0,4,-15); spawnItem('weapon_sniper',20,1,-12);
+  spawnItem('ammo',8,2,0);
+  spawnItem('health',0,4,-15);
+  spawnItem('weapon_sniper',20,1,-12);
 
   document.getElementById('area-name').textContent = 'Deep Space — Sector 9';
   document.getElementById('area-dot').style.background = '#FF6060';
@@ -1129,9 +1023,6 @@ function buildDeepSpace() {
   spawnAt(0,0,0);
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  AREA 3: STATION KIRA-7
-// ─────────────────────────────────────────────────────────────────
 function buildStation() {
   clearArea();
   Game.scene.fog = new THREE.FogExp2(0x050008, 0.055);
@@ -1142,46 +1033,29 @@ function buildStation() {
   const flMat  = new THREE.MeshStandardMaterial({color:0x070510,roughness:0.9,metalness:0.3});
 
   function corridor(x,y,z,w,h,d) {
-    const fl = new THREE.Mesh(new THREE.BoxGeometry(w,0.1,d),flMat); fl.position.set(x,y-h/2+0.05,z); Game.scene.add(fl);
-    const ce = new THREE.Mesh(new THREE.BoxGeometry(w,0.1,d),corMat); ce.position.set(x,y+h/2-0.05,z); Game.scene.add(ce);
-    const wl = new THREE.Mesh(new THREE.BoxGeometry(0.15,h,d),corMat); wl.position.set(x-w/2,y,z); wl.castShadow=true; Game.scene.add(wl); Game.objects.push(wl);
-    const wr = wl.clone(); wr.position.set(x+w/2,y,z); Game.scene.add(wr); Game.objects.push(wr);
+    const fl = new THREE.Mesh(new THREE.BoxGeometry(w,0.1,d),flMat); 
+    fl.position.set(x,y-h/2+0.05,z); 
+    Game.scene.add(fl);
+    const wl = new THREE.Mesh(new THREE.BoxGeometry(0.15,h,d),corMat); 
+    wl.position.set(x-w/2,y,z); 
+    wl.castShadow=true; 
+    Game.scene.add(wl); 
+    Game.objects.push(wl);
+    const wr = wl.clone(); 
+    wr.position.set(x+w/2,y,z); 
+    Game.scene.add(wr); 
+    Game.objects.push(wr);
   }
+  
   corridor(0,1.5,0,5,3.2,44);
   corridor(-7,1.5,-8,5,3.2,14);
-  corridor(7,1.5,5,5,3.2,14);
-  corridor(0,1.5,-24,14,4.0,10);
-  corridor(-10,1.5,-18,8,3.5,8);
 
-  // Red flickering emergency lights
-  [[-16,-8],[0,-6],[8,2],[16,10],[0,-24]].forEach(([z,x2]) => {
-    const el = new THREE.PointLight(0xff0022,1.2,7); el.position.set(x2||0,2.8,z); el.userData.flicker=true; el.userData.baseInt=1.2; Game.scene.add(el);
-  });
-  // Purple accent
-  [[-7,1.5,-8],[7,1.5,5],[-10,1.5,-18]].forEach(([x,y,z]) => {
-    const pl = new THREE.PointLight(0x8800ff,0.8,10); pl.position.set(x,y+1,z); Game.scene.add(pl);
-  });
-
-  // Cover crates
-  [[2,0,-5],[-2,0,-12],[1.5,0,-18],[-1.5,0,3],[4,0,-24],[-4,0,-24],[-8,0,-16],[8,0,3]].forEach(([x,y,z]) => {
-    const c = new THREE.Mesh(new THREE.BoxGeometry(1.3,1.1,1.2),corMat); c.position.set(x,0.55,z); c.castShadow=true; Game.scene.add(c); Game.objects.push(c);
-  });
-  // Broken consoles
-  [[-2.2,1.2,-8],[2.2,1.2,-15],[-2.2,1.2,-20]].forEach(([x,y,z]) => {
-    const con = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.9,1.5),corMat); con.position.set(x,y,z); Game.scene.add(con);
-    const cl = new THREE.PointLight(0x0088ff,0.6,3); cl.position.set(x+0.2,y,z); Game.scene.add(cl);
-  });
-  // Exposed pipes
-  for (let z=-20; z<=8; z+=4) {
-    const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,1.5,8), new THREE.MeshStandardMaterial({color:0x0d1520,roughness:0.6,metalness:0.7}));
-    pipe.rotation.z=Math.PI/2; pipe.position.set(-2.3,2.8,z); Game.scene.add(pipe);
-  }
-
-  for (let i=0; i<5; i++) spawnEnemy('drone','station');
+  for (let i=0; i<3; i++) spawnEnemy('drone','station');
   spawnEnemy('sentinel','station');
 
-  spawnItem('shield',0,0,-8); spawnItem('ammo',-7,0,-10);
-  spawnItem('health',3,0,-20); spawnItem('weapon_rocket',0,0,-24);
+  spawnItem('shield',0,0,-8);
+  spawnItem('health',3,0,-20);
+  spawnItem('weapon_rocket',0,0,-24);
 
   document.getElementById('area-name').textContent = 'Station Kira-7';
   document.getElementById('area-dot').style.background = '#9955FF';
@@ -1200,12 +1074,10 @@ const ITEM_DEFS = {
 
 function spawnItem(type, x, y, z) {
   const def = ITEM_DEFS[type]; if (!def) return;
-  // Outer glow ring
-  const outerGeo = new THREE.TorusGeometry(0.32, 0.04, 8, 24);
+  const outerGeo = new THREE.TorusGeometry(0.32, 0.04, 6, 16);
   const outerMat = new THREE.MeshBasicMaterial({color:def.color, transparent:true, opacity:0.7});
   const outer = new THREE.Mesh(outerGeo, outerMat);
   outer.rotation.x = Math.PI/2; outer.position.set(x, y+0.5, z);
-  // Inner cube
   const inner = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.4), new THREE.MeshStandardMaterial({color:def.color,emissive:def.emissive,emissiveIntensity:0.8,metalness:0.3,roughness:0.4}));
   inner.position.set(x, y+0.5, z);
   const light = new THREE.PointLight(def.glowCol, 2, 5);
@@ -1259,12 +1131,6 @@ function collectItem(idx) {
 function flashHeal() { const hf=document.getElementById('heal-flash'); hf.style.opacity='1'; setTimeout(()=>hf.style.opacity='0',400); }
 function showPickupNotif(text) { const el=document.getElementById('pickup-notif'); el.textContent=text; el.style.display='block'; setTimeout(()=>el.style.display='none',2200); }
 
-// ── HELPERS ──────────────────────────────────────────────────────
-function addBox(x,y,z,w,h,d,color,collide) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshStandardMaterial({color}));
-  mesh.position.set(x,y,z); mesh.castShadow=true; mesh.receiveShadow=true;
-  Game.scene.add(mesh); if (collide) Game.objects.push(mesh); return mesh;
-}
 function spawnAt(x,y,z) { Game.camera.position.set(x,y,z); Game.yaw=0; Game.pitch=0; }
 
 // ── ENEMIES ──────────────────────────────────────────────────────
@@ -1274,34 +1140,45 @@ function spawnEnemy(type, area) {
   const x=Math.cos(ang)*r, z=Math.sin(ang)*r+(isStation?-8:0), y=isStation?1.5:(Math.random()-.5)*10;
 
   const cfgs = {
-    pirate:  {color:0xff3300, hp:3, speed:0.022, shootInt:2.5, geo:new THREE.ConeGeometry(0.55,1.7,6)},
+    pirate:  {color:0xff3300, hp:3, speed:0.022, shootInt:2.5, geo:new THREE.ConeGeometry(0.55,1.7,5)},
     heavy:   {color:0xff6600, hp:6, speed:0.015, shootInt:1.8, geo:new THREE.BoxGeometry(1.3,1.7,1.1)},
-    drone:   {color:0x8822ff, hp:2, speed:0.030, shootInt:1.6, geo:new THREE.OctahedronGeometry(0.8)},
+    drone:   {color:0x8822ff, hp:2, speed:0.030, shootInt:1.6, geo:new THREE.OctahedronGeometry(0.8,0)},
     sentinel:{color:0xff0088, hp:8, speed:0.012, shootInt:1.2, geo:new THREE.DodecahedronGeometry(1.0,0)},
   };
   const cfg = cfgs[type]||cfgs.pirate;
   const mat = new THREE.MeshStandardMaterial({color:cfg.color,emissive:cfg.color,emissiveIntensity:0.3,roughness:0.35});
   const mesh = new THREE.Mesh(cfg.geo, mat);
   mesh.position.set(x,y,z);
-  // Engine glow core
-  const core = new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8), new THREE.MeshBasicMaterial({color:cfg.color}));
-  mesh.add(core);
-  const el = new THREE.PointLight(cfg.color, 1.2, 6); el.position.set(0,0.5,0); mesh.add(el);
+  const el = new THREE.PointLight(cfg.color, 1.2, 6); 
+  el.position.set(0,0.5,0); 
+  mesh.add(el);
   Game.scene.add(mesh);
   Game.enemies.push({mesh, type, hp:cfg.hp, maxHp:cfg.hp, speed:cfg.speed, shootTimer:Math.random()*2, shootInterval:cfg.shootInt, active:true});
 }
 
 function enemyShoot(enemy) {
+  const eb = getEnemyBulletFromPool();
+  if (!eb) return;
+  
   const dir = new THREE.Vector3().subVectors(Game.camera.position, enemy.mesh.position).normalize();
   const spread = enemy.type==='sentinel'?0.06:0.14;
   dir.x+=(Math.random()-.5)*spread; dir.y+=(Math.random()-.5)*spread*0.7; dir.normalize();
   const col = {pirate:0xff4400,heavy:0xff6600,drone:0xcc00ff,sentinel:0xff0088}[enemy.type]||0xff4400;
-  const geo = new THREE.SphereGeometry(0.09,5,5);
-  const bullet = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:col}));
-  bullet.position.copy(enemy.mesh.position).addScaledVector(dir,1.0);
-  const light = new THREE.PointLight(col,2.5,6); bullet.add(light);
-  Game.scene.add(bullet);
-  Game.enemyBullets.push({mesh:bullet, dir:dir.clone(), speed:enemy.type==='sentinel'?0.46:0.29, life:3.5});
+  
+  eb.material.color.setHex(col);
+  eb.position.copy(enemy.mesh.position).addScaledVector(dir,1.0);
+  eb.visible = true;
+  
+  if (!eb.userData.light) {
+    const light = new THREE.PointLight(col,2.5,6);
+    eb.add(light);
+    eb.userData.light = light;
+  }
+  eb.userData.light.color.setHex(col);
+  
+  if (!eb.parent) Game.scene.add(eb);
+  
+  Game.enemyBullets.push({mesh:eb, dir:dir.clone(), speed:enemy.type==='sentinel'?0.46:0.29, life:3.5});
 }
 
 // ── INTERACTION ──────────────────────────────────────────────────
@@ -1394,24 +1271,42 @@ function quitToTitle() {
   WEAPONS.forEach((w,i)=>{ w.unlocked=i<2; Game.player.weapons[i].ammo=w.maxAmmo; });
 }
 
-// ── MOVEMENT ─────────────────────────────────────────────────────
+// ── MOVEMENT (with gamepad) ──────────────────────────────────────
 const playerBox=new THREE.Box3(), testBox=new THREE.Box3();
 
 function movePlayer(dt) {
   if (Game.dialogueOpen||Game.mapOpen||Game.isDead||Game.paused) return;
+  
   const forward=new THREE.Vector3(-Math.sin(Game.yaw),0,-Math.cos(Game.yaw));
   const right=new THREE.Vector3(Math.cos(Game.yaw),0,-Math.sin(Game.yaw));
   const spd=Game.player.speed;
   const move=new THREE.Vector3();
-  const moving = Game.keys['KeyW']||Game.keys['ArrowUp']||Game.keys['KeyS']||Game.keys['ArrowDown']||Game.keys['KeyA']||Game.keys['ArrowLeft']||Game.keys['KeyD']||Game.keys['ArrowRight'];
+  
+  let moving = Game.keys['KeyW']||Game.keys['ArrowUp']||Game.keys['KeyS']||Game.keys['ArrowDown']||Game.keys['KeyA']||Game.keys['ArrowLeft']||Game.keys['KeyD']||Game.keys['ArrowRight'];
+  
   if (Game.keys['KeyW']||Game.keys['ArrowUp'])    move.addScaledVector(forward, spd);
   if (Game.keys['KeyS']||Game.keys['ArrowDown'])  move.addScaledVector(forward,-spd);
   if (Game.keys['KeyA']||Game.keys['ArrowLeft'])  move.addScaledVector(right,-spd);
   if (Game.keys['KeyD']||Game.keys['ArrowRight']) move.addScaledVector(right, spd);
-  if (Game.currentArea==='deepspace') {
-    if (Game.keys['Space'])     move.y+=spd*0.6;
-    if (Game.keys['ShiftLeft']) move.y-=spd*0.6;
+  
+  if (Game.gamepadAxes.leftX !== 0 || Game.gamepadAxes.leftY !== 0) {
+    move.addScaledVector(right, Game.gamepadAxes.leftX * spd);
+    move.addScaledVector(forward, -Game.gamepadAxes.leftY * spd);
+    moving = true;
   }
+  
+  if (Game.locked && (Game.gamepadAxes.rightX !== 0 || Game.gamepadAxes.rightY !== 0)) {
+    const sensitivity = 0.05;
+    Game.yaw -= Game.gamepadAxes.rightX * sensitivity;
+    Game.pitch -= Game.gamepadAxes.rightY * sensitivity;
+    Game.pitch = Math.max(-Math.PI/2.3, Math.min(Math.PI/2.3, Game.pitch));
+  }
+  
+  if (Game.currentArea==='deepspace') {
+    if (Game.keys['Space'] || Game.gamepadButtons.lt) move.y+=spd*0.6;
+    if (Game.keys['ShiftLeft'] || Game.gamepadButtons.lb) move.y-=spd*0.6;
+  }
+  
   const pos=Game.camera.position;
   pos.x+=move.x; if(collides(pos,0.4))pos.x-=move.x;
   pos.z+=move.z; if(collides(pos,0.4))pos.z-=move.z;
@@ -1419,7 +1314,6 @@ function movePlayer(dt) {
   else { pos.y+=move.y; pos.y=Math.max(-22,Math.min(22,pos.y)); }
   Game.camera.quaternion.setFromEuler(new THREE.Euler(Game.pitch,Game.yaw,0,'YXZ'));
 
-  // Weapon bob while moving
   if (moving && Game.locked) {
     Game.weaponBob += dt*10;
     if (Game.weaponMesh) {
@@ -1427,7 +1321,7 @@ function movePlayer(dt) {
       Game.weaponMesh.position.x += Math.cos(Game.weaponBob*0.5)*0.0012;
     }
   }
-  // Weapon sway decay
+  
   Game.weaponSwayX *= 0.88;
   Game.weaponSwayY *= 0.88;
   if (Game.weaponMesh) {
@@ -1435,12 +1329,11 @@ function movePlayer(dt) {
     Game.weaponMesh.rotation.x = Game.weaponSwayY * 0.3;
   }
 
-  // Interact prompt
   const nearNPC  = Game.interactables.some(o => o.position.distanceTo(pos) < 4.0);
   const nearItem = Game.items.some(o => o.active && o.mesh.position.distanceTo(pos) < 2.5);
   const prompt   = document.getElementById('interact-prompt');
-  if (nearNPC)       { prompt.style.display='block'; prompt.textContent='[E] Talk to '+(Game.interactables.find(o=>o.position.distanceTo(pos)<4.0)?.userData.name||'NPC'); }
-  else if (nearItem) { prompt.style.display='block'; prompt.textContent='[F] or [E] Pick up item'; }
+  if (nearNPC)       { prompt.style.display='block'; prompt.textContent='[E / A] Talk to '+(Game.interactables.find(o=>o.position.distanceTo(pos)<4.0)?.userData.name||'NPC'); }
+  else if (nearItem) { prompt.style.display='block'; prompt.textContent='[F / E / A] Pick up item'; }
   else               { prompt.style.display='none'; }
 }
 
@@ -1469,13 +1362,14 @@ function updateBullets(dt) {
     if (hit||b.life<=0) {
       if (b.isRocket) rocketExplosion(b.mesh.position);
       else spawnParticles(b.mesh.position, b.mesh.material.color.getHex(), 5, 0.5, 0.04, 0.3);
-      Game.scene.remove(b.mesh); Game.bullets.splice(i,1);
+      b.mesh.visible = false;
+      Game.bullets.splice(i,1);
     }
   }
   for (let i=Game.enemyBullets.length-1; i>=0; i--) {
     const b=Game.enemyBullets[i]; b.mesh.position.addScaledVector(b.dir,b.speed); b.life-=dt;
-    if (b.mesh.position.distanceTo(Game.camera.position)<0.55) { takeDamage(10); Game.scene.remove(b.mesh); Game.enemyBullets.splice(i,1); continue; }
-    if (b.life<=0) { Game.scene.remove(b.mesh); Game.enemyBullets.splice(i,1); }
+    if (b.mesh.position.distanceTo(Game.camera.position)<0.55) { takeDamage(10); b.mesh.visible=false; Game.enemyBullets.splice(i,1); continue; }
+    if (b.life<=0) { b.mesh.visible=false; Game.enemyBullets.splice(i,1); }
   }
 }
 
@@ -1571,42 +1465,19 @@ function drawMinimap() {
   const ctx=Game.minimapCtx, W=116,H=116,CX=58,CY=58,SCALE=4.5;
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(0,5,20,0.7)'; ctx.fillRect(0,0,W,H);
-  // Grid
-  ctx.strokeStyle='rgba(0,40,80,0.4)'; ctx.lineWidth=0.5;
-  for (let i=0;i<W;i+=20){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,H);ctx.stroke();}
-  for (let i=0;i<H;i+=20){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(W,i);ctx.stroke();}
-  // Objects
-  Game.objects.forEach(obj=>{
-    const dx=(obj.position.x-Game.camera.position.x)/SCALE, dz=(obj.position.z-Game.camera.position.z)/SCALE;
-    ctx.fillStyle='rgba(0,60,120,0.25)'; ctx.fillRect(CX+dx-1,CY+dz-1,2,2);
-  });
-  // Items
-  Game.items.forEach(item=>{
-    if(!item.active)return;
-    const dx=(item.mesh.position.x-Game.camera.position.x)/SCALE, dz=(item.mesh.position.z-Game.camera.position.z)/SCALE;
-    const col=item.type.startsWith('weapon')?'#ffee44':item.type==='health'?'#00ff66':item.type==='shield'?'#4499ff':'#ffaa22';
-    ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=4;
-    ctx.beginPath(); ctx.arc(CX+dx,CY+dz,3,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-  });
-  // Enemies
+  
   Game.enemies.forEach(e=>{
     if(!e.active)return;
     const dx=(e.mesh.position.x-Game.camera.position.x)/SCALE, dz=(e.mesh.position.z-Game.camera.position.z)/SCALE;
     const col={pirate:'#ff5500',heavy:'#ff8800',drone:'#bb44ff',sentinel:'#ff0099'}[e.type]||'#ff5500';
-    ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=5;
+    ctx.fillStyle=col;
     ctx.beginPath(); ctx.arc(CX+dx,CY+dz,3,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
   });
-  // Player dot
-  ctx.fillStyle='#52B043'; ctx.shadowColor='#52B043'; ctx.shadowBlur=6;
-  ctx.beginPath(); ctx.arc(CX,CY,4.5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-  // Direction
+  
+  ctx.fillStyle='#52B043';
+  ctx.beginPath(); ctx.arc(CX,CY,4.5,0,Math.PI*2); ctx.fill();
   ctx.strokeStyle='#52B043'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(CX,CY); ctx.lineTo(CX+Math.sin(-Game.yaw)*12,CY+Math.cos(-Game.yaw)*12); ctx.stroke();
-  // Border
-  ctx.strokeStyle='rgba(0,80,160,0.4)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.arc(CX,CY,CX-1,0,Math.PI*2); ctx.stroke();
 }
 
 // ── KILL FEED ────────────────────────────────────────────────────
@@ -1618,11 +1489,13 @@ function addKillFeed(text, cls) {
 }
 
 // ── ANIMATE ──────────────────────────────────────────────────────
-let shieldRegenTimer=0, minimapTimer=0;
+let minimapTimer=0;
 
 function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(Game.clock.getDelta(), 0.05);
+
+  updateGamepad();
 
   if (Game.paused || Game.isDead) {
     Game.renderer.clear(); Game.renderer.render(Game.scene, Game.camera);
@@ -1637,35 +1510,12 @@ function animate() {
 
   Game.shootCooldown = Math.max(0, Game.shootCooldown-dt);
 
-  // Shield regen
   damageTimer -= dt;
   if (damageTimer<=0 && Game.player.shield<100) {
     Game.player.shield = Math.min(100, Game.player.shield+dt*5);
     updateHealthHUD();
   }
 
-  // Flicker lights
-  const now = Date.now()*0.001;
-  Game.scene.children.forEach(c => {
-    if (c.isPointLight && c.userData.flicker) {
-      const spd = c.userData.flickerSpeed || 8;
-      c.intensity = c.userData.baseInt * (0.5+Math.sin(now*spd+c.position.z*0.3)*0.3+Math.random()*0.15);
-    }
-  });
-  // Also flicker lights in groups (ships)
-  Game.scene.children.forEach(g => {
-    if (g.isGroup) g.children.forEach(c => {
-      if (c.isPointLight && c.userData.flicker) {
-        const spd=c.userData.flickerSpeed||8;
-        c.intensity=c.userData.baseInt*(0.5+Math.sin(now*spd)*0.3+Math.random()*0.15);
-      }
-    });
-  });
-
-  // Rotate debris / objects
-  Game.objects.forEach(c => { if(c.userData.rotSpeed){c.rotation.x+=c.userData.rotSpeed.x;c.rotation.y+=c.userData.rotSpeed.y;} });
-
-  // Screen shake
   if (Game.screenShake > 0) {
     const s = Game.screenShake;
     Game.renderer.domElement.style.transform = `translate(${(Math.random()-.5)*s*40}px,${(Math.random()-.5)*s*40}px)`;
@@ -1673,14 +1523,10 @@ function animate() {
     if (Game.screenShake <= 0) { Game.screenShake=0; Game.renderer.domElement.style.transform=''; }
   }
 
-  // Minimap every 3 frames
-  minimapTimer++; if(minimapTimer>=3){ minimapTimer=0; drawMinimap(); }
+  minimapTimer++; if(minimapTimer>=5){ minimapTimer=0; drawMinimap(); }
 
-  // Render main scene
   Game.renderer.clear();
   Game.renderer.render(Game.scene, Game.camera);
-
-  // Render weapon on top (no depth test against world)
   Game.renderer.clearDepth();
   Game.renderer.render(Game.weaponScene, Game.weaponCamera);
 }
