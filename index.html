@@ -1071,67 +1071,120 @@
 <!-- ══ JAVASCRIPT ════════════════════════════════════════════════ -->
 <script>
 // ════════════════════════════════════════════════════════════════
-//  GAMEHUB — Auth + Storage System
-//  Accounts stored in localStorage as:
-//    gh_accounts   → { username: { passHash, salt, created, profile } }
-//    gh_session    → { username, loginTime }
-//    gh_profile_<username> → { library:[], playtime:{}, sessions, lastActive, recentGames:[] }
+//  GAMEHUB — GitHub Gist shared database
+//  All accounts + profiles live in one Gist file (gamehub-db.json)
+//  Structure: { accounts: { username: {...} }, profiles: { username: {...} } }
+//  Session (who is logged in on THIS device) stays in localStorage.
 // ════════════════════════════════════════════════════════════════
 
-// ── CRYPTO: Hash password with PBKDF2 via SubtleCrypto ──────────
-async function hashPassword(password, salt) {
-  const enc = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
-  );
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
-    keyMaterial, 256
-  );
-  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+const JSONBIN_ID  = '69b4489eb7ec241ddc6724f8';
+const JSONBIN_KEY = '$2a$10$GxylBsJMueOHJvo5BKbpheT/.yEZCcB82/YEnIdI2/XQI5/V3oMta';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
+let DB = { accounts: {}, profiles: {} };
+
+// ── JSONBIN READ / WRITE ──────────────────────────────────────────
+async function loadDB() {
+  try {
+    const res = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    DB = json.record || { accounts: {}, profiles: {} };
+    if (!DB.accounts) DB.accounts = {};
+    if (!DB.profiles) DB.profiles = {};
+  } catch(e) {
+    console.error('Failed to load DB from JSONBin:', e);
+    showToast('⚠ Could not connect to database. Check your connection.', 'error');
+    DB = { accounts: {}, profiles: {} };
+  }
 }
 
-function generateSalt() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-    .map(b => b.toString(16).padStart(2,'0')).join('');
+async function saveDB() {
+  try {
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY
+      },
+      body: JSON.stringify(DB)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch(e) {
+    console.error('Failed to save DB to JSONBin:', e);
+    showToast('⚠ Could not sync data — check your connection.', 'error');
+  }
 }
 
-// ── STORAGE HELPERS ──────────────────────────────────────────────
+// ── LOCAL SESSION (device-only) ───────────────────────────────────
 const LS = {
-  get:    k       => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
-  set:    (k, v)  => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
-  remove: k       => { try { localStorage.removeItem(k); } catch {} }
+  get:    k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set:    (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  remove: k => { try { localStorage.removeItem(k); } catch {} }
 };
+function getSession()    { return LS.get('gh_session'); }
+function saveSession(u)  { LS.set('gh_session', { username: u, loginTime: Date.now() }); }
+function clearSession()  { LS.remove('gh_session'); }
 
-function getAccounts()       { return LS.get('gh_accounts') || {}; }
-function saveAccounts(a)     { LS.set('gh_accounts', a); }
-function getSession()        { return LS.get('gh_session'); }
-function saveSession(u)      { LS.set('gh_session', { username: u, loginTime: Date.now() }); }
-function clearSession()      { LS.remove('gh_session'); }
-function getProfile(u)       { return LS.get('gh_profile_' + u) || createProfile(); }
-function saveProfile(u, p)   { LS.set('gh_profile_' + u, p); }
+// ── HELPER ACCESSORS INTO DB ──────────────────────────────────────
+function getAccounts()         { return DB.accounts; }
+function getProfile(u)         { return DB.profiles[u] || createProfile(); }
+function saveProfileToDB(u, p) { DB.profiles[u] = p; }
 
 function createProfile() {
-  return { library: [], playtime: {}, sessions: 0, lastActive: null, recentGames: [] };
+  return { library: [], playtime: {}, sessions: 0, lastActive: null, recentGames: [], friends: {} };
 }
 
-// ── SESSION STATE ────────────────────────────────────────────────
-let currentUser = null;   // username string or null
+// ── SESSION STATE ─────────────────────────────────────────────────
+let currentUser    = null;
 let currentProfile = null;
 
-function loadSession() {
+async function loadSession() {
+  showLoadingOverlay(true);
+  await loadDB();
   const s = getSession();
-  if (!s) return;
-  const accounts = getAccounts();
-  if (accounts[s.username]) {
-    currentUser = s.username;
+  if (s && DB.accounts[s.username]) {
+    currentUser    = s.username;
     currentProfile = getProfile(s.username);
   } else {
     clearSession();
   }
+  showLoadingOverlay(false);
+  renderHeader();
+  renderLibrary();
+  updateFriendsBadge();
 }
 
-// ── AUTH MODAL ───────────────────────────────────────────────────
+function showLoadingOverlay(show) {
+  let el = document.getElementById('gh-loading');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'gh-loading';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(8,12,8,0.92);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity 0.3s;';
+    el.innerHTML = '<div style="font-size:48px;">🎮</div><div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:600;color:#52B043;letter-spacing:1px;">Connecting to GameHub…</div><div style="width:180px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;"><div id="gh-load-bar" style="height:100%;width:0%;background:#52B043;border-radius:2px;animation:ghbar 1.8s ease-in-out infinite;"></div></div>';
+    document.head.insertAdjacentHTML('beforeend','<style>@keyframes ghbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}</style>');
+    document.body.appendChild(el);
+  }
+  if (show) { el.style.display = 'flex'; el.style.opacity = '1'; }
+  else { el.style.opacity = '0'; setTimeout(() => { el.style.display = 'none'; }, 300); }
+}
+
+// ── CRYPTO: PBKDF2 password hashing ──────────────────────────────
+async function hashPassword(password, salt) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', salt:enc.encode(salt), iterations:100000, hash:'SHA-256' }, key, 256
+  );
+  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function generateSalt() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── AUTH MODAL ────────────────────────────────────────────────────
 let authMode = 'login';
 
 function showAuthModal(mode) {
@@ -1140,10 +1193,7 @@ function showAuthModal(mode) {
   clearAuthErrors();
   document.getElementById('auth-modal').classList.add('open');
 }
-
-function hideAuthModal() {
-  document.getElementById('auth-modal').classList.remove('open');
-}
+function hideAuthModal() { document.getElementById('auth-modal').classList.remove('open'); }
 
 document.getElementById('auth-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('auth-modal')) hideAuthModal();
@@ -1157,41 +1207,29 @@ function switchAuthTab(tab) {
   document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
   clearAuthErrors();
 }
-
 function clearAuthErrors() {
   document.querySelectorAll('.auth-error').forEach(e => e.style.display = 'none');
   document.querySelectorAll('.auth-input').forEach(e => e.classList.remove('error'));
 }
-
 function showAuthError(id, inputId) {
-  const err = document.getElementById(id);
-  if (err) err.style.display = 'block';
+  const err = document.getElementById(id); if (err) err.style.display = 'block';
   if (inputId) document.getElementById(inputId)?.classList.add('error');
 }
 
-// ── PASSWORD STRENGTH ────────────────────────────────────────────
+// ── PASSWORD STRENGTH ─────────────────────────────────────────────
 function checkPasswordStrength(pw) {
-  const fill  = document.getElementById('strength-fill');
-  const label = document.getElementById('strength-label');
+  const fill = document.getElementById('strength-fill'), label = document.getElementById('strength-label');
   let score = 0;
-  if (pw.length >= 6)  score++;
-  if (pw.length >= 10) score++;
-  if (/[A-Z]/.test(pw)) score++;
-  if (/[0-9]/.test(pw)) score++;
-  if (/[^A-Za-z0-9]/.test(pw)) score++;
-  const configs = [
-    { pct:'0%', color:'transparent', label:'Enter a password' },
-    { pct:'20%', color:'#FF4040', label:'Very weak' },
-    { pct:'40%', color:'#FF8040', label:'Weak' },
-    { pct:'60%', color:'#FFCC00', label:'Fair' },
-    { pct:'80%', color:'#52B043', label:'Good' },
-    { pct:'100%', color:'#7AE060', label:'Strong' },
-  ];
-  const c = configs[score] || configs[0];
-  fill.style.width = c.pct;
-  fill.style.background = c.color;
-  label.textContent = c.label;
-  label.style.color = c.color;
+  if (pw.length >= 6) score++; if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++; if (/[0-9]/.test(pw)) score++; if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const c = [
+    {pct:'0%',color:'transparent',label:'Enter a password'},
+    {pct:'20%',color:'#FF4040',label:'Very weak'},{pct:'40%',color:'#FF8040',label:'Weak'},
+    {pct:'60%',color:'#FFCC00',label:'Fair'},{pct:'80%',color:'#52B043',label:'Good'},
+    {pct:'100%',color:'#7AE060',label:'Strong'}
+  ][score] || {pct:'0%',color:'transparent',label:''};
+  fill.style.width = c.pct; fill.style.background = c.color;
+  label.textContent = c.label; label.style.color = c.color;
 }
 
 // ── REGISTER ─────────────────────────────────────────────────────
@@ -1200,48 +1238,39 @@ async function doRegister() {
   const username = document.getElementById('reg-user').value.trim();
   const pass     = document.getElementById('reg-pass').value;
   const pass2    = document.getElementById('reg-pass2').value;
-
   let valid = true;
   if (!/^[A-Za-z0-9]{3,20}$/.test(username)) {
     showAuthError('reg-user-error','reg-user');
     document.getElementById('reg-user-error').textContent = 'Username must be 3–20 letters/numbers only.';
     valid = false;
   }
-  if (pass.length < 6) {
-    showAuthError('reg-pass-error','reg-pass');
-    valid = false;
-  }
-  if (pass !== pass2) {
-    showAuthError('reg-pass2-error','reg-pass2');
-    valid = false;
-  }
+  if (pass.length < 6) { showAuthError('reg-pass-error','reg-pass'); valid = false; }
+  if (pass !== pass2)  { showAuthError('reg-pass2-error','reg-pass2'); valid = false; }
   if (!valid) return;
 
-  const accounts = getAccounts();
-  if (accounts[username]) {
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true; btn.textContent = 'Checking username…';
+
+  // Reload DB to get freshest accounts before checking for duplicates
+  await loadDB();
+  if (DB.accounts[username]) {
     showAuthError('reg-user-error','reg-user');
     document.getElementById('reg-user-error').textContent = 'Username already taken.';
+    btn.disabled = false; btn.textContent = 'Create Account';
     return;
   }
 
-  const btn = document.getElementById('register-btn');
-  btn.disabled = true; btn.textContent = 'Creating account…';
-
+  btn.textContent = 'Creating account…';
   const salt = generateSalt();
   const hash = await hashPassword(pass, salt);
 
-  accounts[username] = {
-    passHash: hash,
-    salt,
-    created: Date.now(),
-    displayName: username
-  };
-  saveAccounts(accounts);
-
+  DB.accounts[username] = { passHash: hash, salt, created: Date.now(), displayName: username };
   const profile = createProfile();
-  profile.sessions = 1;
+  profile.sessions   = 1;
   profile.lastActive = Date.now();
-  saveProfile(username, profile);
+  DB.profiles[username] = profile;
+
+  await saveDB();
 
   currentUser    = username;
   currentProfile = profile;
@@ -1250,8 +1279,9 @@ async function doRegister() {
   btn.disabled = false; btn.textContent = 'Create Account';
   hideAuthModal();
   renderHeader();
-  showToast('✓ Account created! Welcome, ' + username, 'success');
+  renderLibrary();
   updateFriendsBadge();
+  showToast('✓ Account created! Welcome, ' + username, 'success');
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────────
@@ -1259,34 +1289,31 @@ async function doLogin() {
   clearAuthErrors();
   const username = document.getElementById('login-user').value.trim();
   const pass     = document.getElementById('login-pass').value;
-
-  if (!username || !pass) {
-    showAuthError('login-error','login-user');
-    return;
-  }
-
-  const accounts = getAccounts();
-  const account  = accounts[username];
-  if (!account) {
-    showAuthError('login-error','login-user');
-    return;
-  }
+  if (!username || !pass) { showAuthError('login-error','login-user'); return; }
 
   const btn = document.getElementById('login-btn');
   btn.disabled = true; btn.textContent = 'Signing in…';
 
+  // Always reload DB so we see the latest accounts from all devices
+  await loadDB();
+  const account = DB.accounts[username];
+  if (!account) {
+    btn.disabled = false; btn.textContent = 'Sign In';
+    showAuthError('login-error','login-user'); return;
+  }
+
   const hash = await hashPassword(pass, account.salt);
   if (hash !== account.passHash) {
     btn.disabled = false; btn.textContent = 'Sign In';
-    showAuthError('login-error','login-pass');
-    return;
+    showAuthError('login-error','login-pass'); return;
   }
 
   currentUser    = username;
   currentProfile = getProfile(username);
   currentProfile.sessions++;
   currentProfile.lastActive = Date.now();
-  saveProfile(username, currentProfile);
+  DB.profiles[username] = currentProfile;
+  await saveDB();
   saveSession(username);
 
   btn.disabled = false; btn.textContent = 'Sign In';
@@ -1299,18 +1326,18 @@ async function doLogin() {
 }
 
 // ── SIGN OUT ─────────────────────────────────────────────────────
-function doSignOut() {
-  if (currentProfile) saveProfile(currentUser, currentProfile);
-  currentUser    = null;
-  currentProfile = null;
+async function doSignOut() {
+  if (currentUser && currentProfile) {
+    DB.profiles[currentUser] = currentProfile;
+    await saveDB();
+  }
+  currentUser = null; currentProfile = null;
   clearSession();
-  renderHeader();
-  renderLibrary();
-  showPage('home');
+  renderHeader(); renderLibrary(); showPage('home');
   showToast('Signed out successfully.', 'success');
 }
 
-// ── HEADER RENDER ─────────────────────────────────────────────────
+// ── HEADER ───────────────────────────────────────────────────────
 function renderHeader() {
   const area = document.getElementById('header-auth-area');
   if (currentUser) {
@@ -1334,149 +1361,107 @@ function renderHeader() {
     area.innerHTML = `<button class="sign-in-btn" onclick="showAuthModal('login')">Sign In</button>`;
   }
 }
-
 function toggleAvatarMenu(e) {
   e.stopPropagation();
   const menu = document.getElementById('avatar-menu');
   if (menu) menu.classList.toggle('open');
 }
-
-// Close avatar menu when clicking anywhere outside it
 document.addEventListener('click', () => {
   const menu = document.getElementById('avatar-menu');
   if (menu) menu.classList.remove('open');
 });
 
-// ── LIBRARY SYSTEM ───────────────────────────────────────────────
-function isInLibrary(gameName) {
-  if (!currentProfile) return false;
-  return currentProfile.library.some(g => g.name === gameName);
+// ── LIBRARY ───────────────────────────────────────────────────────
+function isInLibrary(name) {
+  return currentProfile ? currentProfile.library.some(g => g.name === name) : false;
 }
-
-function addToLibrary(game) {
+async function addToLibrary(game) {
   if (!currentUser) { showAuthModal('login'); return false; }
   if (isInLibrary(game.name)) return true;
   currentProfile.library.push({ ...game, addedAt: Date.now(), playtime: 0 });
-  saveProfile(currentUser, currentProfile);
+  DB.profiles[currentUser] = currentProfile;
+  await saveDB();
   renderLibrary();
   return true;
 }
-
-function removeFromLibrary(gameName) {
+async function removeFromLibrary(gameName) {
   if (!currentProfile) return;
   currentProfile.library = currentProfile.library.filter(g => g.name !== gameName);
-  saveProfile(currentUser, currentProfile);
+  DB.profiles[currentUser] = currentProfile;
+  await saveDB();
   renderLibrary();
 }
-
-function toggleLibrary() {
+async function toggleLibrary() {
   if (!currentUser) { closeModal(); showAuthModal('login'); return; }
-  const game = currentModalGame;
-  if (!game) return;
+  const game = currentModalGame; if (!game) return;
   if (isInLibrary(game.name)) {
-    removeFromLibrary(game.name);
-    updateLibBtn(false);
+    await removeFromLibrary(game.name); updateLibBtn(false);
     showToast('Removed from library.', 'success');
   } else {
-    addToLibrary(game);
-    updateLibBtn(true);
+    await addToLibrary(game); updateLibBtn(true);
     showToast('Added to library!', 'success');
   }
 }
-
 function updateLibBtn(inLib) {
-  const btn = document.getElementById('m-lib-btn');
-  if (!btn) return;
-  if (inLib) {
-    btn.textContent = '✓ In Library';
-    btn.classList.add('added');
-  } else {
-    btn.textContent = '+ Add to Library';
-    btn.classList.remove('added');
-  }
+  const btn = document.getElementById('m-lib-btn'); if (!btn) return;
+  btn.textContent = inLib ? '✓ In Library' : '+ Add to Library';
+  btn.classList.toggle('added', inLib);
 }
 
-// ── PLAYTIME TRACKING ────────────────────────────────────────────
-let sessionStart = null;
-let timerInterval = null;
-let currentModalGame = null;
-let sessionPlaytime = 0; // seconds this session
+// ── PLAYTIME ─────────────────────────────────────────────────────
+let sessionStart = null, timerInterval = null, currentModalGame = null;
 
 function startPlaytimeTracking(gameName) {
   sessionStart = Date.now();
-  sessionPlaytime = 0;
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     if (!sessionStart) return;
     const s = Math.floor((Date.now() - sessionStart) / 1000);
-    sessionPlaytime = s;
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
     document.getElementById('m-time').textContent =
-      (h > 0 ? h + 'h ' : '') + (m > 0 || h > 0 ? m + 'm ' : '') + sec + 's';
+      (h>0?h+'h ':'') + (m>0||h>0?m+'m ':'')+sec+'s';
   }, 1000);
 }
 
-function stopPlaytimeTracking(gameName) {
+async function stopPlaytimeTracking(gameName) {
   clearInterval(timerInterval);
   if (!sessionStart || !currentUser || !gameName) return;
   const seconds = Math.floor((Date.now() - sessionStart) / 1000);
   sessionStart = null;
-  if (seconds < 5) return; // ignore very short sessions
+  if (seconds < 5) return;
 
-  // Update profile playtime
   if (!currentProfile.playtime[gameName]) currentProfile.playtime[gameName] = 0;
   currentProfile.playtime[gameName] += seconds;
   currentProfile.lastActive = Date.now();
 
-  // Update library entry
   const libGame = currentProfile.library.find(g => g.name === gameName);
-  if (libGame) libGame.playtime = (libGame.playtime || 0) + seconds;
+  if (libGame) libGame.playtime = (libGame.playtime||0) + seconds;
 
-  // Recent games
-  const existing = currentProfile.recentGames.findIndex(g => g.name === gameName);
-  if (existing !== -1) currentProfile.recentGames.splice(existing, 1);
+  const idx = currentProfile.recentGames.findIndex(g => g.name === gameName);
+  if (idx !== -1) currentProfile.recentGames.splice(idx, 1);
   currentProfile.recentGames.unshift({ ...currentModalGame, lastPlayed: Date.now() });
   if (currentProfile.recentGames.length > 6) currentProfile.recentGames.pop();
 
-  saveProfile(currentUser, currentProfile);
+  DB.profiles[currentUser] = currentProfile;
+  await saveDB();
   renderLibrary();
 }
 
-function fmtPlaytime(seconds) {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return h + 'h ' + m + 'm';
-  if (m > 0) return m + 'm';
-  return seconds + 's';
+function fmtPlaytime(s) {
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+  if (h > 0) return h+'h '+m+'m';
+  if (m > 0) return m+'m';
+  return s+'s';
 }
 
 // ── LIBRARY RENDER ────────────────────────────────────────────────
-const ALL_GAMES = [
-  { name:'Stellar Abyss', icon:'&#128640;', theme:'t-navy', desc:'A deep-space exploration RPG.', genre:'Action RPG', hours:'5&#8211;8 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#189;', meta:'94', players:'2.1M', slug:'stellar-abyss' },
-  { name:'Iron Citadel', icon:'&#127984;', theme:'t-crimson', desc:'A dark fortress-defense strategy game.', genre:'Strategy', hours:'3&#8211;5 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'88', players:'980K', slug:'' },
-  { name:'Neon Drift', icon:'&#127950;', theme:'t-violet', desc:'High-octane neon racing.', genre:'Racing', hours:'2&#8211;4 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'91', players:'1.4M', slug:'' },
-  { name:'Verdant Wilds', icon:'&#127807;', theme:'t-forest', desc:'Meditative alien survival.', genre:'Survival', hours:'4&#8211;7 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#9733;', meta:'96', players:'3.3M', slug:'' },
-  { name:'Hollow Protocol', icon:'&#129302;', theme:'t-slate', desc:'Cyber-noir stealth thriller.', genre:'Stealth', hours:'3&#8211;6 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'87', players:'760K', slug:'' },
-  { name:'Ember Forge', icon:'&#9874;', theme:'t-copper', desc:'Craft legendary weapons.', genre:'Crafting RPG', hours:'5&#8211;9 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'89', players:'1.1M', slug:'' },
-  { name:'Rift Walker', icon:'&#127744;', theme:'t-violet', desc:'A mind-bending puzzle platformer.', genre:'Puzzle', hours:'3&#8211;5 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'90', players:'870K', slug:'' },
-  { name:'Phantom Bloom', icon:'&#127800;', theme:'t-rose', desc:'A haunting action-adventure.', genre:'Action', hours:'3&#8211;5 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#189;', meta:'92', players:'1.8M', slug:'' },
-  { name:'Runebound Saga', icon:'&#9876;', theme:'t-crimson', desc:'Epic fantasy RPG.', genre:'RPG', hours:'8&#8211;12 hrs', rating:'&#9733;&#9733;&#9733;&#9733;&#9733;', meta:'97', players:'4.2M', slug:'' },
-  { name:'Deep Trench', icon:'&#129425;', theme:'t-teal', desc:'Explore an alien ocean floor.', genre:'Exploration', hours:'4&#8211;6 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'85', players:'520K', slug:'' },
-  { name:'Sandstorm Kings', icon:'&#127964;', theme:'t-amber', desc:'Rule a desert empire.', genre:'Strategy', hours:'6&#8211;10 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'88', players:'640K', slug:'' },
-  { name:'Glacial Protocol', icon:'&#129398;', theme:'t-ice', desc:'Espionage on a frozen moon.', genre:'Thriller', hours:'4&#8211;7 hrs', rating:'&#9733;&#9733;&#9733;&#9733;', meta:'86', players:'430K', slug:'' },
-];
-
 let libFilter = 'all';
-
 function filterLibrary(f, btn) {
   libFilter = f;
   document.querySelectorAll('.lib-filter').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderLibrary();
 }
-
 function renderLibrary() {
   const grid = document.getElementById('library-grid');
   if (!currentUser) {
@@ -1484,74 +1469,54 @@ function renderLibrary() {
     return;
   }
   let games = currentProfile.library;
-  if (libFilter === 'recent') {
-    games = (currentProfile.recentGames || []).map(rg => currentProfile.library.find(g => g.name === rg.name)).filter(Boolean);
-  } else if (libFilter === 'installed') {
-    games = games.filter(g => g.slug);
-  }
-  if (games.length === 0) {
-    grid.innerHTML = `<div class="lib-empty"><strong>No games here yet</strong>${libFilter === 'all' ? 'Browse the store and add games to your library.' : 'No games match this filter.'}</div>`;
+  if (libFilter === 'recent') games = (currentProfile.recentGames||[]).map(rg=>currentProfile.library.find(g=>g.name===rg.name)).filter(Boolean);
+  else if (libFilter === 'installed') games = games.filter(g=>g.slug);
+  if (!games.length) {
+    grid.innerHTML = `<div class="lib-empty"><strong>No games here yet</strong>${libFilter==='all'?'Browse the store and add games to your library.':'No games match this filter.'}</div>`;
     return;
   }
   grid.innerHTML = games.map(g => {
-    const pt = currentProfile.playtime[g.name] || 0;
-    const ptStr = pt > 0 ? fmtPlaytime(pt) : '0h';
+    const pt = currentProfile.playtime[g.name]||0;
     return `<div class="game-card" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc}','${g.genre}','${g.hours}','${g.rating}','${g.meta}','${g.players}','${g.slug||''}')">
-      <div class="gc-bg ${g.theme}"></div>
-      <div class="gc-icon">${g.icon}</div>
-      <div class="gc-gradient"></div>
+      <div class="gc-bg ${g.theme}"></div><div class="gc-icon">${g.icon}</div><div class="gc-gradient"></div>
       <div class="gc-play"><div class="gc-play-btn">&#9654;</div></div>
-      <div class="gc-info">
-        <div class="gc-name">${g.name}</div>
-        <div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">${ptStr} played</span></div>
-      </div>
+      <div class="gc-info"><div class="gc-name">${g.name}</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">${pt>0?fmtPlaytime(pt):'0h'} played</span></div></div>
     </div>`;
   }).join('');
 }
 
-// ── PROFILE PAGE RENDER ───────────────────────────────────────────
+// ── PROFILE PAGE ──────────────────────────────────────────────────
 function renderProfilePage() {
   if (!currentUser) return;
   const p = currentProfile;
   document.getElementById('profile-avatar-big').textContent = currentUser.substring(0,2).toUpperCase();
   document.getElementById('profile-username-display').textContent = currentUser;
-  const accounts = getAccounts();
-  const acc = accounts[currentUser];
-  document.getElementById('profile-joined').textContent = acc ? 'Joined ' + new Date(acc.created).toLocaleDateString('en-GB', {month:'long', year:'numeric'}) : '';
-
+  const acc = DB.accounts[currentUser];
+  document.getElementById('profile-joined').textContent = acc
+    ? 'Joined ' + new Date(acc.created).toLocaleDateString('en-GB',{month:'long',year:'numeric'}) : '';
   document.getElementById('ps-games').textContent = p.library.length;
-  const totalSec = Object.values(p.playtime).reduce((a,b) => a+b, 0);
-  document.getElementById('ps-hours').textContent = fmtPlaytime(totalSec);
-  document.getElementById('ps-sessions').textContent = p.sessions || 0;
-  document.getElementById('ps-last').textContent = p.lastActive
-    ? new Date(p.lastActive).toLocaleDateString('en-GB')
-    : '—';
-
+  document.getElementById('ps-hours').textContent = fmtPlaytime(Object.values(p.playtime).reduce((a,b)=>a+b,0));
+  document.getElementById('ps-sessions').textContent = p.sessions||0;
+  document.getElementById('ps-last').textContent = p.lastActive ? new Date(p.lastActive).toLocaleDateString('en-GB') : '—';
   const recent = document.getElementById('profile-recent');
-  const rg = p.recentGames || [];
-  if (rg.length === 0) {
-    recent.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">No recent activity yet.</div>';
-  } else {
-    recent.innerHTML = rg.map(g => {
-      const pt = p.playtime[g.name] || 0;
-      return `<div class="recent-game-row">
-        <div class="rg-icon ${g.theme}">${g.icon}</div>
-        <div class="rg-name">${g.name}</div>
-        <div class="rg-time">${fmtPlaytime(pt)} played</div>
-        <button class="rg-play" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc}','${g.genre}','${g.hours}','${g.rating}','${g.meta}','${g.players}','${g.slug||''}')">Play</button>
-      </div>`;
-    }).join('');
-  }
+  const rg = p.recentGames||[];
+  if (!rg.length) { recent.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">No recent activity yet.</div>'; return; }
+  recent.innerHTML = rg.map(g => {
+    const pt = p.playtime[g.name]||0;
+    return `<div class="recent-game-row">
+      <div class="rg-icon ${g.theme}">${g.icon}</div>
+      <div class="rg-name">${g.name}</div>
+      <div class="rg-time">${fmtPlaytime(pt)} played</div>
+      <button class="rg-play" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc}','${g.genre}','${g.hours}','${g.rating}','${g.meta}','${g.players}','${g.slug||''}')">Play</button>
+    </div>`;
+  }).join('');
 }
 
 // ── NAV ───────────────────────────────────────────────────────────
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  if (btn) {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+  document.getElementById('page-'+id).classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
   if (id === 'library') renderLibrary();
   if (id === 'profile') renderProfilePage();
   if (id === 'friends') renderFriendsPage();
@@ -1560,12 +1525,11 @@ function showPage(id, btn) {
 
 // ── GAME MODAL ────────────────────────────────────────────────────
 function openGame(name, icon, theme, desc, genre, hours, rating, meta, players, slug) {
-  currentModalGame = { name, icon, theme, desc, genre, hours, rating, meta, players, slug: slug||'' };
-
+  currentModalGame = { name, icon, theme, desc, genre, hours, rating, meta, players, slug:slug||'' };
   document.getElementById('m-icon').innerHTML = icon;
   document.getElementById('m-ph-icon').innerHTML = icon;
   document.getElementById('m-load-icon').innerHTML = icon;
-  document.getElementById('m-icon-wrap').className = 'modal-game-icon ' + theme;
+  document.getElementById('m-icon-wrap').className = 'modal-game-icon '+theme;
   document.getElementById('m-name').textContent = name;
   document.getElementById('m-genre').textContent = genre;
   document.getElementById('m-hours').innerHTML = hours;
@@ -1577,363 +1541,261 @@ function openGame(name, icon, theme, desc, genre, hours, rating, meta, players, 
   document.getElementById('m-meta').textContent = meta;
   document.getElementById('m-genre-tag').textContent = genre;
   document.getElementById('m-time').textContent = '—';
-
-  // Show user's playtime for this game
   if (currentUser && currentProfile) {
-    const pt = currentProfile.playtime[name] || 0;
+    const pt = currentProfile.playtime[name]||0;
     if (pt > 0) document.getElementById('m-time').textContent = fmtPlaytime(pt);
   }
-
-  // Library button state
-  const inLib = isInLibrary(name);
-  updateLibBtn(inLib);
-
-  // Launch button behaviour: require sign-in for actual games
+  updateLibBtn(isInLibrary(name));
   const launchFn = () => {
-    if (!currentUser) {
-      closeModal();
-      showAuthModal('login');
-      showToast('Sign in to play games.', 'error');
-      return;
-    }
-    // Auto-add to library when launching
+    if (!currentUser) { closeModal(); showAuthModal('login'); showToast('Sign in to play games.','error'); return; }
     if (!isInLibrary(name)) addToLibrary(currentModalGame);
     updateLibBtn(true);
     launchGame(name, icon, slug);
   };
-
   document.getElementById('m-launch-btn').onclick = launchFn;
   document.getElementById('m-play-btn').onclick   = launchFn;
-
-  // Hint for signed-out users
-  document.getElementById('m-ph-hint').textContent = currentUser
-    ? 'Your game will load in this window'
-    : 'Sign in to play — it\'s free!';
-
-  // Reset state
+  document.getElementById('m-ph-hint').textContent = currentUser ? 'Your game will load in this window' : "Sign in to play — it's free!";
   document.getElementById('m-placeholder').style.display = 'flex';
   document.getElementById('m-loading').style.display     = 'none';
   document.getElementById('m-iframe-wrap').style.display = 'none';
   document.getElementById('m-iframe-wrap').innerHTML     = '';
   document.getElementById('m-return-btn').style.display  = 'none';
-
   document.getElementById('modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function launchGame(name, icon, slug) {
   const ph = document.getElementById('m-placeholder');
   ph.style.transition = 'opacity 0.22s'; ph.style.opacity = '0';
   setTimeout(() => {
     ph.style.display = 'none'; ph.style.opacity = '1';
-    const loading = document.getElementById('m-loading');
-    const bar     = document.getElementById('m-load-bar');
-    const lbl     = document.getElementById('m-load-label');
-    loading.style.display = 'flex';
-    bar.style.width = '0%';
-    const labels = ['Loading assets...', 'Building world...', 'Spawning entities...', 'Almost ready...', 'Launching...'];
+    const loading = document.getElementById('m-loading'), bar = document.getElementById('m-load-bar'), lbl = document.getElementById('m-load-label');
+    loading.style.display = 'flex'; bar.style.width = '0%';
+    const labels = ['Loading assets...','Building world...','Spawning entities...','Almost ready...','Launching...'];
     let progress = 0, li = 0;
-    const interval = setInterval(() => {
-      progress += Math.random()*9+3;
-      if (progress > 100) progress = 100;
-      bar.style.width = progress + '%';
+    const iv = setInterval(() => {
+      progress += Math.random()*9+3; if (progress>100) progress=100;
+      bar.style.width = progress+'%';
       const nli = Math.min(Math.floor((progress/100)*labels.length), labels.length-1);
-      if (nli !== li) { li = nli; lbl.textContent = labels[li]; }
+      if (nli!==li) { li=nli; lbl.textContent=labels[li]; }
       if (progress >= 100) {
-        clearInterval(interval);
-        lbl.style.color = '#52B043'; lbl.textContent = '✓ Ready';
-        setTimeout(() => { loading.style.display = 'none'; showGameFrame(slug, icon, name); }, 400);
+        clearInterval(iv); lbl.style.color='#52B043'; lbl.textContent='✓ Ready';
+        setTimeout(() => { loading.style.display='none'; showGameFrame(slug,icon,name); }, 400);
       }
     }, 90);
   }, 240);
 }
-
 function showGameFrame(slug, icon, name) {
-  const wrap      = document.getElementById('m-iframe-wrap');
-  const returnBtn = document.getElementById('m-return-btn');
+  const wrap = document.getElementById('m-iframe-wrap'), rb = document.getElementById('m-return-btn');
   if (slug) {
-    const iframe = document.createElement('iframe');
-    iframe.src = slug + '/index.html';
-    iframe.allow = 'pointer-lock';
-    wrap.appendChild(iframe);
+    const iframe = document.createElement('iframe'); iframe.src = slug+'/index.html'; iframe.allow='pointer-lock'; wrap.appendChild(iframe);
   } else {
-    wrap.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;">
-      <div style="font-size:64px;">${icon}</div>
-      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;">${name}</div>
-      <div style="font-size:13px;color:#52B043;display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;background:#52B043;border-radius:50%;"></div>Game Coming Soon</div>
-    </div>`;
+    wrap.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#050C05;"><div style="font-size:64px;">${icon}</div><div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;">${name}</div><div style="font-size:13px;color:#52B043;display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;background:#52B043;border-radius:50%;"></div>Game Coming Soon</div></div>`;
   }
-  wrap.style.display      = 'block';
-  returnBtn.style.display = 'flex';
+  wrap.style.display = 'block'; rb.style.display = 'flex';
   startPlaytimeTracking(name);
 }
-
-function returnToLauncher() {
-  stopPlaytimeTracking(currentModalGame?.name);
-  const wrap = document.getElementById('m-iframe-wrap');
-  const rb   = document.getElementById('m-return-btn');
-  wrap.style.display = 'none'; wrap.innerHTML = '';
-  rb.style.display   = 'none';
-  document.getElementById('m-placeholder').style.display = 'flex';
-  // Update displayed playtime
+async function returnToLauncher() {
+  await stopPlaytimeTracking(currentModalGame?.name);
+  const wrap = document.getElementById('m-iframe-wrap'), rb = document.getElementById('m-return-btn');
+  wrap.style.display='none'; wrap.innerHTML=''; rb.style.display='none';
+  document.getElementById('m-placeholder').style.display='flex';
   if (currentUser && currentModalGame) {
-    const pt = currentProfile.playtime[currentModalGame.name] || 0;
-    if (pt > 0) document.getElementById('m-time').textContent = fmtPlaytime(pt);
+    const pt = currentProfile.playtime[currentModalGame.name]||0;
+    if (pt>0) document.getElementById('m-time').textContent = fmtPlaytime(pt);
   }
 }
-
-function closeModal() {
-  stopPlaytimeTracking(currentModalGame?.name);
+async function closeModal() {
+  await stopPlaytimeTracking(currentModalGame?.name);
   document.getElementById('modal').classList.remove('open');
   document.body.style.overflow = '';
-  document.getElementById('m-iframe-wrap').style.display = 'none';
-  document.getElementById('m-iframe-wrap').innerHTML     = '';
-  document.getElementById('m-return-btn').style.display  = 'none';
-  document.getElementById('m-placeholder').style.display = 'flex';
-  document.getElementById('m-loading').style.display     = 'none';
+  document.getElementById('m-iframe-wrap').style.display='none';
+  document.getElementById('m-iframe-wrap').innerHTML='';
+  document.getElementById('m-return-btn').style.display='none';
+  document.getElementById('m-placeholder').style.display='flex';
+  document.getElementById('m-loading').style.display='none';
 }
+function closeIfBackdrop(e) { if (e.target===document.getElementById('modal')) closeModal(); }
 
-function closeIfBackdrop(e) {
-  if (e.target === document.getElementById('modal')) closeModal();
-}
-
-// ── TOAST ──────────────────────────────────────────────────────────
+// ── TOAST ─────────────────────────────────────────────────────────
 function showToast(msg, type) {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = 'toast ' + (type || 'success');
-  toast.innerHTML = `<span class="toast-icon">${type === 'error' ? '⚠' : '✓'}</span> ${msg}`;
-  container.appendChild(toast);
-  setTimeout(() => { toast.style.transition = 'opacity 0.4s'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast '+(type||'success');
+  t.innerHTML = `<span class="toast-icon">${type==='error'?'⚠':'✓'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3500);
 }
 
-// ── LIBRARY FILTER BUTTONS ────────────────────────────────────────
-document.querySelectorAll('.lib-filter').forEach(f => {
-  f.addEventListener('click', () => {
-    document.querySelectorAll('.lib-filter').forEach(x => x.classList.remove('active'));
-    f.classList.add('active');
-  });
-});
-
-// ── KEYBOARD: close modals ────────────────────────────────────────
+// ── KEYBOARD ─────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    if (document.getElementById('auth-modal').classList.contains('open')) hideAuthModal();
-  }
+  if (e.key==='Escape' && document.getElementById('auth-modal').classList.contains('open')) hideAuthModal();
 });
-
-// ── ENTER KEY for auth forms ──────────────────────────────────────
-document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('reg-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+document.getElementById('reg-pass2').addEventListener('keydown',  e => { if (e.key==='Enter') doRegister(); });
 
 // ════════════════════════════════════════════════════════════════
-//  FRIENDS SYSTEM
-//  Friends are stored in each user's profile under:
-//    profile.friends = { username: { status, since } }
-//  statuses: 'accepted' | 'pending_sent' | 'pending_received'
-//
-//  When user A sends to B:
-//    A.friends[B] = { status:'pending_sent',   since:now }
-//    B.friends[A] = { status:'pending_received', since:now }
-//  When B accepts:
-//    both become 'accepted'
+//  FRIENDS SYSTEM — all data in DB.profiles[username].friends
+//  { targetUsername: { status: 'accepted'|'pending_sent'|'pending_received', since: timestamp } }
 // ════════════════════════════════════════════════════════════════
 
 function getFriends(username) {
-  const p = getProfile(username);
-  return p.friends || {};
+  return (DB.profiles[username] || createProfile()).friends || {};
 }
 
-function saveFriendsForUser(username, friends) {
-  const p = getProfile(username);
-  p.friends = friends;
-  saveProfile(username, p);
-  if (username === currentUser) currentProfile.friends = friends;
-}
-
-function sendFriendRequest() {
+async function sendFriendRequest() {
   const input = document.getElementById('friend-input');
   const errEl = document.getElementById('friend-add-error');
   errEl.style.display = 'none';
   const target = input.value.trim();
-
   if (!currentUser) { showAuthModal('login'); return; }
   if (!target) return;
+  if (target === currentUser) { errEl.textContent="You can't add yourself."; errEl.style.display='block'; return; }
 
-  if (target === currentUser) {
-    errEl.textContent = "You can't add yourself.";
-    errEl.style.display = 'block'; return;
-  }
+  // Reload DB to check the very latest state
+  await loadDB();
+  if (!DB.accounts[target]) { errEl.textContent='No account found with that username.'; errEl.style.display='block'; return; }
 
-  const accounts = getAccounts();
-  if (!accounts[target]) {
-    errEl.textContent = 'No account found with that username.';
-    errEl.style.display = 'block'; return;
-  }
-
-  const myFriends  = getFriends(currentUser);
-  const existing   = myFriends[target];
+  const myFriends = getFriends(currentUser);
+  const existing  = myFriends[target];
   if (existing) {
-    const msgs = {
-      accepted:          'You are already friends!',
-      pending_sent:      'Request already sent.',
-      pending_received:  'They already sent you a request — check your pending requests!'
-    };
-    errEl.textContent = msgs[existing.status] || 'Already connected.';
-    errEl.style.display = 'block'; return;
+    errEl.textContent = { accepted:'You are already friends!', pending_sent:'Request already sent.', pending_received:"They already sent you a request — check pending!" }[existing.status]||'Already connected.';
+    errEl.style.display='block'; return;
   }
 
-  // Write to both profiles
-  myFriends[target] = { status: 'pending_sent', since: Date.now() };
-  saveFriendsForUser(currentUser, myFriends);
+  // Write both sides
+  if (!DB.profiles[currentUser]) DB.profiles[currentUser] = currentProfile;
+  if (!DB.profiles[target])      DB.profiles[target]      = createProfile();
+  if (!DB.profiles[currentUser].friends) DB.profiles[currentUser].friends = {};
+  if (!DB.profiles[target].friends)      DB.profiles[target].friends      = {};
 
-  const theirFriends = getFriends(target);
-  theirFriends[currentUser] = { status: 'pending_received', since: Date.now() };
-  saveFriendsForUser(target, theirFriends);
+  DB.profiles[currentUser].friends[target] = { status:'pending_sent',      since:Date.now() };
+  DB.profiles[target].friends[currentUser] = { status:'pending_received',   since:Date.now() };
+  currentProfile.friends = DB.profiles[currentUser].friends;
+  await saveDB();
 
   input.value = '';
   renderFriendsPage();
   updateFriendsBadge();
-  showToast('Friend request sent to ' + target + '!', 'success');
+  showToast('Friend request sent to '+target+'!', 'success');
 }
 
-function acceptFriendRequest(fromUser) {
-  const myFriends    = getFriends(currentUser);
-  const theirFriends = getFriends(fromUser);
+async function acceptFriendRequest(fromUser) {
+  await loadDB();
   const now = Date.now();
-  myFriends[fromUser]    = { status: 'accepted', since: now };
-  theirFriends[currentUser] = { status: 'accepted', since: now };
-  saveFriendsForUser(currentUser, myFriends);
-  saveFriendsForUser(fromUser, theirFriends);
-  renderFriendsPage();
-  updateFriendsBadge();
-  showToast(fromUser + ' is now your friend!', 'success');
+  if (!DB.profiles[currentUser])  DB.profiles[currentUser]  = currentProfile;
+  if (!DB.profiles[fromUser])     DB.profiles[fromUser]      = createProfile();
+  if (!DB.profiles[currentUser].friends) DB.profiles[currentUser].friends = {};
+  if (!DB.profiles[fromUser].friends)    DB.profiles[fromUser].friends    = {};
+  DB.profiles[currentUser].friends[fromUser]  = { status:'accepted', since:now };
+  DB.profiles[fromUser].friends[currentUser]  = { status:'accepted', since:now };
+  currentProfile.friends = DB.profiles[currentUser].friends;
+  await saveDB();
+  renderFriendsPage(); updateFriendsBadge();
+  showToast(fromUser+' is now your friend!', 'success');
 }
 
-function declineFriendRequest(fromUser) {
-  const myFriends    = getFriends(currentUser);
-  const theirFriends = getFriends(fromUser);
-  delete myFriends[fromUser];
-  delete theirFriends[currentUser];
-  saveFriendsForUser(currentUser, myFriends);
-  saveFriendsForUser(fromUser, theirFriends);
-  renderFriendsPage();
-  updateFriendsBadge();
+async function declineFriendRequest(fromUser) {
+  await loadDB();
+  if (DB.profiles[currentUser]?.friends) delete DB.profiles[currentUser].friends[fromUser];
+  if (DB.profiles[fromUser]?.friends)    delete DB.profiles[fromUser].friends[currentUser];
+  currentProfile.friends = DB.profiles[currentUser]?.friends || {};
+  await saveDB();
+  renderFriendsPage(); updateFriendsBadge();
   showToast('Request declined.', 'success');
 }
 
-function cancelFriendRequest(toUser) {
-  const myFriends    = getFriends(currentUser);
-  const theirFriends = getFriends(toUser);
-  delete myFriends[toUser];
-  delete theirFriends[currentUser];
-  saveFriendsForUser(currentUser, myFriends);
-  saveFriendsForUser(toUser, theirFriends);
+async function cancelFriendRequest(toUser) {
+  await loadDB();
+  if (DB.profiles[currentUser]?.friends) delete DB.profiles[currentUser].friends[toUser];
+  if (DB.profiles[toUser]?.friends)      delete DB.profiles[toUser].friends[currentUser];
+  currentProfile.friends = DB.profiles[currentUser]?.friends || {};
+  await saveDB();
   renderFriendsPage();
   showToast('Request cancelled.', 'success');
 }
 
-function removeFriend(username) {
-  const myFriends    = getFriends(currentUser);
-  const theirFriends = getFriends(username);
-  delete myFriends[username];
-  delete theirFriends[currentUser];
-  saveFriendsForUser(currentUser, myFriends);
-  saveFriendsForUser(username, theirFriends);
+async function removeFriend(username) {
+  await loadDB();
+  if (DB.profiles[currentUser]?.friends) delete DB.profiles[currentUser].friends[username];
+  if (DB.profiles[username]?.friends)    delete DB.profiles[username].friends[currentUser];
+  currentProfile.friends = DB.profiles[currentUser]?.friends || {};
+  await saveDB();
   renderFriendsPage();
-  showToast('Removed ' + username + ' from friends.', 'success');
+  showToast('Removed '+username+' from friends.', 'success');
 }
 
 // ── FRIENDS PAGE RENDER ───────────────────────────────────────────
-function renderFriendsPage() {
+async function renderFriendsPage() {
   if (!currentUser) {
-    document.getElementById('friends-list').innerHTML    = '<div class="friends-empty"><span class="friends-empty-icon">👥</span>Sign in to see your friends.</div>';
-    document.getElementById('friends-sent-list').innerHTML   = '';
-    document.getElementById('friends-pending-list').innerHTML = '';
+    document.getElementById('friends-list').innerHTML = '<div class="friends-empty"><span class="friends-empty-icon">👥</span>Sign in to see your friends.</div>';
+    document.getElementById('friends-sent-list').innerHTML = document.getElementById('friends-pending-list').innerHTML = '';
     document.getElementById('friends-pending-section').style.display = 'none';
-    updateCounts(0, 0, 0);
-    return;
+    updateCounts(0,0,0); return;
   }
 
-  const friends = getFriends(currentUser);
-  const accepted = [], sent = [], received = [];
+  // Reload DB so friend requests from other devices are visible
+  await loadDB();
+  currentProfile = getProfile(currentUser);
 
-  Object.entries(friends).forEach(([u, f]) => {
-    if (f.status === 'accepted')          accepted.push(u);
-    else if (f.status === 'pending_sent') sent.push(u);
-    else if (f.status === 'pending_received') received.push(u);
+  const friends = getFriends(currentUser);
+  const accepted=[], sent=[], received=[];
+  Object.entries(friends).forEach(([u,f]) => {
+    if (f.status==='accepted')           accepted.push(u);
+    else if (f.status==='pending_sent')  sent.push(u);
+    else if (f.status==='pending_received') received.push(u);
   });
 
   updateCounts(accepted.length, received.length, sent.length);
-
-  // Incoming pending requests
-  const pendingSection = document.getElementById('friends-pending-section');
-  pendingSection.style.display = received.length ? 'block' : 'none';
-  document.getElementById('friends-pending-list').innerHTML = received.length
-    ? received.map(u => friendRowHTML(u, 'received')).join('')
-    : '';
-
-  // Accepted friends
+  const ps = document.getElementById('friends-pending-section');
+  ps.style.display = received.length ? 'block' : 'none';
+  document.getElementById('friends-pending-list').innerHTML = received.map(u=>friendRowHTML(u,'received')).join('');
   document.getElementById('friends-list').innerHTML = accepted.length
-    ? accepted.map(u => friendRowHTML(u, 'accepted')).join('')
+    ? accepted.map(u=>friendRowHTML(u,'accepted')).join('')
     : '<div class="friends-empty"><span class="friends-empty-icon">👥</span>No friends yet.<br>Add someone by username above.</div>';
-
-  // Sent requests
   document.getElementById('friends-sent-list').innerHTML = sent.length
-    ? sent.map(u => friendRowHTML(u, 'sent')).join('')
+    ? sent.map(u=>friendRowHTML(u,'sent')).join('')
     : '<div class="friends-empty"><span class="friends-empty-icon">📨</span>No outgoing requests.</div>';
+
+  updateFriendsBadge();
 }
 
 function friendRowHTML(username, type) {
-  const accounts = getAccounts();
-  const profile  = getProfile(username);
-  const exists   = !!accounts[username];
+  const profile  = DB.profiles[username] || createProfile();
   const initials = username.substring(0,2).toUpperCase();
-  const games    = (profile.library || []).length;
-  const totalSec = Object.values(profile.playtime || {}).reduce((a,b)=>a+b,0);
+  const games    = (profile.library||[]).length;
+  const totalSec = Object.values(profile.playtime||{}).reduce((a,b)=>a+b,0);
+  const exists   = !!DB.accounts[username];
   const sub      = exists ? `${games} games · ${fmtPlaytime(totalSec)}` : 'Account not found';
-
   let actions = '';
-  if (type === 'received') {
-    actions = `<button class="friend-btn accept"  onclick="event.stopPropagation();acceptFriendRequest('${username}')">Accept</button>
-               <button class="friend-btn decline" onclick="event.stopPropagation();declineFriendRequest('${username}')">Decline</button>`;
-  } else if (type === 'sent') {
-    actions = `<button class="friend-btn cancel" onclick="event.stopPropagation();cancelFriendRequest('${username}')">Cancel</button>`;
-  } else if (type === 'accepted') {
-    actions = `<button class="friend-btn view"   onclick="event.stopPropagation();openFriendProfile('${username}')">View</button>
-               <button class="friend-btn remove" onclick="event.stopPropagation();removeFriend('${username}')">Remove</button>`;
+  if (type==='received') {
+    actions=`<button class="friend-btn accept" onclick="event.stopPropagation();acceptFriendRequest('${username}')">Accept</button>
+             <button class="friend-btn decline" onclick="event.stopPropagation();declineFriendRequest('${username}')">Decline</button>`;
+  } else if (type==='sent') {
+    actions=`<button class="friend-btn cancel" onclick="event.stopPropagation();cancelFriendRequest('${username}')">Cancel</button>`;
+  } else {
+    actions=`<button class="friend-btn view" onclick="event.stopPropagation();openFriendProfile('${username}')">View</button>
+             <button class="friend-btn remove" onclick="event.stopPropagation();removeFriend('${username}')">Remove</button>`;
   }
-
-  const clickable = type === 'accepted' ? `onclick="openFriendProfile('${username}')"` : '';
-  return `<div class="friend-row" ${clickable}>
+  const click = type==='accepted' ? `onclick="openFriendProfile('${username}')"` : '';
+  return `<div class="friend-row" ${click}>
     <div class="friend-avatar">${initials}</div>
-    <div class="friend-info">
-      <div class="friend-name">${username}</div>
-      <div class="friend-sub">${sub}</div>
-    </div>
+    <div class="friend-info"><div class="friend-name">${username}</div><div class="friend-sub">${sub}</div></div>
     <div class="friend-actions">${actions}</div>
   </div>`;
 }
 
-function updateCounts(friends, pending, sent) {
-  document.getElementById('friends-count').textContent  = friends;
-  document.getElementById('pending-count').textContent  = pending;
-  document.getElementById('sent-count').textContent     = sent;
+function updateCounts(f,p,s) {
+  document.getElementById('friends-count').textContent = f;
+  document.getElementById('pending-count').textContent = p;
+  document.getElementById('sent-count').textContent    = s;
 }
 
-// ── FRIENDS BADGE (nav) ───────────────────────────────────────────
 function updateFriendsBadge() {
-  const badge = document.getElementById('friends-badge');
-  if (!badge) return;
-  if (!currentUser) { badge.style.display = 'none'; return; }
-  const friends  = getFriends(currentUser);
-  const incoming = Object.values(friends).filter(f => f.status === 'pending_received').length;
-  if (incoming > 0) {
-    badge.textContent    = incoming;
-    badge.style.display  = 'inline';
-  } else {
-    badge.style.display  = 'none';
-  }
+  const badge = document.getElementById('friends-badge'); if (!badge) return;
+  if (!currentUser) { badge.style.display='none'; return; }
+  const incoming = Object.values(getFriends(currentUser)).filter(f=>f.status==='pending_received').length;
+  badge.textContent   = incoming;
+  badge.style.display = incoming > 0 ? 'inline' : 'none';
 }
 
 // ── FRIEND PROFILE DRAWER ─────────────────────────────────────────
@@ -1941,67 +1803,43 @@ let fpCurrentUser = null;
 
 function openFriendProfile(username) {
   fpCurrentUser = username;
-  const accounts = getAccounts();
-  const profile  = getProfile(username);
-  const acc      = accounts[username];
-
+  const profile  = DB.profiles[username] || createProfile();
+  const acc      = DB.accounts[username];
   document.getElementById('fp-avatar').textContent = username.substring(0,2).toUpperCase();
   document.getElementById('fp-name').textContent   = username;
   document.getElementById('fp-joined').textContent = acc
-    ? 'Joined ' + new Date(acc.created).toLocaleDateString('en-GB', {month:'long', year:'numeric'})
+    ? 'Joined '+new Date(acc.created).toLocaleDateString('en-GB',{month:'long',year:'numeric'})
     : 'Unknown join date';
-
-  const games    = (profile.library || []).length;
-  const totalSec = Object.values(profile.playtime || {}).reduce((a,b)=>a+b,0);
-  document.getElementById('fp-games').textContent = games;
-  document.getElementById('fp-hours').textContent = fmtPlaytime(totalSec);
-
+  document.getElementById('fp-games').textContent = (profile.library||[]).length;
+  document.getElementById('fp-hours').textContent = fmtPlaytime(Object.values(profile.playtime||{}).reduce((a,b)=>a+b,0));
   const recentEl = document.getElementById('fp-recent');
-  const recent   = profile.recentGames || [];
-  if (recent.length === 0) {
-    recentEl.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:4px 0;">No recent activity.</div>';
-  } else {
-    recentEl.innerHTML = recent.slice(0,5).map(g => {
-      const pt = (profile.playtime || {})[g.name] || 0;
-      return `<div class="fp-game-row">
-        <div class="fp-game-icon ${g.theme}">${g.icon}</div>
-        <div class="fp-game-name">${g.name}</div>
-        <div class="fp-game-time">${fmtPlaytime(pt)}</div>
-      </div>`;
-    }).join('');
-  }
-
+  const recent   = profile.recentGames||[];
+  recentEl.innerHTML = recent.length
+    ? recent.slice(0,5).map(g=>`<div class="fp-game-row"><div class="fp-game-icon ${g.theme}">${g.icon}</div><div class="fp-game-name">${g.name}</div><div class="fp-game-time">${fmtPlaytime((profile.playtime||{})[g.name]||0)}</div></div>`).join('')
+    : '<div style="color:var(--muted);font-size:12px;padding:4px 0;">No recent activity.</div>';
   document.getElementById('fp-backdrop').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
 function closeFriendProfile(e) {
-  if (e && e.target !== document.getElementById('fp-backdrop')) return;
+  if (e && e.target!==document.getElementById('fp-backdrop')) return;
   document.getElementById('fp-backdrop').classList.remove('open');
-  document.body.style.overflow = '';
-  fpCurrentUser = null;
+  document.body.style.overflow=''; fpCurrentUser=null;
 }
-
-function removeFriendFromDrawer() {
+async function removeFriendFromDrawer() {
   if (!fpCurrentUser) return;
   const u = fpCurrentUser;
   document.getElementById('fp-backdrop').classList.remove('open');
-  document.body.style.overflow = '';
-  fpCurrentUser = null;
-  removeFriend(u);
+  document.body.style.overflow=''; fpCurrentUser=null;
+  await removeFriend(u);
 }
 
-// ── ENTER KEY for friend search ───────────────────────────────────
 document.getElementById('friend-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') sendFriendRequest();
-  document.getElementById('friend-add-error').style.display = 'none';
+  if (e.key==='Enter') sendFriendRequest();
+  document.getElementById('friend-add-error').style.display='none';
 });
 
-
+// ── BOOT ─────────────────────────────────────────────────────────
 loadSession();
-renderHeader();
-renderLibrary();
-updateFriendsBadge();
 </script>
 </body>
 </html>
