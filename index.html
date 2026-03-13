@@ -33,8 +33,8 @@
 
   /* Avatar / sign-in button */
   .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);border:2px solid var(--green-bright);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green-bright);cursor:pointer;position:relative;}
-  .avatar-menu{position:absolute;top:38px;right:0;background:#0D160D;border:1px solid rgba(82,176,67,0.25);border-radius:6px;min-width:190px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.8);display:none;z-index:300;}
-  .avatar:hover .avatar-menu,.avatar-menu:hover{display:block;}
+  .avatar-menu{position:absolute;top:42px;right:0;background:#0D160D;border:1px solid rgba(82,176,67,0.25);border-radius:6px;min-width:190px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.8);display:none;z-index:300;padding-bottom:4px;}
+  .avatar-menu.open{display:block;animation:aslide 0.15s cubic-bezier(0.4,0,0.2,1);}
   .avatar-menu-header{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);}
   .avatar-menu-name{font-weight:700;font-size:13px;color:#fff;}
   .avatar-menu-sub{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:0.5px;}
@@ -943,9 +943,9 @@ function renderHeader() {
   if (currentUser) {
     const initials = currentUser.substring(0,2).toUpperCase();
     area.innerHTML = `
-      <div class="avatar" tabindex="0">
+      <div class="avatar" id="avatar-btn" onclick="toggleAvatarMenu(event)">
         ${initials}
-        <div class="avatar-menu">
+        <div class="avatar-menu" id="avatar-menu">
           <div class="avatar-menu-header">
             <div class="avatar-menu-name">${currentUser}</div>
             <div class="avatar-menu-sub">GameHub Member</div>
@@ -961,6 +961,18 @@ function renderHeader() {
     area.innerHTML = `<button class="sign-in-btn" onclick="showAuthModal('login')">Sign In</button>`;
   }
 }
+
+function toggleAvatarMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('avatar-menu');
+  if (menu) menu.classList.toggle('open');
+}
+
+// Close avatar menu when clicking anywhere outside it
+document.addEventListener('click', () => {
+  const menu = document.getElementById('avatar-menu');
+  if (menu) menu.classList.remove('open');
+});
 
 // ── LIBRARY SYSTEM ───────────────────────────────────────────────
 function isInLibrary(gameName) {
