@@ -427,6 +427,106 @@
   .lib-add-btn{padding:7px 14px;border:1px solid rgba(82,176,67,0.35);background:transparent;color:var(--green-bright);font-size:12px;font-weight:600;border-radius:3px;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.15s;}
   .lib-add-btn:hover{background:rgba(82,176,67,0.1);}
   .lib-add-btn.added{border-color:rgba(255,255,255,0.15);color:var(--muted);}
+
+  /* ══ MY GAMES PAGE ══════════════════════════════════════════════ */
+  .mg-hero{border-radius:6px;margin:3px 3px 3px;padding:30px 36px;background:linear-gradient(120deg,#060C06 0%,#0E1F0E 55%,#060C14 100%);border:1px solid rgba(82,176,67,0.1);display:flex;align-items:center;gap:32px;position:relative;overflow:hidden;}
+  .mg-hero::after{content:'';position:absolute;right:-80px;top:-80px;width:380px;height:380px;border:1px solid rgba(82,176,67,0.05);border-radius:50%;pointer-events:none;}
+  .mg-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);border:3px solid var(--green-bright);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:var(--green-bright);flex-shrink:0;font-family:'Rajdhani',sans-serif;}
+  .mg-hero-info{flex:1;}
+  .mg-hero-name{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;letter-spacing:0.5px;margin-bottom:3px;}
+  .mg-hero-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+  .mg-stats{display:flex;gap:28px;}
+  .mg-stat{display:flex;flex-direction:column;gap:2px;}
+  .mg-stat-num{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--green-bright);line-height:1;}
+  .mg-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .mg-noauth{text-align:center;padding:80px 20px;color:var(--muted);}
+  .mg-noauth-icon{font-size:48px;margin-bottom:16px;opacity:0.4;}
+  .mg-noauth strong{display:block;font-size:18px;color:rgba(255,255,255,0.5);margin-bottom:8px;font-family:'Rajdhani',sans-serif;}
+  .activity-feed{display:flex;flex-direction:column;gap:3px;}
+  .activity-row{display:flex;align-items:center;gap:14px;padding:12px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:5px;transition:all 0.15s;cursor:pointer;}
+  .activity-row:hover{border-color:rgba(82,176,67,0.25);background:rgba(82,176,67,0.04);}
+  .activity-icon{width:48px;height:48px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+  .activity-info{flex:1;}
+  .activity-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+  .activity-sub{font-size:11px;color:var(--muted);}
+  .activity-right{text-align:right;flex-shrink:0;}
+  .activity-hrs{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green-bright);}
+  .activity-hrs-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;}
+  .activity-empty{padding:40px;text-align:center;color:var(--muted);font-size:13px;}
+  .activity-empty strong{display:block;font-size:15px;color:rgba(255,255,255,0.35);margin-bottom:6px;}
+  .genre-bar-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:6px;padding:20px 22px;}
+  .gbc-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.6);}
+  .gbc-title::before{content:'';width:3px;height:13px;background:var(--green-bright);border-radius:2px;display:inline-block;}
+  .gb-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+  .gb-row:last-child{margin-bottom:0;}
+  .gb-lbl{font-size:11px;color:var(--muted);width:86px;flex-shrink:0;}
+  .gb-track{flex:1;height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+  .gb-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#107C10,#52B043);}
+  .gb-n{font-size:10px;color:var(--dim);width:16px;text-align:right;}
+  .mg-two-col{display:grid;grid-template-columns:1fr 300px;gap:3px;margin:3px;}
+  .mg-main{display:flex;flex-direction:column;gap:3px;}
+  .mg-side{display:flex;flex-direction:column;gap:3px;}
+  .mg-side-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:6px;padding:18px 20px;}
+  .mg-side-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .mg-side-title::before{content:'';width:3px;height:13px;background:var(--green-bright);border-radius:2px;display:inline-block;}
+  .achievement-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .achievement-row:last-child{border-bottom:none;}
+  .ach-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0;}
+  .ach-info{flex:1;}
+  .ach-name{font-size:12px;font-weight:600;margin-bottom:1px;}
+  .ach-game{font-size:10px;color:var(--muted);}
+  .ach-pts{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#FFB900;}
+  .streak-num{font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;color:var(--green-bright);line-height:1;text-align:center;}
+  .streak-lbl{font-size:11px;color:var(--muted);text-align:center;margin-top:2px;}
+  .streak-days{display:flex;justify-content:center;gap:6px;margin-top:14px;}
+  .streak-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--dim);}
+  .streak-dot.on{background:rgba(82,176,67,0.2);border-color:var(--green-bright);color:var(--green-bright);}
+
+  /* ══ STORE PAGE ══════════════════════════════════════════════════ */
+  .store-banner{margin:3px;border-radius:6px;padding:38px 44px;background:linear-gradient(125deg,#06060E 0%,#0D0B1F 45%,#120618 100%);position:relative;overflow:hidden;border:1px solid rgba(120,80,220,0.12);}
+  .store-banner::before{content:'';position:absolute;top:-120px;right:-120px;width:540px;height:540px;border:1px solid rgba(120,80,220,0.07);border-radius:50%;pointer-events:none;}
+  .store-banner::after{content:'';position:absolute;top:50px;right:50px;width:270px;height:270px;border:1px solid rgba(120,80,220,0.04);border-radius:50%;pointer-events:none;}
+  .store-eyebrow{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#9B6DFF;font-weight:700;margin-bottom:10px;}
+  .store-banner-title{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;line-height:1;margin-bottom:10px;letter-spacing:0.5px;}
+  .store-banner-sub{font-size:13px;color:rgba(255,255,255,0.5);max-width:500px;line-height:1.7;margin-bottom:22px;}
+  .store-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:0;}
+  .sf-pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,0.1);color:var(--muted);cursor:pointer;transition:all 0.15s;background:transparent;font-family:'Barlow',sans-serif;}
+  .sf-pill:hover{border-color:rgba(155,109,255,0.35);color:#C4A0FF;}
+  .sf-pill.active{background:rgba(155,109,255,0.15);border-color:#9B6DFF;color:#C4A0FF;}
+  .deals-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:0 3px;}
+  .deal-main{border-radius:6px;padding:28px 30px;position:relative;overflow:hidden;cursor:pointer;transition:filter 0.18s;}
+  .deal-main:hover{filter:brightness(1.09);}
+  .deal-eyebrow{display:inline-flex;align-items:center;gap:5px;background:rgba(255,70,70,0.18);border:1px solid rgba(255,70,70,0.35);color:#FF8888;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:2px;margin-bottom:10px;}
+  .deal-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:5px;}
+  .deal-desc{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:14px;max-width:300px;}
+  .deal-prices{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .deal-was{font-size:13px;color:var(--muted);text-decoration:line-through;}
+  .deal-now{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:#52B043;}
+  .deal-off{background:rgba(255,70,70,0.18);border:1px solid rgba(255,70,70,0.3);color:#FF8888;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;}
+  .deal-art{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:100px;opacity:0.06;filter:blur(2px);pointer-events:none;}
+  .deal-secondary{display:flex;flex-direction:column;gap:3px;}
+  .deal-sm{flex:1;border-radius:6px;padding:16px 18px;position:relative;overflow:hidden;cursor:pointer;transition:filter 0.18s;}
+  .deal-sm:hover{filter:brightness(1.1);}
+  .deal-sm-icon{font-size:26px;margin-bottom:6px;opacity:0.65;}
+  .deal-sm-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;margin-bottom:2px;}
+  .deal-sm-genre{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:7px;}
+  .deal-sm-prices{display:flex;align-items:center;gap:7px;}
+  .deal-sm-was{font-size:10px;color:var(--muted);text-decoration:line-through;}
+  .deal-sm-now{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#52B043;}
+  .deal-sm-off{font-size:8px;font-weight:700;color:#FF8888;background:rgba(255,70,70,0.15);padding:1px 5px;border-radius:2px;}
+  .store-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:0 3px;}
+  .store-card{aspect-ratio:2/3;position:relative;border-radius:5px;overflow:hidden;cursor:pointer;background:var(--bg-card);transition:transform 0.2s,box-shadow 0.2s;}
+  .store-card:hover{transform:translateY(-4px) scale(1.02);z-index:10;box-shadow:0 16px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(155,109,255,0.3);}
+  .sc-bg{position:absolute;inset:0;}
+  .sc-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:0.2;}
+  .sc-gradient{position:absolute;bottom:0;left:0;right:0;height:65%;background:linear-gradient(to top,rgba(0,0,0,0.97),transparent);}
+  .sc-info{position:absolute;bottom:0;left:0;right:0;padding:9px 8px;}
+  .sc-name{font-size:10px;font-weight:600;margin-bottom:3px;line-height:1.3;}
+  .sc-genre-tag{font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;}
+  .sc-overlay{position:absolute;inset:0;background:rgba(90,40,180,0.1);opacity:0;transition:opacity 0.18s;display:flex;align-items:center;justify-content:center;}
+  .store-card:hover .sc-overlay{opacity:1;}
+  .sc-play-btn{width:42px;height:42px;background:rgba(155,109,255,0.65);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(196,160,255,0.5);font-size:15px;padding-left:3px;}
+  .store-section-wrap{margin:0 3px;}
 </style>
 </head>
 <body>
@@ -493,10 +593,10 @@
   </div>
   <nav>
     <button class="nav-btn active"  onclick="showPage('home',this)">Home</button>
-    <button class="nav-btn"         onclick="showPage('home',this)">My Games</button>
+    <button class="nav-btn"         onclick="showPage('mygames',this)">My Games</button>
     <button class="nav-btn"         onclick="showPage('gamepass',this)">Game Pass</button>
     <button class="nav-btn"         onclick="showPage('library',this)">Library</button>
-    <button class="nav-btn"         onclick="showPage('home',this)">Store</button>
+    <button class="nav-btn"         onclick="showPage('store',this)">Store</button>
     <button class="nav-btn"         onclick="showPage('friends',this)">Friends <span id="friends-badge" style="display:none;background:var(--green);color:#fff;border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700;margin-left:4px;vertical-align:middle;"></span></button>
   </nav>
   <div class="header-end">
@@ -843,6 +943,159 @@
 
       </div>
     </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ MY GAMES PAGE ══════════════════════════════════════════════ -->
+<div id="page-mygames" class="page">
+
+  <div id="mg-auth-gate" style="display:none;">
+    <div class="mg-noauth">
+      <div class="mg-noauth-icon">🎮</div>
+      <strong>Sign in to see your games</strong>
+      Your library, playtime, and stats will appear here.
+      <br><br>
+      <button class="btn-primary" style="margin-top:8px;" onclick="openAuthModal()">Sign In</button>
+    </div>
+  </div>
+
+  <div id="mg-content" style="display:none;">
+    <!-- profile hero -->
+    <div class="mg-hero">
+      <div class="mg-avatar" id="mg-avatar-letter">?</div>
+      <div class="mg-hero-info">
+        <div class="mg-hero-name" id="mg-username-label">—</div>
+        <div class="mg-hero-sub" id="mg-member-since">Member since —</div>
+        <div class="mg-stats">
+          <div class="mg-stat"><div class="mg-stat-num" id="mg-total-games">0</div><div class="mg-stat-lbl">Games</div></div>
+          <div class="mg-stat"><div class="mg-stat-num" id="mg-total-hours">0</div><div class="mg-stat-lbl">Hours Played</div></div>
+          <div class="mg-stat"><div class="mg-stat-num" id="mg-sessions">0</div><div class="mg-stat-lbl">Sessions</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mg-two-col">
+      <!-- left: activity feed -->
+      <div class="mg-main">
+        <div class="section-head" style="padding:14px 0 4px;"><div class="section-label">Recently Played</div></div>
+        <div class="activity-feed" id="mg-activity-feed">
+          <div class="activity-empty"><strong>No games played yet</strong>Launch a game to start tracking your time.</div>
+        </div>
+        <div class="section-head" style="padding:14px 0 4px;"><div class="section-label">Your Library</div></div>
+        <div class="activity-feed" id="mg-library-feed">
+          <div class="activity-empty"><strong>Library is empty</strong>Games you add will appear here.</div>
+        </div>
+      </div>
+
+      <!-- right: sidebar -->
+      <div class="mg-side">
+        <!-- streak -->
+        <div class="mg-side-card" style="text-align:center;padding:22px 20px;">
+          <div class="mg-side-title" style="justify-content:center;">Daily Streak</div>
+          <div class="streak-num" id="mg-streak">1</div>
+          <div class="streak-lbl">days in a row</div>
+          <div class="streak-days" id="mg-streak-dots"></div>
+        </div>
+        <!-- achievements -->
+        <div class="mg-side-card">
+          <div class="mg-side-title">Recent Achievements</div>
+          <div class="achievement-row"><div class="ach-icon">🏆</div><div class="ach-info"><div class="ach-name">First Launch</div><div class="ach-game">Stellar Abyss</div></div><div class="ach-pts">10G</div></div>
+          <div class="achievement-row"><div class="ach-icon">⚡</div><div class="ach-info"><div class="ach-name">Speed Runner</div><div class="ach-game">Rift Walker</div></div><div class="ach-pts">25G</div></div>
+          <div class="achievement-row"><div class="ach-icon">🌟</div><div class="ach-info"><div class="ach-name">Explorer</div><div class="ach-game">Verdant Wilds</div></div><div class="ach-pts">50G</div></div>
+          <div class="achievement-row"><div class="ach-icon">🔥</div><div class="ach-info"><div class="ach-name">On Fire</div><div class="ach-game">Runebound Saga</div></div><div class="ach-pts">15G</div></div>
+        </div>
+        <!-- genre breakdown -->
+        <div class="genre-bar-card">
+          <div class="gbc-title">Genre Breakdown</div>
+          <div class="gb-row"><div class="gb-lbl">Action RPG</div><div class="gb-track"><div class="gb-fill" style="width:75%"></div></div><div class="gb-n">3</div></div>
+          <div class="gb-row"><div class="gb-lbl">Exploration</div><div class="gb-track"><div class="gb-fill" style="width:50%"></div></div><div class="gb-n">2</div></div>
+          <div class="gb-row"><div class="gb-lbl">Strategy</div><div class="gb-track"><div class="gb-fill" style="width:25%"></div></div><div class="gb-n">1</div></div>
+          <div class="gb-row"><div class="gb-lbl">Puzzle</div><div class="gb-track"><div class="gb-fill" style="width:25%"></div></div><div class="gb-n">1</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ STORE PAGE ═════════════════════════════════════════════════ -->
+<div id="page-store" class="page">
+
+  <!-- banner -->
+  <div class="store-banner">
+    <div class="store-eyebrow">🎮 GameHub Catalogue</div>
+    <div class="store-banner-title">Discover What's Playing</div>
+    <div class="store-banner-sub">Every game on GameHub is free to play. Browse the full catalogue, filter by genre, and jump straight in.</div>
+    <div class="store-filters">
+      <button class="sf-pill active" onclick="storeFilter('all',this)">All Games</button>
+      <button class="sf-pill" onclick="storeFilter('action',this)">Action</button>
+      <button class="sf-pill" onclick="storeFilter('rpg',this)">RPG</button>
+      <button class="sf-pill" onclick="storeFilter('strategy',this)">Strategy</button>
+      <button class="sf-pill" onclick="storeFilter('puzzle',this)">Puzzle</button>
+      <button class="sf-pill" onclick="storeFilter('exploration',this)">Exploration</button>
+    </div>
+  </div>
+
+  <!-- spotlight -->
+  <div class="section-head" style="padding:18px 6px 6px;"><div class="section-label">⭐ Spotlight</div></div>
+  <div class="deals-grid">
+    <div class="deal-main t-navy" onclick="openGame('Stellar Abyss','🚀','t-navy','A deep-space exploration RPG. Chart unknown star systems and uncover the mystery behind the vanishing colonies.','Action RPG','5–8 hrs','★★★★½','94','2.1M','stellar-abyss')" style="background:linear-gradient(135deg,#050D1C,#0A1A32);">
+      <div class="deal-eyebrow">⭐ Featured Game</div>
+      <div class="deal-title">Stellar Abyss</div>
+      <div class="deal-desc">A deep-space exploration RPG. Chart unknown star systems and uncover the mystery behind the vanishing colonies.</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:12px;color:var(--muted);">
+        <span>★★★★½</span><span>·</span><span>94 Metacritic</span><span>·</span><span>2.1M playing</span><span>·</span><span>5–8 hrs</span>
+      </div>
+      <button class="btn-primary" style="font-size:13px;padding:10px 24px;" onclick="event.stopPropagation();openGame('Stellar Abyss','🚀','t-navy','A deep-space exploration RPG.','Action RPG','5–8 hrs','★★★★½','94','2.1M','stellar-abyss')">▶ Play Now</button>
+      <div class="deal-art">🚀</div>
+    </div>
+    <div class="deal-secondary">
+      <div class="deal-sm t-crimson" onclick="openGame('Runebound Saga','⚔','t-crimson','Epic high fantasy RPG with branching storylines.','RPG','8–12 hrs','★★★★★','97','4.2M','')" style="background:linear-gradient(135deg,#1A0505,#2E0A0A);">
+        <div class="deal-sm-icon">⚔️</div>
+        <div class="deal-sm-name">Runebound Saga</div>
+        <div class="deal-sm-genre">RPG · 8–12 hrs · 97 Meta</div>
+        <div style="font-size:10px;color:var(--green-bright);margin-top:4px;">▶ Play Free</div>
+      </div>
+      <div class="deal-sm t-forest" onclick="openGame('Verdant Wilds','🌿','t-forest','A meditative survival sim set in a lush alien biome.','Survival','4–7 hrs','★★★★★','96','3.3M','')" style="background:linear-gradient(135deg,#051205,#0A2010);">
+        <div class="deal-sm-icon">🌿</div>
+        <div class="deal-sm-name">Verdant Wilds</div>
+        <div class="deal-sm-genre">Survival · 4–7 hrs · 96 Meta</div>
+        <div style="font-size:10px;color:var(--green-bright);margin-top:4px;">▶ Play Free</div>
+      </div>
+      <div class="deal-sm t-violet" onclick="openGame('Rift Walker','🌙','t-violet','A mind-bending puzzle platformer.','Puzzle','3–5 hrs','★★★★','90','870K','')" style="background:linear-gradient(135deg,#0E0514,#1A0A26);">
+        <div class="deal-sm-icon">🌙</div>
+        <div class="deal-sm-name">Rift Walker</div>
+        <div class="deal-sm-genre">Puzzle · 3–5 hrs · 90 Meta</div>
+        <div style="font-size:10px;color:var(--green-bright);margin-top:4px;">▶ Play Free</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- browse grid -->
+  <div class="section-head" style="padding:18px 6px 6px;"><div class="section-label">All Games</div></div>
+  <div class="store-grid-5 store-section-wrap" id="store-browse-grid">
+    <div class="store-card" data-genre="Action RPG" onclick="openGame('Stellar Abyss','🚀','t-navy','A deep-space exploration RPG.','Action RPG','5–8 hrs','★★★★½','94','2.1M','stellar-abyss')"><div class="sc-bg t-navy"></div><div class="sc-icon">🚀</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Stellar Abyss</div><div class="sc-genre-tag">Action RPG</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="RPG" onclick="openGame('Runebound Saga','⚔','t-crimson','Epic high fantasy RPG.','RPG','8–12 hrs','★★★★★','97','4.2M','')"><div class="sc-bg t-crimson"></div><div class="sc-icon">⚔️</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Runebound Saga</div><div class="sc-genre-tag">RPG</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Survival" onclick="openGame('Verdant Wilds','🌿','t-forest','A meditative survival sim.','Survival','4–7 hrs','★★★★★','96','3.3M','')"><div class="sc-bg t-forest"></div><div class="sc-icon">🌿</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Verdant Wilds</div><div class="sc-genre-tag">Survival</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Action" onclick="openGame('Phantom Bloom','🌸','t-rose','A haunting action-adventure.','Action','3–5 hrs','★★★★½','92','1.8M','')"><div class="sc-bg t-rose"></div><div class="sc-icon">🌸</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Phantom Bloom</div><div class="sc-genre-tag">Action</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Puzzle" onclick="openGame('Rift Walker','🌙','t-violet','A mind-bending puzzle platformer.','Puzzle','3–5 hrs','★★★★','90','870K','')"><div class="sc-bg t-violet"></div><div class="sc-icon">🌙</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Rift Walker</div><div class="sc-genre-tag">Puzzle</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Stealth" onclick="openGame('Hollow Protocol','🤖','t-slate','Cyber-noir stealth thriller.','Stealth','3–6 hrs','★★★★','87','760K','')"><div class="sc-bg t-slate"></div><div class="sc-icon">🤖</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Hollow Protocol</div><div class="sc-genre-tag">Stealth</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Crafting RPG" onclick="openGame('Ember Forge','⚒','t-copper','Craft legendary weapons.','Crafting RPG','5–9 hrs','★★★★','89','1.1M','')"><div class="sc-bg t-copper"></div><div class="sc-icon">⚒️</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Ember Forge</div><div class="sc-genre-tag">Crafting RPG</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Thriller" onclick="openGame('Glacial Protocol','🧊','t-ice','Espionage on a frozen moon.','Thriller','4–7 hrs','★★★★','86','430K','')"><div class="sc-bg t-ice"></div><div class="sc-icon">🧊</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Glacial Protocol</div><div class="sc-genre-tag">Thriller</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Strategy" onclick="openGame('Sandstorm Kings','🏰','t-amber','Rule a desert empire.','Strategy','6–10 hrs','★★★★','88','640K','')"><div class="sc-bg t-amber"></div><div class="sc-icon">🏰</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Sandstorm Kings</div><div class="sc-genre-tag">Strategy</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+    <div class="store-card" data-genre="Exploration" onclick="openGame('Deep Trench','🦑','t-teal','Explore an alien ocean floor.','Exploration','4–6 hrs','★★★★','85','520K','')"><div class="sc-bg t-teal"></div><div class="sc-icon">🦑</div><div class="sc-gradient"></div><div class="sc-info"><div class="sc-name">Deep Trench</div><div class="sc-genre-tag">Exploration</div></div><div class="sc-overlay"><div class="sc-play-btn">▶</div></div></div>
+  </div>
+
+  <!-- coming soon -->
+  <div class="section-head" style="padding:18px 6px 6px;"><div class="section-label">🔜 Coming Soon</div></div>
+  <div class="grid-4 store-section-wrap" style="margin-bottom:0;">
+    <div class="wide-card" onclick="openGame('Nova Fractured','💥','t-violet','Reality-bending roguelite.','Roguelite','∞','★★★★','88','290K','')"><div class="wc-bg t-violet"></div><div class="wc-icon">💥</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Nova Fractured</div><div class="wc-meta"><span class="wc-rating">Roguelite</span><span class="wc-hours">In Development</span></div></div></div>
+    <div class="wide-card" onclick="openGame('Iron Citadel II','🛡','t-slate','Tower defence epic sequel.','Tower Defence','5–8 hrs','★★★★½','91','480K','')"><div class="wc-bg t-slate"></div><div class="wc-icon">🛡️</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Iron Citadel II</div><div class="wc-meta"><span class="wc-rating">Tower Defence</span><span class="wc-hours">In Development</span></div></div></div>
+    <div class="wide-card" onclick="openGame('BioSync Arena','🧬','t-teal','Tactical bio-combat.','Tactical','3–5 hrs','★★★★','87','210K','')"><div class="wc-bg t-teal"></div><div class="wc-icon">🧬</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">BioSync Arena</div><div class="wc-meta"><span class="wc-rating">Tactical</span><span class="wc-hours">In Development</span></div></div></div>
+    <div class="wide-card" onclick="openGame('Neon Drift','🏎','t-violet','High-octane neon racing.','Racing','2–4 hrs','★★★★','91','1.4M','')"><div class="wc-bg t-violet"></div><div class="wc-icon">🏎️</div><div class="wc-gradient"></div><div class="wc-content"><div class="wc-name">Neon Drift</div><div class="wc-meta"><span class="wc-rating">Racing</span><span class="wc-hours">Planned</span></div></div></div>
   </div>
 
   <div class="spacer"></div>
@@ -1517,11 +1770,95 @@ function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   if (btn) { document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
-  if (id === 'library') renderLibrary();
-  if (id === 'profile') renderProfilePage();
-  if (id === 'friends') renderFriendsPage();
+  if (id === 'library')  renderLibrary();
+  if (id === 'profile')  renderProfilePage();
+  if (id === 'friends')  renderFriendsPage();
+  if (id === 'mygames')  renderMyGames();
   window.scrollTo(0,0);
 }
+
+// ── MY GAMES PAGE ─────────────────────────────────────────────────
+function renderMyGames() {
+  const gate    = document.getElementById('mg-auth-gate');
+  const content = document.getElementById('mg-content');
+  if (!currentUser || !currentProfile) {
+    gate.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+  gate.style.display = 'none';
+  content.style.display = 'block';
+
+  // hero stats
+  const initial = currentUser.charAt(0).toUpperCase();
+  document.getElementById('mg-avatar-letter').textContent = initial;
+  document.getElementById('mg-username-label').textContent = currentUser;
+  const joined = currentProfile.created ? new Date(currentProfile.created).toLocaleDateString('en-GB',{month:'long',year:'numeric'}) : 'Recently';
+  document.getElementById('mg-member-since').textContent = 'Member since ' + joined;
+  document.getElementById('mg-total-games').textContent = currentProfile.library.length;
+  const totalSecs = Object.values(currentProfile.playtime||{}).reduce((a,b)=>a+b,0);
+  document.getElementById('mg-total-hours').textContent = Math.floor(totalSecs/3600) || 0;
+  document.getElementById('mg-sessions').textContent = currentProfile.sessions || 0;
+
+  // streak dots (last 7 days visual)
+  const streak = Math.min(currentProfile.sessions || 1, 7);
+  document.getElementById('mg-streak').textContent = streak;
+  const dotsEl = document.getElementById('mg-streak-dots');
+  const days = ['M','T','W','T','F','S','S'];
+  dotsEl.innerHTML = days.map((d,i) => `<div class="streak-dot ${i < streak ? 'on' : ''}">${d}</div>`).join('');
+
+  // recently played
+  const actFeed = document.getElementById('mg-activity-feed');
+  const recent = currentProfile.recentGames || [];
+  if (recent.length === 0) {
+    actFeed.innerHTML = `<div class="activity-empty"><strong>No games played yet</strong>Launch a game to start tracking your time.</div>`;
+  } else {
+    actFeed.innerHTML = recent.map(g => {
+      const secs = currentProfile.playtime[g.name] || 0;
+      const hrs  = (secs/3600).toFixed(1);
+      return `<div class="activity-row" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc||''}','${g.genre||''}','${g.hours||''}','${g.rating||''}','${g.meta||''}','${g.players||''}','${g.slug||''}')">
+        <div class="activity-icon ${g.theme}">${g.icon}</div>
+        <div class="activity-info"><div class="activity-name">${g.name}</div><div class="activity-sub">${g.genre||'Game'}</div></div>
+        <div class="activity-right"><div class="activity-hrs">${hrs}h</div><div class="activity-hrs-lbl">played</div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // library list
+  const libFeed = document.getElementById('mg-library-feed');
+  const lib = currentProfile.library || [];
+  if (lib.length === 0) {
+    libFeed.innerHTML = `<div class="activity-empty"><strong>Library is empty</strong>Add games to your library to see them here.</div>`;
+  } else {
+    libFeed.innerHTML = lib.map(g => {
+      const secs = currentProfile.playtime[g.name] || 0;
+      return `<div class="activity-row" onclick="openGame('${g.name}','${g.icon}','${g.theme}','${g.desc||''}','${g.genre||''}','${g.hours||''}','${g.rating||''}','${g.meta||''}','${g.players||''}','${g.slug||''}')">
+        <div class="activity-icon ${g.theme}">${g.icon}</div>
+        <div class="activity-info"><div class="activity-name">${g.name}</div><div class="activity-sub">${g.genre||'Game'} · Added to library</div></div>
+        <div class="activity-right"><div class="activity-hrs">${fmtPlaytime(secs)}</div><div class="activity-hrs-lbl">played</div></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── STORE FILTER ──────────────────────────────────────────────────
+function storeFilter(genre, btn) {
+  document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const genreMap = {
+    action:['Action','Action RPG','Stealth'],
+    rpg:['RPG','Action RPG','Crafting RPG'],
+    strategy:['Strategy','Tower Defence','Tactical'],
+    puzzle:['Puzzle'],
+    exploration:['Exploration','Survival','Thriller']
+  };
+  const allowed = genreMap[genre] || null;
+  document.querySelectorAll('#store-browse-grid .store-card').forEach(card => {
+    if (!allowed) { card.style.display = ''; return; }
+    card.style.display = allowed.includes(card.dataset.genre) ? '' : 'none';
+  });
+}
+
 
 // ── GAME MODAL ────────────────────────────────────────────────────
 function openGame(name, icon, theme, desc, genre, hours, rating, meta, players, slug) {
