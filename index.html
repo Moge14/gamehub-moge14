@@ -183,6 +183,99 @@
   .rg-play{padding:5px 14px;background:var(--green);border:none;border-radius:3px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:background 0.15s;}
   .rg-play:hover{background:var(--green-bright);}
 
+  /* ── ABOUT STRIP ── */
+  .about-strip{margin:3px;border-radius:6px;background:linear-gradient(135deg,#060C06 0%,#0B1A0B 50%,#060C14 100%);border:1px solid rgba(82,176,67,0.1);display:grid;grid-template-columns:1fr 1fr 1fr;position:relative;overflow:hidden;}
+  .about-strip::after{content:'';position:absolute;top:-120px;right:-120px;width:500px;height:500px;border:1px solid rgba(82,176,67,0.05);border-radius:50%;pointer-events:none;}
+  .about-col{padding:28px 32px;border-right:1px solid rgba(255,255,255,0.05);}
+  .about-col:last-child{border-right:none;}
+  .about-eyebrow{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--green-bright);font-weight:700;margin-bottom:10px;}
+  .about-heading{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;line-height:1.15;margin-bottom:10px;}
+  .about-body{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.75;}
+  .about-stat-row{display:flex;gap:22px;margin-top:16px;}
+  .about-stat-num{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green-bright);line-height:1;}
+  .about-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+  .about-feature-list{list-style:none;margin-top:10px;}
+  .about-feature-list li{font-size:12px;color:rgba(255,255,255,0.5);padding:5px 0;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .about-feature-list li:last-child{border-bottom:none;}
+  .about-feature-list li::before{content:'';width:5px;height:5px;background:var(--green-bright);border-radius:50%;flex-shrink:0;}
+
+  /* ── PROMO SPOTLIGHT (horizontal scroll) ── */
+  .promo-scroll{display:flex;gap:6px;padding:0 6px;overflow-x:auto;scrollbar-width:none;}
+  .promo-scroll::-webkit-scrollbar{display:none;}
+  .promo-card{flex-shrink:0;width:320px;height:190px;border-radius:7px;position:relative;overflow:hidden;cursor:pointer;transition:transform 0.22s,box-shadow 0.22s;}
+  .promo-card:hover{transform:scale(1.03);box-shadow:0 16px 48px rgba(0,0,0,0.7),0 0 0 1px rgba(82,176,67,0.3);}
+  .pc-bg{position:absolute;inset:0;}
+  .pc-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:88px;opacity:0.1;filter:blur(2px);line-height:1;}
+  .pc-overlay{position:absolute;inset:0;background:linear-gradient(100deg,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.45) 55%,transparent 100%);}
+  .pc-content{position:absolute;bottom:16px;left:18px;right:100px;}
+  .pc-badge{font-size:8px;letter-spacing:1.8px;text-transform:uppercase;font-weight:700;color:var(--green-bright);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+  .pc-name{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;line-height:1.1;margin-bottom:4px;}
+  .pc-desc{font-size:10px;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:10px;}
+  .pc-row{display:flex;gap:8px;align-items:center;}
+  .pc-btn{background:var(--green);border:none;color:#fff;padding:6px 14px;border-radius:3px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:background 0.15s;}
+  .pc-btn:hover{background:var(--green-bright);}
+  .pc-meta{font-size:10px;color:var(--muted);}
+
+  /* ── EDITOR PICKS (2-col feature layout) ── */
+  .picks-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 6px;}
+  .pick-card{border-radius:6px;overflow:hidden;cursor:pointer;position:relative;height:148px;background:var(--bg-card);transition:transform 0.2s,box-shadow 0.2s;}
+  .pick-card:hover{transform:scale(1.02);box-shadow:0 12px 36px rgba(0,0,0,0.7),0 0 0 1px rgba(82,176,67,0.25);}
+  .pick-bg{position:absolute;inset:0;}
+  .pick-icon-big{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:72px;opacity:0.12;filter:blur(1px);}
+  .pick-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.2) 70%,transparent 100%);}
+  .pick-content{position:absolute;bottom:16px;left:18px;right:18px;}
+  .pick-tag{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green-bright);font-weight:700;margin-bottom:5px;}
+  .pick-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;line-height:1;margin-bottom:4px;}
+  .pick-meta{display:flex;gap:10px;font-size:10px;color:rgba(255,255,255,0.5);align-items:center;}
+  .pick-stars{color:#FFD43B;letter-spacing:-1px;font-size:10px;}
+
+  /* ── COMING SOON ROW ── */
+  .coming-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 6px;}
+  .coming-card{border-radius:6px;overflow:hidden;position:relative;cursor:default;background:var(--bg-card);aspect-ratio:16/9;}
+  .coming-bg{position:absolute;inset:0;}
+  .coming-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;opacity:0.12;}
+  .coming-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.2) 100%);}
+  .coming-content{position:absolute;bottom:12px;left:12px;right:12px;}
+  .coming-pill{display:inline-block;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);font-size:8px;letter-spacing:1.2px;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-bottom:5px;}
+  .coming-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;line-height:1.1;}
+  .coming-sub{font-size:9px;color:var(--muted);margin-top:3px;}
+
+  /* ── DEVLOG ── */
+  .devlog-wrap{display:grid;grid-template-columns:2fr 1fr;gap:6px;padding:0 6px;}
+  .devlog-main{}
+  .devlog-entry{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:18px 20px;margin-bottom:6px;transition:border-color 0.15s;}
+  .devlog-entry:hover{border-color:rgba(82,176,67,0.2);}
+  .devlog-entry:last-child{margin-bottom:0;}
+  .devlog-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .devlog-version{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--green-bright);background:rgba(82,176,67,0.1);border:1px solid rgba(82,176,67,0.2);padding:2px 10px;border-radius:3px;letter-spacing:0.5px;}
+  .devlog-date{font-size:10px;color:var(--muted);letter-spacing:0.5px;}
+  .devlog-tag{font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:20px;font-weight:700;margin-left:auto;}
+  .devlog-tag.feature{background:rgba(82,176,67,0.12);color:var(--green-bright);border:1px solid rgba(82,176,67,0.2);}
+  .devlog-tag.fix{background:rgba(255,180,50,0.1);color:#FFB432;border:1px solid rgba(255,180,50,0.2);}
+  .devlog-tag.update{background:rgba(80,160,255,0.1);color:#80B4FF;border:1px solid rgba(80,160,255,0.2);}
+  .devlog-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+  .devlog-body{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7;}
+  .devlog-changes{list-style:none;margin-top:8px;}
+  .devlog-changes li{font-size:11px;color:rgba(255,255,255,0.45);padding:3px 0;display:flex;gap:8px;align-items:flex-start;}
+  .devlog-changes li::before{content:'▸';color:var(--green-bright);font-size:9px;flex-shrink:0;margin-top:2px;}
+  .devlog-sidebar{}
+  .devlog-side-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:18px;margin-bottom:6px;}
+  .devlog-side-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .devlog-side-title::before{content:'';width:3px;height:14px;background:var(--green-bright);border-radius:2px;display:inline-block;}
+  .roadmap-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .roadmap-item:last-child{border-bottom:none;}
+  .roadmap-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .roadmap-dot.done{background:var(--green-bright);}
+  .roadmap-dot.wip{background:#FFB432;}
+  .roadmap-dot.planned{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);}
+  .roadmap-label{font-size:12px;flex:1;}
+  .roadmap-status{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);}
+  .stat-ticker{display:flex;flex-direction:column;gap:8px;}
+  .ticker-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .ticker-row:last-child{border-bottom:none;}
+  .ticker-label{font-size:11px;color:var(--muted);}
+  .ticker-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--green-bright);}
+
   /* ── FRIENDS PAGE ── */
   .friends-wrap{padding:24px 8px;}
   .friends-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
@@ -416,12 +509,14 @@
 
 <!-- ══ HOME PAGE ═════════════════════════════════════════════════ -->
 <div id="page-home" class="page active">
+
+  <!-- HERO FEATURE -->
   <div class="hero">
     <div class="hero-feature" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG. Chart unknown star systems and uncover the mystery behind the vanishing colonies.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')">
       <div class="hero-bg-art"></div><div class="hero-lines"></div>
       <div class="hero-icon-bg">&#128640;</div><div class="hero-glow"></div>
       <div class="hero-content">
-        <div class="hero-badge">&#9889; Now on Game Pass</div>
+        <div class="hero-badge">&#9889; Featured Game &mdash; Now on Game Pass</div>
         <div class="hero-title">STELLAR ABYSS</div>
         <div class="hero-meta">
           <span class="stars">&#9733;&#9733;&#9733;&#9733;&#189;</span>
@@ -429,7 +524,7 @@
           <span class="dot"></span><span>5&#8211;8 hrs</span>
           <span class="dot"></span><span>2.1M playing</span>
         </div>
-        <div class="hero-desc">Chart unknown star systems, build your crew, and uncover the mystery behind the vanishing colonies in this deep-space open-world RPG.</div>
+        <div class="hero-desc">Chart unknown star systems, build your crew, and uncover the mystery behind the vanishing colonies in this deep-space open-world RPG. Now playable directly in your browser.</div>
         <div class="hero-actions">
           <button class="btn-primary" onclick="event.stopPropagation();openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')">&#9654;&nbsp;Play Now</button>
           <button class="btn-secondary">+ Wishlist</button>
@@ -437,41 +532,319 @@
       </div>
     </div>
     <div class="hero-stack">
-      <div class="hero-mini" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')">
-        <div class="hero-mini-bg t-crimson"></div><div class="hero-mini-icon">&#127984;</div><div class="hero-mini-overlay"></div>
-        <div class="hero-mini-label"><div class="hero-mini-name">Iron Citadel</div><div class="hero-mini-sub">Strategy &middot; 3&#8211;5 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
-      </div>
-      <div class="hero-mini" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')">
-        <div class="hero-mini-bg t-violet"></div><div class="hero-mini-icon">&#127950;</div><div class="hero-mini-overlay"></div>
-        <div class="hero-mini-label"><div class="hero-mini-name">Neon Drift</div><div class="hero-mini-sub">Racing &middot; 2&#8211;4 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
+      <div class="hero-mini" onclick="openGame('Runebound Saga','&#9876;','t-crimson','Epic fantasy RPG with deep lore.','RPG','8&#8211;12 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','97','4.2M','')">
+        <div class="hero-mini-bg t-crimson"></div><div class="hero-mini-icon">&#9876;</div><div class="hero-mini-overlay"></div>
+        <div class="hero-mini-label"><div class="hero-mini-name">Runebound Saga</div><div class="hero-mini-sub">RPG &middot; 97 Metacritic</div><div class="hero-mini-gp">&#9733;&#9733;&#9733;&#9733;&#9733; Editor&#8217;s Choice</div></div>
       </div>
       <div class="hero-mini" onclick="openGame('Verdant Wilds','&#127807;','t-forest','A meditative survival sim.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')">
         <div class="hero-mini-bg t-forest"></div><div class="hero-mini-icon">&#127807;</div><div class="hero-mini-overlay"></div>
-        <div class="hero-mini-label"><div class="hero-mini-name">Verdant Wilds</div><div class="hero-mini-sub">Survival &middot; 4&#8211;7 hrs</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
+        <div class="hero-mini-label"><div class="hero-mini-name">Verdant Wilds</div><div class="hero-mini-sub">Survival &middot; 3.3M playing</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
+      </div>
+      <div class="hero-mini" onclick="openGame('Phantom Bloom','&#127800;','t-rose','A haunting action-adventure.','Action','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','92','1.8M','')">
+        <div class="hero-mini-bg t-rose"></div><div class="hero-mini-icon">&#127800;</div><div class="hero-mini-overlay"></div>
+        <div class="hero-mini-label"><div class="hero-mini-name">Phantom Bloom</div><div class="hero-mini-sub">Action &middot; New Release</div><div class="hero-mini-gp">&#9889; Game Pass</div></div>
       </div>
     </div>
   </div>
 
-  <div class="notif">
-    <div class="notif-icon">&#127918;</div>
-    <div class="notif-text"><strong>6 new games added to Game Pass this week</strong><br><span>Including Verdant Wilds, Hollow Protocol, and more &#8212; all playable now.</span></div>
-    <button class="btn-outline" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">See What&#8217;s New</button>
+  <!-- ABOUT GAMEHUB -->
+  <div class="about-strip">
+    <div class="about-col">
+      <div class="about-eyebrow">What is GameHub?</div>
+      <div class="about-heading">Your browser gaming platform</div>
+      <div class="about-body">GameHub is an open gaming platform where anyone can play, build, and share browser-based games. No downloads, no installs — just click and play. Every game runs natively in your browser, built with open web tech.</div>
+      <div class="about-stat-row">
+        <div><div class="about-stat-num">12+</div><div class="about-stat-lbl">Games</div></div>
+        <div><div class="about-stat-num">4.2M</div><div class="about-stat-lbl">Players</div></div>
+        <div><div class="about-stat-num">Free</div><div class="about-stat-lbl">Always</div></div>
+      </div>
+    </div>
+    <div class="about-col">
+      <div class="about-eyebrow">Platform Features</div>
+      <div class="about-heading">Everything in one place</div>
+      <ul class="about-feature-list">
+        <li>Instant play — no downloads ever required</li>
+        <li>Personal library &amp; playtime tracking</li>
+        <li>Friends system with cross-account requests</li>
+        <li>Game Pass — hundreds of games, one subscription</li>
+        <li>Achievements, profiles &amp; leaderboards (coming soon)</li>
+        <li>Password-protected local accounts</li>
+      </ul>
+    </div>
+    <div class="about-col">
+      <div class="about-eyebrow">For Developers</div>
+      <div class="about-heading">Open platform, open submissions</div>
+      <div class="about-body">GameHub is built with plain HTML, CSS, and JavaScript — no framework required. Any browser game can be submitted. Games live in their own folder and are embedded directly via iframe with full pointer-lock support for immersive experiences like Stellar Abyss.</div>
+      <div style="margin-top:16px;">
+        <button class="btn-outline" style="font-size:11px;padding:6px 16px;" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">Browse Game Pass &#8594;</button>
+      </div>
+    </div>
   </div>
 
+  <!-- PROMO SPOTLIGHT -->
   <div class="section">
     <div class="section-head">
-      <div class="section-label">My Games &amp; Apps</div>
-      <button class="see-all" onclick="showPage('library',document.querySelectorAll('.nav-btn')[3])">See all &#8594;</button>
+      <div class="section-label">Hot Right Now</div>
+      <button class="see-all" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">View all &#8594;</button>
     </div>
-    <div class="grid-6">
-      <div class="game-card" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')"><div class="gc-bg t-navy"></div><div class="gc-icon">&#128640;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Stellar Abyss</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Action RPG</span></div></div></div>
-      <div class="game-card" onclick="openGame('Iron Citadel','&#127984;','t-crimson','A dark fortress-defense strategy game.','Strategy','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','88','980K','')"><div class="gc-bg t-crimson"></div><div class="gc-icon">&#127984;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Iron Citadel</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Strategy</span></div></div></div>
-      <div class="game-card" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')"><div class="gc-bg t-violet"></div><div class="gc-icon">&#127950;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Neon Drift</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Racing</span></div></div></div>
-      <div class="game-card" onclick="openGame('Verdant Wilds','&#127807;','t-forest','Meditative alien survival.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')"><div class="gc-bg t-forest"></div><div class="gc-icon">&#127807;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Verdant Wilds</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Survival</span></div></div></div>
-      <div class="game-card" onclick="openGame('Hollow Protocol','&#129302;','t-slate','Cyber-noir stealth thriller.','Stealth','3&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','87','760K','')"><div class="gc-bg t-slate"></div><div class="gc-icon">&#129302;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Hollow Protocol</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Stealth</span></div></div></div>
-      <div class="game-card" onclick="openGame('Ember Forge','&#9874;','t-copper','Craft legendary weapons.','Crafting RPG','5&#8211;9 hrs','&#9733;&#9733;&#9733;&#9733;','89','1.1M','')"><div class="gc-bg t-copper"></div><div class="gc-icon">&#9874;</div><div class="gc-gradient"></div><div class="gc-play"><div class="gc-play-btn">&#9654;</div></div><div class="gc-info"><div class="gc-name">Ember Forge</div><div class="gc-tags"><div class="gc-gp"></div><span class="gc-genre">Crafting RPG</span></div></div></div>
+    <div class="promo-scroll">
+
+      <div class="promo-card" onclick="openGame('Runebound Saga','&#9876;','t-crimson','Epic fantasy RPG with branching quests.','RPG','8&#8211;12 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','97','4.2M','')">
+        <div class="pc-bg t-crimson"></div><div class="pc-icon">&#9876;</div><div class="pc-overlay"></div>
+        <div class="pc-content">
+          <div class="pc-badge">&#9733; #1 Most Played</div>
+          <div class="pc-name">Runebound Saga</div>
+          <div class="pc-desc">A sweeping fantasy RPG with 12+ hours of branching story, hundreds of items, and full party management.</div>
+          <div class="pc-row"><button class="pc-btn" onclick="event.stopPropagation();openGame('Runebound Saga','&#9876;','t-crimson','Epic fantasy RPG.','RPG','8&#8211;12 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','97','4.2M','')">Play Free</button><span class="pc-meta">97 Metacritic &middot; 4.2M playing</span></div>
+        </div>
+      </div>
+
+      <div class="promo-card" onclick="openGame('Verdant Wilds','&#127807;','t-forest','Meditative alien survival sim.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')">
+        <div class="pc-bg t-forest"></div><div class="pc-icon">&#127807;</div><div class="pc-overlay"></div>
+        <div class="pc-content">
+          <div class="pc-badge">&#9889; Game Pass Pick</div>
+          <div class="pc-name">Verdant Wilds</div>
+          <div class="pc-desc">Survive and build on a living alien world that adapts to your every decision. Breathtaking procedural environments.</div>
+          <div class="pc-row"><button class="pc-btn" onclick="event.stopPropagation();openGame('Verdant Wilds','&#127807;','t-forest','Meditative alien survival.','Survival','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;&#9733;','96','3.3M','')">Play Free</button><span class="pc-meta">96 Metacritic &middot; 3.3M playing</span></div>
+        </div>
+      </div>
+
+      <div class="promo-card" onclick="openGame('Phantom Bloom','&#127800;','t-rose','A haunting action-adventure.','Action','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','92','1.8M','')">
+        <div class="pc-bg t-rose"></div><div class="pc-icon">&#127800;</div><div class="pc-overlay"></div>
+        <div class="pc-content">
+          <div class="pc-badge">&#127381; New Release</div>
+          <div class="pc-name">Phantom Bloom</div>
+          <div class="pc-desc">A hauntingly beautiful action-adventure. Fight through cursed gardens in a world where every enemy was once a person.</div>
+          <div class="pc-row"><button class="pc-btn" onclick="event.stopPropagation();openGame('Phantom Bloom','&#127800;','t-rose','A haunting action-adventure.','Action','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','92','1.8M','')">Play Free</button><span class="pc-meta">92 Metacritic &middot; 1.8M playing</span></div>
+        </div>
+      </div>
+
+      <div class="promo-card" onclick="openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')">
+        <div class="pc-bg t-violet"></div><div class="pc-icon">&#127950;</div><div class="pc-overlay"></div>
+        <div class="pc-content">
+          <div class="pc-badge">&#128293; Top Rated Racing</div>
+          <div class="pc-name">Neon Drift</div>
+          <div class="pc-desc">Blistering neon tracks, gravity-defying shortcuts, and a synthwave soundtrack that never lets up.</div>
+          <div class="pc-row"><button class="pc-btn" onclick="event.stopPropagation();openGame('Neon Drift','&#127950;','t-violet','High-octane neon racing.','Racing','2&#8211;4 hrs','&#9733;&#9733;&#9733;&#9733;','91','1.4M','')">Play Free</button><span class="pc-meta">91 Metacritic &middot; 1.4M playing</span></div>
+        </div>
+      </div>
+
+      <div class="promo-card" onclick="openGame('Deep Trench','&#129425;','t-teal','Explore an alien ocean floor.','Exploration','4&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','85','520K','')">
+        <div class="pc-bg t-teal"></div><div class="pc-icon">&#129425;</div><div class="pc-overlay"></div>
+        <div class="pc-content">
+          <div class="pc-badge">&#128269; Hidden Gem</div>
+          <div class="pc-name">Deep Trench</div>
+          <div class="pc-desc">Dive into the crushing dark of an alien ocean. Map bioluminescent ecosystems and survive what lives in the deep.</div>
+          <div class="pc-row"><button class="pc-btn" onclick="event.stopPropagation();openGame('Deep Trench','&#129425;','t-teal','Explore an alien ocean floor.','Exploration','4&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','85','520K','')">Play Free</button><span class="pc-meta">85 Metacritic &middot; 520K playing</span></div>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <!-- EDITOR'S PICKS -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-label">Editor&#8217;s Picks</div>
+      <button class="see-all" onclick="showPage('library',document.querySelectorAll('.nav-btn')[3])">See library &#8594;</button>
+    </div>
+    <div class="picks-grid">
+      <div class="pick-card" onclick="openGame('Hollow Protocol','&#129302;','t-slate','Cyber-noir stealth thriller.','Stealth','3&#8211;6 hrs','&#9733;&#9733;&#9733;&#9733;','87','760K','')">
+        <div class="pick-bg t-slate"></div><div class="pick-icon-big">&#129302;</div><div class="pick-overlay"></div>
+        <div class="pick-content">
+          <div class="pick-tag">&#127381; Staff Pick &mdash; Stealth</div>
+          <div class="pick-name">Hollow Protocol</div>
+          <div class="pick-meta"><span class="pick-stars">&#9733;&#9733;&#9733;&#9733;</span><span>87 Meta</span><span>&middot;</span><span>3&#8211;6 hrs</span><span>&middot;</span><span>760K playing</span></div>
+        </div>
+      </div>
+      <div class="pick-card" onclick="openGame('Ember Forge','&#9874;','t-copper','Craft legendary weapons in a dying forge.','Crafting RPG','5&#8211;9 hrs','&#9733;&#9733;&#9733;&#9733;','89','1.1M','')">
+        <div class="pick-bg t-copper"></div><div class="pick-icon-big">&#9874;</div><div class="pick-overlay"></div>
+        <div class="pick-content">
+          <div class="pick-tag">&#9889; Most Innovative</div>
+          <div class="pick-name">Ember Forge</div>
+          <div class="pick-meta"><span class="pick-stars">&#9733;&#9733;&#9733;&#9733;</span><span>89 Meta</span><span>&middot;</span><span>5&#8211;9 hrs</span><span>&middot;</span><span>1.1M playing</span></div>
+        </div>
+      </div>
+      <div class="pick-card" onclick="openGame('Rift Walker','&#127744;','t-violet','A mind-bending puzzle platformer.','Puzzle','3&#8211;5 hrs','&#9733;&#9733;&#9733;&#9733;','90','870K','')">
+        <div class="pick-bg t-violet"></div><div class="pick-icon-big">&#127744;</div><div class="pick-overlay"></div>
+        <div class="pick-content">
+          <div class="pick-tag">&#129504; Best Puzzle 2025</div>
+          <div class="pick-name">Rift Walker</div>
+          <div class="pick-meta"><span class="pick-stars">&#9733;&#9733;&#9733;&#9733;</span><span>90 Meta</span><span>&middot;</span><span>3&#8211;5 hrs</span><span>&middot;</span><span>870K playing</span></div>
+        </div>
+      </div>
+      <div class="pick-card" onclick="openGame('Glacial Protocol','&#129398;','t-ice','Espionage thriller on a frozen moon.','Thriller','4&#8211;7 hrs','&#9733;&#9733;&#9733;&#9733;','86','430K','')">
+        <div class="pick-bg t-ice"></div><div class="pick-icon-big">&#129398;</div><div class="pick-overlay"></div>
+        <div class="pick-content">
+          <div class="pick-tag">&#128274; Best Story</div>
+          <div class="pick-name">Glacial Protocol</div>
+          <div class="pick-meta"><span class="pick-stars">&#9733;&#9733;&#9733;&#9733;</span><span>86 Meta</span><span>&middot;</span><span>4&#8211;7 hrs</span><span>&middot;</span><span>430K playing</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMING SOON -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-label">Coming Soon</div>
+    </div>
+    <div class="coming-row">
+      <div class="coming-card">
+        <div class="coming-bg t-amber"></div><div class="coming-icon">&#127964;</div><div class="coming-overlay"></div>
+        <div class="coming-content">
+          <div class="coming-pill">In Development</div>
+          <div class="coming-name">Sandstorm Kings</div>
+          <div class="coming-sub">Grand Strategy &middot; Q2 2026</div>
+        </div>
+      </div>
+      <div class="coming-card">
+        <div class="coming-bg t-navy"></div><div class="coming-icon">&#128171;</div><div class="coming-overlay"></div>
+        <div class="coming-content">
+          <div class="coming-pill">Announced</div>
+          <div class="coming-name">Nova Fractured</div>
+          <div class="coming-sub">Roguelike &middot; Q3 2026</div>
+        </div>
+      </div>
+      <div class="coming-card">
+        <div class="coming-bg t-copper"></div><div class="coming-icon">&#128296;</div><div class="coming-overlay"></div>
+        <div class="coming-content">
+          <div class="coming-pill">In Development</div>
+          <div class="coming-name">Iron Citadel II</div>
+          <div class="coming-sub">Strategy &middot; Q4 2026</div>
+        </div>
+      </div>
+      <div class="coming-card">
+        <div class="coming-bg t-teal"></div><div class="coming-icon">&#129514;</div><div class="coming-overlay"></div>
+        <div class="coming-content">
+          <div class="coming-pill">Concept</div>
+          <div class="coming-name">BioSync Arena</div>
+          <div class="coming-sub">Action &middot; TBA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVLOG + SIDEBAR -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-label">Dev Log</div>
+    </div>
+    <div class="devlog-wrap">
+
+      <div class="devlog-main">
+
+        <div class="devlog-entry">
+          <div class="devlog-header">
+            <div class="devlog-version">v0.4.0</div>
+            <div class="devlog-date">March 13, 2026</div>
+            <div class="devlog-tag feature">Feature</div>
+          </div>
+          <div class="devlog-title">Friends System &amp; Account Improvements</div>
+          <div class="devlog-body">A full friends system is now live. Add anyone on the platform by username, send and receive friend requests, and view their profile, game library, and playtime. The avatar dropdown has also been fixed to use a proper click-to-open interaction so menu items are reliably clickable.</div>
+          <ul class="devlog-changes">
+            <li>Add friends by username with live cross-account request state</li>
+            <li>Accept, decline, and cancel friend requests</li>
+            <li>Friend profile side-drawer showing games and playtime</li>
+            <li>Pending requests badge on the Friends nav button</li>
+            <li>Avatar dropdown rewritten to click-toggle (fixes hover gap bug)</li>
+          </ul>
+        </div>
+
+        <div class="devlog-entry">
+          <div class="devlog-header">
+            <div class="devlog-version">v0.3.0</div>
+            <div class="devlog-date">March 13, 2026</div>
+            <div class="devlog-tag feature">Feature</div>
+          </div>
+          <div class="devlog-title">Accounts, Local Storage &amp; Playtime Tracking</div>
+          <div class="devlog-body">GameHub now has a full local account system. Create a username and password — credentials are stored using PBKDF2 hashing via the browser's native SubtleCrypto API, with a unique random salt per account. Sessions persist across refreshes. Playtime is tracked per game and saved to your profile.</div>
+          <ul class="devlog-changes">
+            <li>Account creation with PBKDF2-hashed passwords (100k iterations)</li>
+            <li>Session persistence — stay logged in across page reloads</li>
+            <li>Personal library: add games, track playtime per title</li>
+            <li>Profile page with stats: total playtime, sessions, last active</li>
+            <li>Games gated behind login — prevents anonymous botting</li>
+            <li>Password strength meter on registration</li>
+          </ul>
+        </div>
+
+        <div class="devlog-entry">
+          <div class="devlog-header">
+            <div class="devlog-version">v0.2.0</div>
+            <div class="devlog-date">March 13, 2026</div>
+            <div class="devlog-tag update">Update</div>
+          </div>
+          <div class="devlog-title">Stellar Abyss — Weapons, Pickups &amp; HUD Overhaul</div>
+          <div class="devlog-body">Major content update to Stellar Abyss. Four distinct weapons with unlock progression, a full item pickup system, overhauled enemies, and a redesigned HUD featuring a live minimap radar.</div>
+          <ul class="devlog-changes">
+            <li>4 weapons: Plasma Rifle, Scatter Cannon, Rail Sniper, Rocket Launcher</li>
+            <li>Item pickups: Health Pack, Shield Cell, Ammo Crate, Weapon drops</li>
+            <li>New enemy types: Heavy Raider, Drone, Elite Sentinel</li>
+            <li>Minimap HUD with color-coded enemy and item radar</li>
+            <li>Redesigned stat panel and weapon selector</li>
+          </ul>
+        </div>
+
+        <div class="devlog-entry">
+          <div class="devlog-header">
+            <div class="devlog-version">v0.1.0</div>
+            <div class="devlog-date">March 13, 2026</div>
+            <div class="devlog-tag feature">Launch</div>
+          </div>
+          <div class="devlog-title">GameHub &amp; Stellar Abyss — Initial Launch</div>
+          <div class="devlog-body">First public release of GameHub. The platform launches alongside its first original game, Stellar Abyss — a first-person 3D space shooter built in Three.js r128, running entirely in the browser with no installs required.</div>
+          <ul class="devlog-changes">
+            <li>Xbox Series X-inspired launcher UI with Home, Game Pass, Library pages</li>
+            <li>Game modal with loading animation and iframe embedding</li>
+            <li>Stellar Abyss: three explorable areas, NPC dialogue, full FPS controls</li>
+            <li>Session timer in modal footer</li>
+            <li>Game Pass page with trending and new releases sections</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="devlog-sidebar">
+
+        <div class="devlog-side-card">
+          <div class="devlog-side-title">Roadmap</div>
+          <div class="roadmap-item"><div class="roadmap-dot done"></div><div class="roadmap-label">Platform launcher</div><div class="roadmap-status">Done</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot done"></div><div class="roadmap-label">Stellar Abyss v1</div><div class="roadmap-status">Done</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot done"></div><div class="roadmap-label">Account system</div><div class="roadmap-status">Done</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot done"></div><div class="roadmap-label">Friends system</div><div class="roadmap-status">Done</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot wip"></div><div class="roadmap-label">Achievements</div><div class="roadmap-status">In Progress</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot wip"></div><div class="roadmap-label">Sandstorm Kings</div><div class="roadmap-status">In Progress</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot planned"></div><div class="roadmap-label">Leaderboards</div><div class="roadmap-status">Planned</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot planned"></div><div class="roadmap-label">Nova Fractured</div><div class="roadmap-status">Planned</div></div>
+          <div class="roadmap-item"><div class="roadmap-dot planned"></div><div class="roadmap-label">Iron Citadel II</div><div class="roadmap-status">Planned</div></div>
+        </div>
+
+        <div class="devlog-side-card">
+          <div class="devlog-side-title">Platform Stats</div>
+          <div class="stat-ticker">
+            <div class="ticker-row"><span class="ticker-label">Total Games</span><span class="ticker-val">12</span></div>
+            <div class="ticker-row"><span class="ticker-label">Playable Now</span><span class="ticker-val">1</span></div>
+            <div class="ticker-row"><span class="ticker-label">In Development</span><span class="ticker-val">2</span></div>
+            <div class="ticker-row"><span class="ticker-label">Game Pass Titles</span><span class="ticker-val">12</span></div>
+            <div class="ticker-row"><span class="ticker-label">Platform Version</span><span class="ticker-val">v0.4</span></div>
+            <div class="ticker-row"><span class="ticker-label">Engine</span><span class="ticker-val">Three.js</span></div>
+          </div>
+        </div>
+
+        <div class="devlog-side-card">
+          <div class="devlog-side-title">Quick Links</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+            <button class="btn-outline" style="font-size:11px;padding:7px 14px;text-align:left;" onclick="openGame('Stellar Abyss','&#128640;','t-navy','A deep-space exploration RPG.','Action RPG','5&#8211;8 hrs','&#9733;&#9733;&#9733;&#9733;&#189;','94','2.1M','stellar-abyss')">&#9654; Play Stellar Abyss</button>
+            <button class="btn-outline" style="font-size:11px;padding:7px 14px;text-align:left;" onclick="showPage('gamepass',document.querySelectorAll('.nav-btn')[2])">&#9889; Browse Game Pass</button>
+            <button class="btn-outline" style="font-size:11px;padding:7px 14px;text-align:left;" onclick="showPage('library',document.querySelectorAll('.nav-btn')[3])">&#128218; My Library</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <div class="spacer"></div>
 </div>
 
