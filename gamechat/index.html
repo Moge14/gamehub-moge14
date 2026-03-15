@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:#107C10; --green-bright:#52B043; --green-glow:rgba(82,176,67,0.18);
+    --bg:#080C08; --bg-card:#0E150E; --bg-panel:#0A110A;
+    --bg-input:#111811; --bg-msg-hover:#0F170F;
+    --text:#FFFFFF; --muted:#7A8A7A; --dim:#3A4A3A;
+    --border:rgba(82,176,67,0.12); --border-strong:rgba(82,176,67,0.25);
+    --online:#52B043; --idle:#FFB432; --dnd:#FF4040; --offline:#4A5A4A;
+    --mention:rgba(82,176,67,0.15); --mention-border:rgba(82,176,67,0.4);
+    --radius:5px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+  /* ══ TOPBAR ════════════════════════════════════════════════════ */
+  .topbar{
+    height:48px;background:rgba(8,12,8,0.96);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 16px 0 0;gap:0;flex-shrink:0;
+    backdrop-filter:blur(20px);
+  }
+  .topbar-logo{
+    width:64px;height:48px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,rgba(16,124,16,0.25),rgba(16,124,16,0.08));
+    border-right:1px solid var(--border);flex-shrink:0;cursor:pointer;
+    transition:background 0.15s;
+  }
+  .topbar-logo:hover{background:rgba(16,124,16,0.3);}
+  .logo-sphere{width:26px;height:26px;background:radial-gradient(circle at 35% 35%,#52B043,#107C10 60%,#063606);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(16,124,16,0.5),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden;}
+  .logo-sphere::after{content:'';position:absolute;top:2px;left:3px;width:8px;height:5px;background:rgba(255,255,255,0.22);border-radius:50%;filter:blur(1.5px);}
+  .logo-cross{position:absolute;width:16px;height:16px;}
+  .logo-cross::before,.logo-cross::after{content:'';position:absolute;background:rgba(255,255,255,0.55);border-radius:1px;}
+  .logo-cross::before{width:2px;height:100%;top:0;left:50%;transform:translateX(-50%);}
+  .logo-cross::after{width:100%;height:2px;top:50%;left:0;transform:translateY(-50%);}
+
+  .topbar-channel-info{display:flex;align-items:center;gap:10px;padding:0 16px;border-right:1px solid var(--border);height:100%;}
+  .topbar-channel-hash{font-size:18px;color:var(--muted);font-weight:300;}
+  .topbar-channel-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.3px;}
+  .topbar-channel-desc{font-size:11px;color:var(--muted);padding-left:10px;border-left:1px solid var(--border);margin-left:2px;}
+
+  .topbar-actions{display:flex;align-items:center;gap:2px;margin-left:auto;}
+  .topbar-btn{width:32px;height:32px;border-radius:4px;border:none;background:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.15s;}
+  .topbar-btn:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .topbar-btn.active{color:var(--green-bright);}
+  .topbar-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
+  .member-count-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);padding:0 10px;}
+  .member-count-dot{width:7px;height:7px;border-radius:50%;background:var(--online);box-shadow:0 0 5px rgba(82,176,67,0.5);}
+
+  /* ══ MAIN LAYOUT ═══════════════════════════════════════════════ */
+  .app-body{display:flex;flex:1;overflow:hidden;}
+
+  /* ══ SERVER SIDEBAR (left icons) ═══════════════════════════════ */
+  .server-rail{
+    width:64px;background:#060C06;border-right:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;
+    overflow-y:auto;flex-shrink:0;scrollbar-width:none;
+  }
+  .server-rail::-webkit-scrollbar{display:none;}
+  .server-icon{
+    width:44px;height:44px;border-radius:50%;background:var(--bg-card);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:all 0.18s cubic-bezier(0.4,0,0.2,1);font-size:20px;position:relative;
+    border:2px solid transparent;
+  }
+  .server-icon::before{
+    content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+    width:4px;height:0;background:var(--green-bright);border-radius:0 3px 3px 0;
+    transition:height 0.18s;
+  }
+  .server-icon:hover{border-radius:14px;border-color:var(--border-strong);}
+  .server-icon:hover::before{height:20px;}
+  .server-icon.active{border-radius:14px;border-color:var(--green-bright);background:rgba(16,124,16,0.25);}
+  .server-icon.active::before{height:36px;}
+  .server-icon.gamehub{background:linear-gradient(135deg,#0E280E,#107C10);}
+  .server-divider{width:32px;height:1px;background:var(--border);margin:4px 0;}
+  .server-add{
+    width:44px;height:44px;border-radius:50%;background:rgba(82,176,67,0.06);
+    border:1px dashed rgba(82,176,67,0.25);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all 0.18s;color:var(--muted);font-size:20px;
+  }
+  .server-add:hover{background:rgba(82,176,67,0.14);border-color:var(--green-bright);color:var(--green-bright);border-radius:14px;}
+
+  /* ══ CHANNEL SIDEBAR ═══════════════════════════════════════════ */
+  .channel-sidebar{
+    width:224px;background:var(--bg-panel);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;flex-shrink:0;
+  }
+  .server-header{
+    height:48px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;border-bottom:1px solid var(--border);cursor:pointer;
+    transition:background 0.15s;flex-shrink:0;
+  }
+  .server-header:hover{background:rgba(255,255,255,0.03);}
+  .server-header-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .server-header-chevron{color:var(--muted);font-size:12px;flex-shrink:0;}
+
+  .channel-list{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:thin;scrollbar-color:var(--dim) transparent;}
+  .channel-list::-webkit-scrollbar{width:4px;}
+  .channel-list::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px;}
+
+  .channel-category{
+    display:flex;align-items:center;gap:4px;padding:14px 8px 4px 12px;
+    font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);cursor:pointer;
+    transition:color 0.15s;
+  }
+  .channel-category:hover{color:rgba(255,255,255,0.7);}
+  .channel-category-chevron{font-size:8px;transition:transform 0.15s;}
+  .channel-category.collapsed .channel-category-chevron{transform:rotate(-90deg);}
+  .category-add{margin-left:auto;font-size:14px;color:var(--muted);width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:3px;}
+  .category-add:hover{color:#fff;background:rgba(255,255,255,0.06);}
+
+  .channel-item{
+    display:flex;align-items:center;gap:7px;padding:5px 8px 5px 14px;
+    margin:1px 6px;border-radius:var(--radius);cursor:pointer;transition:background 0.12s;
+    font-size:13px;color:var(--muted);min-height:30px;
+  }
+  .channel-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);}
+  .channel-item.active{background:rgba(82,176,67,0.14);color:#fff;}
+  .channel-item.active .channel-hash{color:var(--green-bright);}
+  .channel-item.has-unread{color:rgba(255,255,255,0.85);font-weight:600;}
+  .channel-hash{font-size:17px;color:var(--dim);line-height:1;flex-shrink:0;transition:color 0.12s;font-weight:300;}
+  .channel-voice-icon{font-size:14px;flex-shrink:0;}
+  .channel-name{flex:1;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .channel-unread-badge{background:rgba(255,80,80,0.85);color:#fff;border-radius:10px;padding:1px 5px;font-size:9px;font-weight:700;flex-shrink:0;}
+  .channel-mention-badge{background:#FF4040;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700;flex-shrink:0;}
+
+  /* user panel at bottom */
+  .user-panel{
+    height:52px;background:rgba(0,0,0,0.2);border-top:1px solid var(--border);
+    display:flex;align-items:center;padding:0 8px;gap:8px;flex-shrink:0;
+  }
+  .user-panel-avatar{
+    width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);
+    border:2px solid var(--green-bright);display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;color:var(--green-bright);flex-shrink:0;cursor:pointer;
+    position:relative;
+  }
+  .status-dot{
+    position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;
+    border-radius:50%;border:2px solid var(--bg-panel);background:var(--online);
+  }
+  .user-panel-info{flex:1;min-width:0;}
+  .user-panel-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .user-panel-status{font-size:10px;color:var(--muted);}
+  .user-panel-actions{display:flex;gap:1px;}
+  .user-action-btn{width:28px;height:28px;border-radius:4px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+  .user-action-btn:hover{background:rgba(255,255,255,0.06);color:#fff;}
+
+  /* ══ CHAT AREA ═════════════════════════════════════════════════ */
+  .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg-card);position:relative;}
+
+  /* messages */
+  .messages-wrap{flex:1;overflow-y:auto;padding:16px 0 0;scrollbar-width:thin;scrollbar-color:var(--dim) transparent;}
+  .messages-wrap::-webkit-scrollbar{width:5px;}
+  .messages-wrap::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3px;}
+
+  /* welcome */
+  .channel-welcome{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.04);margin-bottom:10px;}
+  .welcome-icon{font-size:56px;margin-bottom:10px;display:block;filter:drop-shadow(0 0 20px rgba(82,176,67,0.25));}
+  .welcome-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px;}
+  .welcome-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+
+  /* date divider */
+  .date-divider{display:flex;align-items:center;gap:10px;padding:10px 20px;margin:4px 0;}
+  .date-divider-line{flex:1;height:1px;background:rgba(255,255,255,0.05);}
+  .date-divider-text{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;white-space:nowrap;}
+
+  /* message */
+  .msg-group{padding:2px 20px;display:flex;gap:14px;transition:background 0.1s;position:relative;}
+  .msg-group:hover{background:var(--bg-msg-hover);}
+  .msg-group.mention-highlight{background:var(--mention);border-left:3px solid var(--mention-border);padding-left:17px;}
+  .msg-group:hover .msg-actions{opacity:1;}
+
+  .msg-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;margin-top:1px;}
+  .msg-avatar:hover{filter:brightness(1.2);}
+
+  .msg-continuation{padding-top:0;padding-bottom:0;}
+  .msg-continuation .msg-avatar{visibility:hidden;}
+  .msg-continuation:hover .msg-time-hover{opacity:1;}
+  .msg-time-hover{position:absolute;left:22px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--dim);opacity:0;transition:opacity 0.1s;pointer-events:none;white-space:nowrap;}
+
+  .msg-main{flex:1;min-width:0;}
+  .msg-header{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;}
+  .msg-author{font-size:13px;font-weight:700;cursor:pointer;transition:color 0.12s;}
+  .msg-author:hover{text-decoration:underline;}
+  .msg-role{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:0.5px;vertical-align:middle;}
+  .role-admin{background:rgba(16,124,16,0.2);color:var(--green-bright);border:1px solid rgba(82,176,67,0.25);}
+  .role-mod{background:rgba(80,130,255,0.15);color:#7EB5FF;border:1px solid rgba(80,130,255,0.25);}
+  .role-gp{background:rgba(255,180,50,0.12);color:#FFB432;border:1px solid rgba(255,180,50,0.22);}
+  .msg-timestamp{font-size:10px;color:var(--dim);font-weight:400;}
+  .msg-text{font-size:13px;line-height:1.55;color:rgba(255,255,255,0.88);word-break:break-word;}
+  .msg-text .mention{background:rgba(82,176,67,0.14);color:var(--green-bright);padding:0 3px;border-radius:3px;font-weight:600;cursor:pointer;}
+  .msg-text .mention:hover{background:rgba(82,176,67,0.28);}
+  .msg-text .channel-link{color:var(--green-bright);cursor:pointer;}
+  .msg-text .channel-link:hover{text-decoration:underline;}
+  .msg-text code{background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px;}
+  .msg-text .spoiler{background:rgba(255,255,255,0.08);border-radius:3px;padding:0 4px;cursor:pointer;color:transparent;transition:all 0.2s;}
+  .msg-text .spoiler.revealed{color:inherit;background:rgba(255,255,255,0.1);}
+  .msg-edited{font-size:9px;color:var(--dim);margin-left:4px;}
+
+  /* embed / game card */
+  .msg-embed{
+    margin-top:6px;background:rgba(0,0,0,0.2);border:1px solid var(--border);
+    border-left:3px solid var(--green-bright);border-radius:0 var(--radius) var(--radius) 0;
+    padding:10px 12px;display:flex;gap:10px;max-width:480px;
+  }
+  .embed-icon{font-size:28px;flex-shrink:0;}
+  .embed-info{}
+  .embed-title{font-size:12px;font-weight:700;color:var(--green-bright);margin-bottom:2px;}
+  .embed-desc{font-size:11px;color:rgba(255,255,255,0.55);line-height:1.5;}
+  .embed-btn{display:inline-block;margin-top:7px;padding:4px 12px;background:var(--green);border:none;color:#fff;border-radius:3px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:background 0.15s;}
+  .embed-btn:hover{background:var(--green-bright);}
+
+  /* image attachment */
+  .msg-image{margin-top:6px;border-radius:var(--radius);overflow:hidden;max-width:380px;cursor:pointer;}
+  .msg-image img{width:100%;display:block;}
+
+  /* reaction */
+  .msg-reactions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .reaction{
+    display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:2px 8px;
+    font-size:12px;cursor:pointer;transition:all 0.15s;user-select:none;
+  }
+  .reaction:hover{background:rgba(82,176,67,0.1);border-color:rgba(82,176,67,0.25);}
+  .reaction.reacted{background:rgba(82,176,67,0.14);border-color:rgba(82,176,67,0.4);}
+  .reaction-count{font-size:11px;color:var(--muted);font-weight:600;}
+  .reaction.reacted .reaction-count{color:var(--green-bright);}
+
+  /* message action bar */
+  .msg-actions{
+    position:absolute;top:-14px;right:20px;background:#0D160D;
+    border:1px solid var(--border-strong);border-radius:5px;display:flex;
+    padding:3px;gap:1px;opacity:0;transition:opacity 0.1s;pointer-events:none;z-index:10;
+    box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  }
+  .msg-group:hover .msg-actions{pointer-events:all;}
+  .action-btn{width:28px;height:28px;border-radius:4px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+  .action-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
+
+  /* typing indicator */
+  .typing-bar{height:24px;padding:0 20px;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .typing-dots{display:flex;gap:3px;align-items:center;}
+  .typing-dot{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:typingBounce 1.2s ease-in-out infinite;}
+  .typing-dot:nth-child(2){animation-delay:0.2s;}
+  .typing-dot:nth-child(3){animation-delay:0.4s;}
+  @keyframes typingBounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+  .typing-text{font-size:11px;color:var(--muted);}
+  .typing-text strong{color:rgba(255,255,255,0.7);}
+
+  /* ══ INPUT BAR ═════════════════════════════════════════════════ */
+  .input-area{padding:0 16px 16px;flex-shrink:0;}
+  .input-box{
+    background:var(--bg-input);border:1px solid rgba(255,255,255,0.08);border-radius:8px;
+    display:flex;align-items:center;gap:4px;padding:0 6px 0 12px;
+    transition:border-color 0.15s;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .input-box:focus-within{border-color:rgba(82,176,67,0.35);}
+  .input-left-btn{width:32px;height:32px;border-radius:4px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;flex-shrink:0;}
+  .input-left-btn:hover{color:var(--green-bright);}
+  .chat-input{
+    flex:1;background:none;border:none;outline:none;color:#fff;
+    font-size:13px;font-family:'Barlow',sans-serif;padding:11px 4px;
+    caret-color:var(--green-bright);
+  }
+  .chat-input::placeholder{color:var(--muted);}
+  .input-right-actions{display:flex;align-items:center;gap:1px;flex-shrink:0;}
+  .input-right-btn{width:32px;height:32px;border-radius:4px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+  .input-right-btn:hover{color:var(--green-bright);}
+  .send-btn{
+    width:32px;height:32px;border-radius:4px;border:none;
+    background:var(--green);color:#fff;cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+  }
+  .send-btn:hover{background:var(--green-bright);box-shadow:0 0 12px rgba(82,176,67,0.3);}
+  .send-btn:disabled{background:var(--dim);cursor:not-allowed;}
+
+  /* ══ MEMBER PANEL ══════════════════════════════════════════════ */
+  .member-panel{
+    width:220px;background:var(--bg-panel);border-left:1px solid var(--border);
+    overflow-y:auto;flex-shrink:0;scrollbar-width:thin;scrollbar-color:var(--dim) transparent;
+  }
+  .member-panel::-webkit-scrollbar{width:4px;}
+  .member-panel::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px;}
+  .member-panel.hidden{display:none;}
+  .member-section-label{
+    padding:16px 10px 6px;font-size:10px;font-weight:700;letter-spacing:1.2px;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .member-item{
+    display:flex;align-items:center;gap:8px;padding:5px 10px;margin:1px 4px;
+    border-radius:var(--radius);cursor:pointer;transition:background 0.12s;
+  }
+  .member-item:hover{background:rgba(255,255,255,0.05);}
+  .member-avatar{
+    width:30px;height:30px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+    position:relative;
+  }
+  .member-status{
+    position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;
+    border-radius:50%;border:2px solid var(--bg-panel);
+  }
+  .s-online{background:var(--online);}
+  .s-idle{background:var(--idle);}
+  .s-dnd{background:var(--dnd);}
+  .s-offline{background:var(--offline);}
+  .member-info{flex:1;min-width:0;}
+  .member-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .member-activity{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .member-item.offline .member-name{color:var(--muted);}
+
+  /* ══ EMPTY STATE / SIGN IN OVERLAY ════════════════════════════ */
+  .auth-overlay{
+    position:absolute;inset:0;background:rgba(8,12,8,0.88);backdrop-filter:blur(10px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    z-index:100;text-align:center;padding:20px;
+  }
+  .auth-overlay-icon{font-size:52px;filter:drop-shadow(0 0 20px rgba(82,176,67,0.3));}
+  .auth-overlay-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;}
+  .auth-overlay-sub{font-size:13px;color:var(--muted);max-width:300px;line-height:1.6;}
+  .overlay-btn{padding:11px 28px;background:var(--green);border:none;border-radius:var(--radius);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:all 0.18s;letter-spacing:0.3px;}
+  .overlay-btn:hover{background:var(--green-bright);box-shadow:0 6px 20px rgba(16,124,16,0.35);}
+
+  /* linked account banner */
+  .linked-banner{
+    background:linear-gradient(90deg,rgba(16,124,16,0.12),rgba(16,124,16,0.04));
+    border:1px solid var(--border-strong);border-radius:var(--radius);
+    padding:9px 14px;margin:0 16px 12px;display:flex;align-items:center;gap:10px;
+    font-size:12px;
+  }
+  .linked-banner-icon{font-size:16px;}
+  .linked-banner-text{flex:1;color:rgba(255,255,255,0.7);}
+  .linked-banner-text strong{color:var(--green-bright);}
+  .linked-banner-dismiss{color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:3px;transition:all 0.12s;}
+  .linked-banner-dismiss:hover{background:rgba(255,255,255,0.06);color:#fff;}
+
+  /* ══ EMOJI / REACTION PICKER ═══════════════════════════════════ */
+  .emoji-picker{
+    position:absolute;bottom:70px;right:20px;background:#0D160D;border:1px solid var(--border-strong);
+    border-radius:8px;padding:10px;display:flex;flex-wrap:wrap;gap:4px;width:240px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.7);z-index:50;
+    animation:pickerIn 0.15s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes pickerIn{from{opacity:0;transform:scale(0.95) translateY(4px)}to{opacity:1;transform:none}}
+  .emoji-btn{
+    width:34px;height:34px;border-radius:5px;border:none;background:none;
+    font-size:18px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;justify-content:center;
+  }
+  .emoji-btn:hover{background:rgba(82,176,67,0.15);transform:scale(1.25);}
+
+  /* toast */
+  #toast-container{position:fixed;bottom:20px;right:20px;z-index:900;display:flex;flex-direction:column;gap:7px;pointer-events:none;}
+  .toast{background:#0D1A0D;border:1px solid rgba(82,176,67,0.3);border-radius:5px;padding:10px 14px;font-size:12px;color:#fff;display:flex;align-items:center;gap:8px;box-shadow:0 6px 24px rgba(0,0,0,0.5);animation:toastin 0.22s ease;min-width:220px;}
+  .toast.error{border-color:rgba(255,80,80,0.35);background:#1A0D0D;}
+  @keyframes toastin{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  /* back btn */
+  .back-to-gamehub{
+    display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11px;
+    cursor:pointer;padding:8px 12px;border-radius:var(--radius);transition:all 0.15s;
+    margin:6px;font-weight:600;letter-spacing:0.3px;
+  }
+  .back-to-gamehub:hover{color:var(--green-bright);background:rgba(82,176,67,0.07);}
+
+  /* scrollbar custom */
+  * { scrollbar-width: thin; scrollbar-color: rgba(82,176,67,0.15) transparent; }
+
+  /* glow pulse on send */
+  @keyframes sendPulse{0%{box-shadow:0 0 0 rgba(82,176,67,0)}50%{box-shadow:0 0 20px rgba(82,176,67,0.4)}100%{box-shadow:0 0 0 rgba(82,176,67,0)}}
+  .send-pulse{animation:sendPulse 0.4s ease;}
+
+  /* Mic / deafen active state */
+  .user-action-btn.muted{color:rgba(255,80,80,0.8);}
+
+  /* notification badge on server icon */
+  .server-notif{position:absolute;bottom:2px;right:2px;width:10px;height:10px;background:#FF4040;border-radius:50%;border:2px solid #060C06;}
+
+  /* thread indicator */
+  .thread-indicator{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--green-bright);cursor:pointer;margin-top:4px;transition:color 0.12s;}
+  .thread-indicator:hover{color:#fff;}
+
+  /* pinned / system msg */
+  .system-msg{padding:6px 20px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+  .system-msg-icon{font-size:14px;}
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo" onclick="window.open('about:blank','_self')" title="Back to GameHub">
+    <div class="logo-sphere"><div class="logo-cross"></div></div>
+  </div>
+  <div class="topbar-channel-info">
+    <span class="topbar-channel-hash">#</span>
+    <span class="topbar-channel-name" id="topbar-channel-name">general</span>
+    <span class="topbar-channel-desc" id="topbar-channel-desc">General chat for all GameHub members</span>
+  </div>
+  <div class="topbar-actions">
+    <div class="member-count-pill">
+      <div class="member-count-dot"></div>
+      <span id="online-count">7</span> online
+    </div>
+    <div class="topbar-divider"></div>
+    <button class="topbar-btn" title="Search" onclick="showToast('Search coming soon!','info')">🔍</button>
+    <button class="topbar-btn active" id="member-toggle-btn" title="Toggle Members" onclick="toggleMemberPanel()">👥</button>
+    <button class="topbar-btn" title="Inbox" onclick="showToast('No new notifications','success')">🔔</button>
+    <button class="topbar-btn" title="Help" onclick="showToast('GameHub Chat v1.0 — Press Enter to send, Shift+Enter for new line.','info')">❓</button>
+    <div class="topbar-divider"></div>
+    <button class="topbar-btn" title="Back to GameHub" onclick="showToast('Opening GameHub launcher…','success')">🎮</button>
+  </div>
+</div>
+
+<div class="app-body">
+
+  <!-- SERVER RAIL -->
+  <div class="server-rail">
+    <div class="server-icon gamehub active" title="GameHub Official">
+      <div class="logo-sphere" style="width:28px;height:28px;"><div class="logo-cross"></div></div>
+    </div>
+    <div class="server-divider"></div>
+    <div class="server-icon" title="Stellar Abyss Community" onclick="switchServer('stellar')">🚀</div>
+    <div class="server-icon" title="Runebound Saga Guild" onclick="switchServer('runebound')" style="position:relative;">⚔️<div class="server-notif"></div></div>
+    <div class="server-icon" title="Verdant Wilds" onclick="switchServer('verdant')">🌿</div>
+    <div class="server-icon" title="Neon Drift Racing" onclick="switchServer('neon')">🏎️</div>
+    <div class="server-divider"></div>
+    <div class="server-add" title="Add a server" onclick="showToast('Server creation coming soon!','info')">＋</div>
+  </div>
+
+  <!-- CHANNEL SIDEBAR -->
+  <div class="channel-sidebar">
+    <div class="server-header">
+      <span class="server-header-name" id="sidebar-server-name">GameHub Official</span>
+      <span class="server-header-chevron">▾</span>
+    </div>
+
+    <div class="channel-list" id="channel-list">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- user panel -->
+    <div class="user-panel">
+      <div class="user-panel-avatar" id="user-panel-avatar" onclick="showToast('Profile settings coming soon!','info')">
+        <span id="user-panel-initials">?</span>
+        <div class="status-dot" id="user-status-dot"></div>
+      </div>
+      <div class="user-panel-info">
+        <div class="user-panel-name" id="user-panel-name">Guest</div>
+        <div class="user-panel-status" id="user-panel-status">🔴 Sign in to chat</div>
+      </div>
+      <div class="user-panel-actions">
+        <button class="user-action-btn" id="mic-btn" title="Toggle Mute" onclick="toggleMute()">🎙️</button>
+        <button class="user-action-btn" id="deafen-btn" title="Toggle Deafen" onclick="toggleDeafen()">🎧</button>
+        <button class="user-action-btn" title="Settings" onclick="showToast('Settings coming soon!','info')">⚙️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CHAT -->
+  <div class="chat-area" id="chat-area">
+
+    <!-- Auth overlay (shown when not logged in) -->
+    <div class="auth-overlay" id="auth-overlay">
+      <div class="auth-overlay-icon">💬</div>
+      <div class="auth-overlay-title">Link Your GameHub Account</div>
+      <div class="auth-overlay-sub">Sign in with your GameHub account to join the conversation. Your username, profile, and game library carry over automatically.</div>
+      <button class="overlay-btn" onclick="linkAccount()">🎮 Link GameHub Account</button>
+    </div>
+
+    <!-- Linked banner (shown briefly after sign-in) -->
+    <div class="linked-banner" id="linked-banner" style="display:none;">
+      <span class="linked-banner-icon">🔗</span>
+      <span class="linked-banner-text">Signed in as <strong id="linked-username">—</strong> · Your GameHub library and playtime are visible to friends</span>
+      <span class="linked-banner-dismiss" onclick="dismissBanner()">✕</span>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-wrap" id="messages-wrap">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="typing-bar" id="typing-bar" style="visibility:hidden;">
+      <div class="typing-dots">
+        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+      </div>
+      <div class="typing-text" id="typing-text"><strong>NovaPilot</strong> is typing…</div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-box">
+        <button class="input-left-btn" title="Add attachment" onclick="showToast('File attachments coming soon!','info')">＋</button>
+        <textarea class="chat-input" id="chat-input" placeholder="Message #general" rows="1"
+          oninput="autoResize(this);onTyping()" onkeydown="handleInputKey(event)"></textarea>
+        <div class="input-right-actions">
+          <button class="input-right-btn" title="GIF" onclick="showToast('GIF picker coming soon!','info')">GIF</button>
+          <button class="input-right-btn" title="Sticker" onclick="showToast('Stickers coming soon!','info')">🎭</button>
+          <button class="input-right-btn" title="Emoji" onclick="toggleEmojiPicker()">😄</button>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emoji picker -->
+    <div class="emoji-picker" id="emoji-picker" style="display:none;">
+      <!-- populated by JS -->
+    </div>
+
+  </div>
+
+  <!-- MEMBER PANEL -->
+  <div class="member-panel" id="member-panel">
+    <!-- populated by JS -->
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  GAMEHUB CHAT — Shared DB via JSONBin (same credentials as launcher)
+// ════════════════════════════════════════════════════════════════
+
+const JSONBIN_ID  = '69b4489eb7ec241ddc6724f8';
+const JSONBIN_KEY = '$2a$10$GxylBsJMueOHJvo5BKbpheT/.yEZCcB82/YEnIdI2/XQI5/V3oMta';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
+let DB = { accounts: {}, profiles: {}, chat: {} };
+let currentUser = null;
+let currentChannel = 'general';
+let currentServer = 'gamehub';
+let isMuted = false, isDeafened = false;
+let memberPanelVisible = true;
+let typingTimer = null;
+let emojiPickerOpen = false;
+let lastMsgAuthor = null;
+let lastMsgTime = null;
+
+// ── DB ────────────────────────────────────────────────────────────
+async function loadDB() {
+  try {
+    const res = await fetch(JSONBIN_URL + '/latest', { headers: { 'X-Master-Key': JSONBIN_KEY } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    DB = json.record || { accounts: {}, profiles: {}, chat: {} };
+    if (!DB.accounts) DB.accounts = {};
+    if (!DB.profiles) DB.profiles = {};
+    if (!DB.chat)     DB.chat     = {};
+  } catch(e) {
+    console.error('Failed to load DB:', e);
+    showToast('⚠ Database connection failed. Messages may not save.', 'error');
+  }
+}
+
+async function saveDB() {
+  try {
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify(DB)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch(e) {
+    console.error('Failed to save DB:', e);
+  }
+}
+
+// ── SESSION ───────────────────────────────────────────────────────
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('gh_session')); } catch { return null; }
+}
+
+// ── CHANNEL / SERVER DATA ─────────────────────────────────────────
+const SERVERS = {
+  gamehub: {
+    name: 'GameHub Official',
+    icon: '🎮',
+    channels: {
+      text: [
+        { id:'general',      name:'general',      desc:'General chat for all GameHub members',      unread:0 },
+        { id:'announcements',name:'announcements', desc:'Official GameHub news and updates',         unread:2, mention:true },
+        { id:'game-chat',    name:'game-chat',     desc:'Talk about any game on GameHub',           unread:0 },
+        { id:'looking-for-group', name:'looking-for-group', desc:'Find people to play with',        unread:1 },
+        { id:'screenshots',  name:'screenshots',   desc:'Share your in-game moments',               unread:0 },
+        { id:'off-topic',    name:'off-topic',     desc:'Anything goes (within reason)',             unread:0 },
+      ],
+      voice: [
+        { id:'v-lobby',    name:'Lobby',    users:3 },
+        { id:'v-gaming',   name:'Gaming',   users:5 },
+        { id:'v-chill',    name:'Chill Zone',users:1 },
+      ]
+    }
+  },
+  stellar: {
+    name: 'Stellar Abyss Hub',
+    icon: '🚀',
+    channels: {
+      text: [
+        { id:'sa-general',  name:'general',     desc:'Stellar Abyss general discussion', unread:0 },
+        { id:'sa-tips',     name:'tips-tricks',  desc:'Share strategies and loadouts',    unread:3 },
+        { id:'sa-lore',     name:'lore-theory',  desc:'Deep dive into the Abyss story',   unread:0 },
+        { id:'sa-bugs',     name:'bug-reports',  desc:'Report issues here',               unread:0 },
+      ],
+      voice: [
+        { id:'sv-squad', name:'Squad Up', users:2 },
+        { id:'sv-raid',  name:'Raid Night', users:0 },
+      ]
+    }
+  }
+};
+
+// ── SEED MESSAGES ─────────────────────────────────────────────────
+const SEED = {
+  general: [
+    { id:'m1', author:'GameHub', role:'admin', color:'#52B043', avatar:'GH', avatarBg:'linear-gradient(135deg,#0E280E,#107C10)', text:'👋 Welcome to <strong>GameHub Chat</strong> — the official community hub for GameHub players. Link your account to start chatting!', ts: Date.now()-1000*60*60*3, reactions:[{e:'👋',n:12,me:false},{e:'🎮',n:8,me:false}] },
+    { id:'m2', author:'NovaPilot', role:'gp', color:'#FFB432', avatar:'NP', avatarBg:'linear-gradient(135deg,#1A1000,#352200)', text:'Just hit 10 hours on Stellar Abyss 🚀 The Rail Sniper is absolutely broken in the best way', ts: Date.now()-1000*60*60*2, reactions:[{e:'🔥',n:5,me:false}] },
+    { id:'m3', author:'VerdantRunner', role:'', color:'#C8E0C0', avatar:'VR', avatarBg:'linear-gradient(135deg,#071507,#112511)', text:'Anyone else noticed the new enemy types in v0.2? Those Elite Sentinels are no joke 😅', ts: Date.now()-1000*60*60*2, reactions:[] },
+    { id:'m4', author:'NovaPilot', role:'gp', color:'#FFB432', avatar:'NP', avatarBg:'linear-gradient(135deg,#1A1000,#352200)', text:'@VerdantRunner yes!! caught me completely off guard the first time. you need the Rocket Launcher to deal with them fast', ts: Date.now()-1000*60*60*2+5000, reactions:[{e:'💯',n:3,me:false}] },
+    { id:'m5', author:'RuinedKnight', role:'mod', color:'#7EB5FF', avatar:'RK', avatarBg:'linear-gradient(135deg,#060818,#0D1540)', text:'Pinned: <strong>Runebound Saga</strong> community playthrough starts this Saturday at 8pm GMT. Drop a 🗡️ if you\'re in!', ts: Date.now()-1000*60*45, reactions:[{e:'🗡️',n:14,me:false},{e:'🎉',n:9,me:false}] },
+    { id:'m6', author:'GlitchWarden', role:'', color:'#C8E0C0', avatar:'GW', avatarBg:'linear-gradient(135deg,#0D1420,#1A2535)', text:'That minimap radar update is a game changer. Can finally tell where the health packs are without stumbling around 😂', ts: Date.now()-1000*60*30, reactions:[] },
+    { id:'m7', author:'PhantomAce', role:'gp', color:'#FFB432', avatar:'PA', avatarBg:'linear-gradient(135deg,#1A0510,#351025)', text:'Phantom Bloom is genuinely gorgeous. whoever designed those cursed garden levels needs a raise', ts: Date.now()-1000*60*20, reactions:[{e:'🌸',n:7,me:false},{e:'❤️',n:4,me:false}] },
+    { id:'m8', author:'GameHub', role:'admin', color:'#52B043', avatar:'GH', avatarBg:'linear-gradient(135deg,#0E280E,#107C10)', text:'📣 <strong>Dev Update:</strong> Friends system is now live in the launcher! Add friends by username and view their profile, games, and playtime. More features incoming 👀', ts: Date.now()-1000*60*10, embed:{ icon:'🚀', title:'Stellar Abyss v0.4.0 — Friends System Live', desc:'Cross-account friend requests, profile drawer, pending badge on nav. Also fixed the avatar dropdown hover bug.', btn:'View Dev Log' }, reactions:[{e:'🎉',n:11,me:false},{e:'❤️',n:6,me:false}] },
+    { id:'m9', author:'VerdantRunner', role:'', color:'#C8E0C0', avatar:'VR', avatarBg:'linear-gradient(135deg,#071507,#112511)', text:'the friends system is so clean, added like 5 people already. now just need leaderboards and my life is complete lol', ts: Date.now()-1000*60*5, reactions:[] },
+  ],
+  'game-chat': [
+    { id:'gc1', author:'RuinedKnight', role:'mod', color:'#7EB5FF', avatar:'RK', avatarBg:'linear-gradient(135deg,#060818,#0D1540)', text:'What\'s everyone\'s GOTY so far? For me it\'s Runebound Saga without question — the branching storylines are insane', ts: Date.now()-1000*60*90, reactions:[{e:'⚔️',n:8,me:false}] },
+    { id:'gc2', author:'GlitchWarden', role:'', color:'#C8E0C0', avatar:'GW', avatarBg:'linear-gradient(135deg,#0D1420,#1A2535)', text:'Verdant Wilds for me. it\'s oddly peaceful for a survival game. sometimes I just wander around the biomes', ts: Date.now()-1000*60*88, reactions:[{e:'🌿',n:5,me:false}] },
+    { id:'gc3', author:'PhantomAce', role:'gp', color:'#FFB432', avatar:'PA', avatarBg:'linear-gradient(135deg,#1A0510,#351025)', text:'Stellar Abyss once I figured out weapon switching. that Rail Sniper + Scatter Cannon combo is disgusting 😈', ts: Date.now()-1000*60*85, reactions:[] },
+  ],
+  announcements: [
+    { id:'a1', author:'GameHub', role:'admin', color:'#52B043', avatar:'GH', avatarBg:'linear-gradient(135deg,#0E280E,#107C10)', text:'🎉 <strong>Platform v0.4 is live!</strong> Friends system, improved account security, and a full My Games page with activity tracking. Read the full changelog in the Dev Log.', ts: Date.now()-1000*60*60*24, reactions:[{e:'🎉',n:24,me:false},{e:'🔥',n:15,me:false},{e:'❤️',n:19,me:false}] },
+    { id:'a2', author:'GameHub', role:'admin', color:'#52B043', avatar:'GH', avatarBg:'linear-gradient(135deg,#0E280E,#107C10)', text:'📅 <strong>Sandstorm Kings</strong> alpha testing begins Q2 2026. If you\'d like to be a tester, reply with 🏰 below!', ts: Date.now()-1000*60*60*48, reactions:[{e:'🏰',n:31,me:false},{e:'👀',n:12,me:false}] },
+  ]
+};
+
+// Members
+const MEMBERS = {
+  online: [
+    { name:'NovaPilot',    role:'gp',    status:'online',  activity:'Playing Stellar Abyss', avatar:'NP', bg:'linear-gradient(135deg,#1A1000,#352200)', color:'#FFB432' },
+    { name:'RuinedKnight', role:'mod',   status:'online',  activity:'Playing Runebound Saga', avatar:'RK', bg:'linear-gradient(135deg,#060818,#0D1540)', color:'#7EB5FF' },
+    { name:'PhantomAce',   role:'gp',    status:'online',  activity:'Playing Phantom Bloom',  avatar:'PA', bg:'linear-gradient(135deg,#1A0510,#351025)', color:'#FFB432' },
+    { name:'GlitchWarden', role:'',      status:'idle',    activity:'Away',                   avatar:'GW', bg:'linear-gradient(135deg,#0D1420,#1A2535)', color:'#C8E0C0' },
+    { name:'VerdantRunner',role:'',      status:'online',  activity:'Browsing GameHub',        avatar:'VR', bg:'linear-gradient(135deg,#071507,#112511)', color:'#C8E0C0' },
+    { name:'IronSage',     role:'gp',    status:'dnd',     activity:'Do Not Disturb',          avatar:'IS', bg:'linear-gradient(135deg,#1A0C00,#352000)', color:'#FFB432' },
+    { name:'CrystalVoid',  role:'',      status:'online',  activity:'Playing Rift Walker',     avatar:'CV', bg:'linear-gradient(135deg,#140520,#24103A)', color:'#C8E0C0' },
+  ],
+  offline: [
+    { name:'AbyssHunter',  role:'',      status:'offline', activity:'Last seen 2h ago',        avatar:'AH', bg:'linear-gradient(135deg,#0A100A,#141814)', color:'#7A8A7A' },
+    { name:'RuneSeeker',   role:'gp',    status:'offline', activity:'Last seen 1d ago',         avatar:'RS', bg:'linear-gradient(135deg,#0A100A,#141814)', color:'#7A8A7A' },
+    { name:'NightBlade',   role:'',      status:'offline', activity:'Last seen 3d ago',         avatar:'NB', bg:'linear-gradient(135deg,#0A100A,#141814)', color:'#7A8A7A' },
+  ]
+};
+
+const EMOJIS = ['😄','😂','❤️','🔥','👏','🎮','🚀','⚔️','🌿','🏆','💀','👀','😅','🎉','💯','👋','🗡️','🌸','🧊','🏰','⚡','🌙','🤖','🎭','💜','🥇'];
+
+// ── INIT ──────────────────────────────────────────────────────────
+async function init() {
+  await loadDB();
+  const session = getSession();
+  if (session && DB.accounts[session.username]) {
+    currentUser = session.username;
+  }
+  renderChannelSidebar();
+  renderMemberPanel();
+  renderMessages();
+  renderUserPanel();
+  renderEmojiPicker();
+
+  if (!currentUser) {
+    document.getElementById('auth-overlay').style.display = 'flex';
+    document.getElementById('chat-input').placeholder = 'Sign in to chat…';
+    document.getElementById('chat-input').disabled = true;
+  }
+
+  // Poll for new messages every 8s
+  setInterval(pollMessages, 8000);
+}
+
+// ── LINK ACCOUNT ──────────────────────────────────────────────────
+async function linkAccount() {
+  if (currentUser) { document.getElementById('auth-overlay').style.display = 'none'; return; }
+  const session = getSession();
+  if (session && DB.accounts[session.username]) {
+    currentUser = session.username;
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.getElementById('linked-username').textContent = currentUser;
+    document.getElementById('linked-banner').style.display = 'flex';
+    document.getElementById('chat-input').disabled = false;
+    document.getElementById('chat-input').placeholder = 'Message #' + currentChannel;
+    renderUserPanel();
+    showToast('✓ Linked as ' + currentUser, 'success');
+  } else {
+    showToast('No GameHub session found. Please sign in at the launcher first.', 'error');
+    setTimeout(() => {
+      window.open('about:blank', '_self');
+    }, 1800);
+  }
+}
+
+function dismissBanner() {
+  document.getElementById('linked-banner').style.display = 'none';
+}
+
+// ── USER PANEL ────────────────────────────────────────────────────
+function renderUserPanel() {
+  const initEl    = document.getElementById('user-panel-initials');
+  const nameEl    = document.getElementById('user-panel-name');
+  const statusEl  = document.getElementById('user-panel-status');
+  const dot       = document.getElementById('user-status-dot');
+  if (currentUser) {
+    initEl.textContent   = currentUser.substring(0,2).toUpperCase();
+    nameEl.textContent   = currentUser;
+    statusEl.textContent = isMuted ? '🔇 Muted' : '🟢 Online';
+    dot.style.background = 'var(--online)';
+  } else {
+    initEl.textContent   = '?';
+    nameEl.textContent   = 'Guest';
+    statusEl.textContent = '🔴 Sign in to chat';
+    dot.style.background = 'var(--offline)';
+  }
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  const btn = document.getElementById('mic-btn');
+  btn.textContent = isMuted ? '🔇' : '🎙️';
+  btn.classList.toggle('muted', isMuted);
+  renderUserPanel();
+  showToast(isMuted ? '🔇 Microphone muted' : '🎙️ Microphone on', 'success');
+}
+
+function toggleDeafen() {
+  isDeafened = !isDeafened;
+  const btn = document.getElementById('deafen-btn');
+  btn.textContent = isDeafened ? '🔕' : '🎧';
+  btn.classList.toggle('muted', isDeafened);
+  showToast(isDeafened ? '🔕 Deafened' : '🎧 Audio on', 'success');
+}
+
+// ── CHANNEL SIDEBAR ───────────────────────────────────────────────
+function renderChannelSidebar() {
+  const srv = SERVERS[currentServer] || SERVERS.gamehub;
+  document.getElementById('sidebar-server-name').textContent = srv.name;
+  document.getElementById('topbar-channel-name').textContent = currentChannel.replace(/^(sa-|sv-|sv-)/,'');
+  const ch = (srv.channels.text || []).find(c => c.id === currentChannel);
+  if (ch) document.getElementById('topbar-channel-desc').textContent = ch.desc || '';
+
+  const list = document.getElementById('channel-list');
+  let html = `<div class="back-to-gamehub" onclick="showToast('Opening GameHub Launcher…','success')">← Back to GameHub</div>`;
+
+  // Text channels
+  html += `<div class="channel-category"><span class="channel-category-chevron">▾</span> Text Channels <span class="category-add">＋</span></div>`;
+  (srv.channels.text || []).forEach(ch => {
+    const active  = ch.id === currentChannel;
+    const unread  = ch.unread  ? `<span class="channel-unread-badge">${ch.unread}</span>` : '';
+    const mention = ch.mention ? `<span class="channel-mention-badge">@</span>` : '';
+    html += `<div class="channel-item ${active?'active':''} ${ch.unread?'has-unread':''}" onclick="switchChannel('${ch.id}','${ch.name}','${ch.desc||''}')">
+      <span class="channel-hash">#</span>
+      <span class="channel-name">${ch.name}</span>
+      ${unread}${mention}
+    </div>`;
+  });
+
+  // Voice channels
+  html += `<div class="channel-category" style="margin-top:6px;"><span class="channel-category-chevron">▾</span> Voice Channels <span class="category-add">＋</span></div>`;
+  (srv.channels.voice || []).forEach(vc => {
+    html += `<div class="channel-item" onclick="joinVoice('${vc.name}')">
+      <span class="channel-voice-icon">🔊</span>
+      <span class="channel-name">${vc.name}</span>
+      ${vc.users > 0 ? `<span style="font-size:9px;color:var(--muted);">${vc.users}</span>` : ''}
+    </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function switchChannel(id, name, desc) {
+  currentChannel = id;
+  lastMsgAuthor = null; lastMsgTime = null;
+  document.getElementById('topbar-channel-name').textContent = name;
+  document.getElementById('topbar-channel-desc').textContent = desc;
+  document.getElementById('chat-input').placeholder = currentUser ? `Message #${name}` : 'Sign in to chat…';
+  renderChannelSidebar();
+  renderMessages();
+  // clear unread
+  const srv = SERVERS[currentServer];
+  if (srv) { const ch = (srv.channels.text||[]).find(c=>c.id===id); if (ch) { ch.unread=0; ch.mention=false; } }
+}
+
+function switchServer(srv) {
+  if (!SERVERS[srv]) { showToast('Server coming soon!','info'); return; }
+  currentServer = srv;
+  const firstCh = SERVERS[srv].channels.text[0];
+  if (firstCh) { currentChannel = firstCh.id; }
+  lastMsgAuthor = null; lastMsgTime = null;
+  renderChannelSidebar();
+  renderMessages();
+  renderMemberPanel();
+  showToast('Switched to ' + SERVERS[srv].name, 'success');
+}
+
+function joinVoice(name) {
+  showToast('Joining voice channel: ' + name, 'success');
+}
+
+// ── MESSAGES ──────────────────────────────────────────────────────
+function getMessages() {
+  // Check DB for this channel's messages, fall back to seed
+  const dbMsgs = DB.chat?.[currentServer]?.[currentChannel];
+  if (dbMsgs && dbMsgs.length > 0) return dbMsgs;
+  return SEED[currentChannel] || [];
+}
+
+function renderMessages() {
+  const wrap = document.getElementById('messages-wrap');
+  const msgs = getMessages();
+  lastMsgAuthor = null; lastMsgTime = null;
+  let html = '';
+
+  // Welcome banner
+  const srv = SERVERS[currentServer] || SERVERS.gamehub;
+  const ch = (srv.channels.text || []).find(c => c.id === currentChannel) || { name: currentChannel, desc: '' };
+  html += `<div class="channel-welcome">
+    <span class="welcome-icon">#</span>
+    <div class="welcome-title">Welcome to #${ch.name}!</div>
+    <div class="welcome-desc">${ch.desc || 'This is the beginning of the #'+ch.name+' channel.'}</div>
+  </div>`;
+
+  // Date divider
+  html += `<div class="date-divider"><div class="date-divider-line"></div><span class="date-divider-text">TODAY</span><div class="date-divider-line"></div></div>`;
+
+  msgs.forEach((msg, i) => {
+    const isCont = msg.author === lastMsgAuthor && (msg.ts - lastMsgTime) < 1000*60*5;
+    html += renderMessage(msg, isCont);
+    lastMsgAuthor = msg.author;
+    lastMsgTime = msg.ts;
+  });
+
+  wrap.innerHTML = html;
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function renderMessage(msg, isContinuation) {
+  const time = new Date(msg.ts);
+  const timeStr = time.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const dateStr = time.toLocaleDateString('en-GB',{month:'short',day:'numeric'});
+  const isMention = currentUser && msg.text && msg.text.includes('@'+currentUser);
+  const isMe = msg.author === currentUser;
+
+  let roleHtml = '';
+  if (msg.role === 'admin') roleHtml = `<span class="msg-role role-admin">ADMIN</span>`;
+  else if (msg.role === 'mod') roleHtml = `<span class="msg-role role-mod">MOD</span>`;
+  else if (msg.role === 'gp') roleHtml = `<span class="msg-role role-gp">⚡ GP</span>`;
+
+  let textHtml = (msg.text || '')
+    .replace(/@(\w+)/g, '<span class="mention">@$1</span>')
+    .replace(/#(\w[\w-]*)/g, '<span class="channel-link">#$1</span>');
+
+  let embedHtml = '';
+  if (msg.embed) {
+    embedHtml = `<div class="msg-embed">
+      <div class="embed-icon">${msg.embed.icon}</div>
+      <div class="embed-info">
+        <div class="embed-title">${msg.embed.title}</div>
+        <div class="embed-desc">${msg.embed.desc}</div>
+        <button class="embed-btn" onclick="showToast('Opening Dev Log…','success')">${msg.embed.btn}</button>
+      </div>
+    </div>`;
+  }
+
+  let reactHtml = '';
+  if (msg.reactions && msg.reactions.length) {
+    reactHtml = '<div class="msg-reactions">' +
+      msg.reactions.map((r,ri) =>
+        `<div class="reaction ${r.me?'reacted':''}" onclick="toggleReaction('${msg.id}',${ri})">
+          <span>${r.e}</span><span class="reaction-count">${r.n}</span>
+        </div>`
+      ).join('') + '</div>';
+  }
+
+  const mentionClass = isMention ? 'mention-highlight' : '';
+  const groupClass = isContinuation ? 'msg-continuation' : '';
+
+  return `<div class="msg-group ${groupClass} ${mentionClass}" id="msg-${msg.id}">
+    <div class="msg-avatar" style="background:${msg.avatarBg||'var(--bg-card)'};">${msg.avatar||'?'}</div>
+    ${isContinuation ? `<div class="msg-time-hover">${timeStr}</div>` : ''}
+    <div class="msg-main">
+      ${!isContinuation ? `<div class="msg-header">
+        <span class="msg-author" style="color:${msg.color||'#fff'}">${msg.author}${isMe?' (you)':''}</span>
+        ${roleHtml}
+        <span class="msg-timestamp">${dateStr} at ${timeStr}</span>
+      </div>` : ''}
+      <div class="msg-text">${textHtml}</div>
+      ${embedHtml}
+      ${reactHtml}
+    </div>
+    <div class="msg-actions">
+      <button class="action-btn" onclick="addReactionToMsg('${msg.id}')" title="Add Reaction">😄</button>
+      ${isMe ? `<button class="action-btn" onclick="showToast('Edit coming soon!','info')" title="Edit">✏️</button>` : ''}
+      ${isMe ? `<button class="action-btn" onclick="deleteMsg('${msg.id}')" title="Delete" style="color:#FF8080">🗑️</button>` : ''}
+      <button class="action-btn" onclick="showToast('Reply coming soon!','info')" title="Reply">↩️</button>
+    </div>
+  </div>`;
+}
+
+async function toggleReaction(msgId, ri) {
+  if (!currentUser) { showToast('Sign in to react!', 'error'); return; }
+  const msgs = getCurrentMsgsWritable();
+  const msg = msgs.find(m => m.id === msgId);
+  if (!msg || !msg.reactions[ri]) return;
+  const r = msg.reactions[ri];
+  r.me = !r.me;
+  r.n  = r.me ? r.n + 1 : Math.max(0, r.n - 1);
+  await syncMsgs(msgs);
+  renderMessages();
+}
+
+async function addReactionToMsg(msgId) {
+  if (!currentUser) { showToast('Sign in to react!', 'error'); return; }
+  const emojis = ['👍','❤️','🔥','🎮','🚀','😂','⚔️','🌿'];
+  const e = emojis[Math.floor(Math.random()*emojis.length)];
+  const msgs = getCurrentMsgsWritable();
+  const msg = msgs.find(m => m.id === msgId);
+  if (!msg) return;
+  if (!msg.reactions) msg.reactions = [];
+  const existing = msg.reactions.find(r => r.e === e);
+  if (existing) { existing.n++; existing.me = true; }
+  else msg.reactions.push({ e, n:1, me:true });
+  await syncMsgs(msgs);
+  renderMessages();
+}
+
+async function deleteMsg(msgId) {
+  if (!currentUser) return;
+  const msgs = getCurrentMsgsWritable().filter(m => m.id !== msgId);
+  await syncMsgs(msgs);
+  renderMessages();
+  showToast('Message deleted.', 'success');
+}
+
+function getCurrentMsgsWritable() {
+  if (!DB.chat[currentServer]) DB.chat[currentServer] = {};
+  if (!DB.chat[currentServer][currentChannel]) DB.chat[currentServer][currentChannel] = [...(SEED[currentChannel]||[])];
+  return DB.chat[currentServer][currentChannel];
+}
+
+async function syncMsgs(msgs) {
+  if (!DB.chat) DB.chat = {};
+  if (!DB.chat[currentServer]) DB.chat[currentServer] = {};
+  DB.chat[currentServer][currentChannel] = msgs;
+  await saveDB();
+}
+
+// ── SEND MESSAGE ──────────────────────────────────────────────────
+async function sendMessage() {
+  if (!currentUser) { showToast('Sign in to send messages!', 'error'); return; }
+  const input = document.getElementById('chat-input');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  const profile = DB.profiles[currentUser] || {};
+  const initials = currentUser.substring(0,2).toUpperCase();
+  const bgColors = [
+    'linear-gradient(135deg,#1C3A1C,#107C10)',
+    'linear-gradient(135deg,#060818,#0D1540)',
+    'linear-gradient(135deg,#1A1000,#352200)',
+    'linear-gradient(135deg,#1A0510,#351025)',
+    'linear-gradient(135deg,#071507,#112511)',
+  ];
+  const bg = bgColors[currentUser.charCodeAt(0) % bgColors.length];
+
+  const msg = {
+    id:       'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    author:    currentUser,
+    role:      '',
+    color:     '#C8E0C0',
+    avatar:    initials,
+    avatarBg:  bg,
+    text:      text,
+    ts:        Date.now(),
+    reactions: [],
+  };
+
+  const msgs = getCurrentMsgsWritable();
+  msgs.push(msg);
+  await syncMsgs(msgs);
+
+  input.value = '';
+  input.style.height = '';
+  renderMessages();
+
+  // Flash send button
+  const btn = document.getElementById('send-btn');
+  btn.classList.add('send-pulse');
+  setTimeout(() => btn.classList.remove('send-pulse'), 400);
+}
+
+// ── EMOJI PICKER ──────────────────────────────────────────────────
+function renderEmojiPicker() {
+  const picker = document.getElementById('emoji-picker');
+  picker.innerHTML = EMOJIS.map(e =>
+    `<button class="emoji-btn" onclick="insertEmoji('${e}')">${e}</button>`
+  ).join('');
+}
+
+function toggleEmojiPicker() {
+  const picker = document.getElementById('emoji-picker');
+  emojiPickerOpen = !emojiPickerOpen;
+  picker.style.display = emojiPickerOpen ? 'flex' : 'none';
+}
+
+function insertEmoji(e) {
+  const input = document.getElementById('chat-input');
+  input.value += e;
+  input.focus();
+  toggleEmojiPicker();
+}
+
+document.addEventListener('click', e => {
+  if (emojiPickerOpen && !e.target.closest('.emoji-picker') && !e.target.closest('.input-right-btn')) {
+    document.getElementById('emoji-picker').style.display = 'none';
+    emojiPickerOpen = false;
+  }
+});
+
+// ── TYPING ────────────────────────────────────────────────────────
+let typingSimInterval = null;
+const typingUsers = ['NovaPilot', 'VerdantRunner', 'GlitchWarden'];
+let typingUserIdx = 0;
+
+function onTyping() {
+  // Show a simulated "other user is typing" indicator sometimes
+  if (Math.random() < 0.07) {
+    simulateTyping();
+  }
+}
+
+function simulateTyping() {
+  const bar = document.getElementById('typing-bar');
+  const text = document.getElementById('typing-text');
+  const user = typingUsers[typingUserIdx % typingUsers.length];
+  typingUserIdx++;
+  text.innerHTML = `<strong>${user}</strong> is typing…`;
+  bar.style.visibility = 'visible';
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => { bar.style.visibility = 'hidden'; }, 2500);
+}
+
+// ── INPUT HANDLING ────────────────────────────────────────────────
+function handleInputKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ── MEMBER PANEL ──────────────────────────────────────────────────
+function renderMemberPanel() {
+  const panel = document.getElementById('member-panel');
+  let html = '';
+
+  // inject current user at top of online if logged in
+  let onlineList = [...MEMBERS.online];
+  if (currentUser) {
+    const initials = currentUser.substring(0,2).toUpperCase();
+    onlineList.unshift({ name:currentUser, role:'', status:'online', activity:'Browsing GameHub Chat', avatar:initials, bg:'linear-gradient(135deg,#1C3A1C,#107C10)', color:'#52B043' });
+  }
+
+  html += `<div class="member-section-label">Online — ${onlineList.length}</div>`;
+  onlineList.forEach(m => { html += memberHTML(m); });
+
+  html += `<div class="member-section-label" style="margin-top:8px;">Offline — ${MEMBERS.offline.length}</div>`;
+  MEMBERS.offline.forEach(m => { html += memberHTML(m, true); });
+
+  panel.innerHTML = html;
+}
+
+function memberHTML(m, isOffline) {
+  const statClass = { online:'s-online', idle:'s-idle', dnd:'s-dnd', offline:'s-offline' }[m.status] || 's-offline';
+  let roleBadge = '';
+  if (m.role === 'admin') roleBadge = `<span style="font-size:9px;color:var(--green-bright);margin-left:2px;">👑</span>`;
+  else if (m.role === 'mod') roleBadge = `<span style="font-size:9px;color:#7EB5FF;margin-left:2px;">🛡️</span>`;
+  return `<div class="member-item ${isOffline?'offline':''}" onclick="showToast('Opening profile for ${m.name}…','info')">
+    <div class="member-avatar" style="background:${m.bg};">
+      <span style="color:${m.color};">${m.avatar}</span>
+      <div class="member-status ${statClass}"></div>
+    </div>
+    <div class="member-info">
+      <div class="member-name">${m.name}${roleBadge}</div>
+      <div class="member-activity">${m.activity}</div>
+    </div>
+  </div>`;
+}
+
+function toggleMemberPanel() {
+  memberPanelVisible = !memberPanelVisible;
+  document.getElementById('member-panel').classList.toggle('hidden', !memberPanelVisible);
+  document.getElementById('member-toggle-btn').classList.toggle('active', memberPanelVisible);
+}
+
+// ── POLL FOR NEW MESSAGES ─────────────────────────────────────────
+async function pollMessages() {
+  try {
+    const res = await fetch(JSONBIN_URL + '/latest', { headers: { 'X-Master-Key': JSONBIN_KEY } });
+    if (!res.ok) return;
+    const json = await res.json();
+    const newDB = json.record;
+    if (!newDB) return;
+    const newMsgs = newDB.chat?.[currentServer]?.[currentChannel] || [];
+    const curMsgs = DB.chat?.[currentServer]?.[currentChannel] || [];
+    if (newMsgs.length !== curMsgs.length) {
+      DB = newDB;
+      if (!DB.chat) DB.chat = {};
+      renderMessages();
+      simulateTyping();
+    } else {
+      DB.accounts = newDB.accounts || DB.accounts;
+      DB.profiles = newDB.profiles || DB.profiles;
+    }
+  } catch(e) {}
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg, type) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast '+(type==='error'?'error':'');
+  t.innerHTML = `<span>${type==='error'?'⚠':'✓'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.transition='opacity 0.4s'; t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3000);
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
