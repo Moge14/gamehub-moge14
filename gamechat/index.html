@@ -663,6 +663,33 @@ const MEMBERS = {
 
 const EMOJIS = ['😄','😂','❤️','🔥','👏','🎮','🚀','⚔️','🌿','🏆','💀','👀','😅','🎉','💯','👋','🗡️','🌸','🧊','🏰','⚡','🌙','🤖','🎭','💜','🥇'];
 
+// ── DM HELPERS ────────────────────────────────────────────────────
+function getFriendsList() {
+  if (!currentUser) return [];
+  const friends = DB.profiles[currentUser]?.friends || {};
+  return Object.entries(friends)
+    .filter(([, f]) => f.status === 'accepted')
+    .map(([username]) => username);
+}
+
+function getDMKey(username) {
+  return [currentUser, username].sort().join('__');
+}
+
+function openDM(username) {
+  if (!currentUser) { showToast('Sign in to send messages.', 'error'); return; }
+  const dmKey = getDMKey(username);
+  currentServer = 'dms';
+  currentChannel = dmKey;
+  lastMsgAuthor = null; lastMsgTime = null;
+  document.getElementById('topbar-channel-name').textContent = username;
+  document.getElementById('topbar-channel-desc').textContent = 'Direct message with ' + username;
+  const input = document.getElementById('chat-input');
+  input.placeholder = currentUser ? 'Message ' + username : 'Sign in to chat…';
+  renderChannelSidebar();
+  renderMessages();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
 async function init() {
   await loadDB();
@@ -681,6 +708,20 @@ async function init() {
     document.getElementById('chat-input').placeholder = 'Sign in to chat…';
     document.getElementById('chat-input').disabled = true;
   }
+
+  // Open DM if requested by parent page
+  const dmTarget = localStorage.getItem('gh_dm_target');
+  if (dmTarget && currentUser) {
+    localStorage.removeItem('gh_dm_target');
+    openDM(dmTarget);
+  }
+
+  // Listen for postMessage from GameHub parent
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'openDM' && e.data.username) {
+      openDM(e.data.username);
+    }
+  });
 
   // Poll for new messages every 8s
   setInterval(pollMessages, 8000);
@@ -750,13 +791,32 @@ function toggleDeafen() {
 // ── CHANNEL SIDEBAR ───────────────────────────────────────────────
 function renderChannelSidebar() {
   const srv = SERVERS[currentServer] || SERVERS.gamehub;
-  document.getElementById('sidebar-server-name').textContent = srv.name;
-  document.getElementById('topbar-channel-name').textContent = currentChannel.replace(/^(sa-|sv-|sv-)/,'');
-  const ch = (srv.channels.text || []).find(c => c.id === currentChannel);
-  if (ch) document.getElementById('topbar-channel-desc').textContent = ch.desc || '';
+  if (currentServer !== 'dms') {
+    document.getElementById('sidebar-server-name').textContent = srv.name;
+    document.getElementById('topbar-channel-name').textContent = currentChannel.replace(/^(sa-|sv-|sv-)/,'');
+    const ch = (srv.channels.text || []).find(c => c.id === currentChannel);
+    if (ch) document.getElementById('topbar-channel-desc').textContent = ch.desc || '';
+  } else {
+    document.getElementById('sidebar-server-name').textContent = 'Direct Messages';
+  }
 
   const list = document.getElementById('channel-list');
   let html = `<div class="back-to-gamehub" onclick="showToast('Opening GameHub Launcher…','success')">← Back to GameHub</div>`;
+
+  // DM section
+  const dmFriends = getFriendsList();
+  if (dmFriends.length > 0) {
+    html += `<div class="channel-category"><span class="channel-category-chevron">▾</span> Direct Messages</div>`;
+    dmFriends.forEach(friend => {
+      const dmKey = getDMKey(friend);
+      const active = currentServer === 'dms' && currentChannel === dmKey;
+      const initials = friend.substring(0, 2).toUpperCase();
+      html += `<div class="channel-item ${active ? 'active' : ''}" onclick="openDM('${friend}')">
+        <span style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#1C3A1C,#107C10);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#52B043;flex-shrink:0;">${initials}</span>
+        <span class="channel-name">${friend}</span>
+      </div>`;
+    });
+  }
 
   // Text channels
   html += `<div class="channel-category"><span class="channel-category-chevron">▾</span> Text Channels <span class="category-add">＋</span></div>`;
@@ -815,6 +875,11 @@ function joinVoice(name) {
 
 // ── MESSAGES ──────────────────────────────────────────────────────
 function getMessages() {
+  if (currentServer === 'dms') {
+    if (!DB.chat) DB.chat = {};
+    if (!DB.chat.dms) DB.chat.dms = {};
+    return DB.chat.dms[currentChannel] || [];
+  }
   // Check DB for this channel's messages, fall back to seed
   const dbMsgs = DB.chat?.[currentServer]?.[currentChannel];
   if (dbMsgs && dbMsgs.length > 0) return dbMsgs;
@@ -828,13 +893,22 @@ function renderMessages() {
   let html = '';
 
   // Welcome banner
-  const srv = SERVERS[currentServer] || SERVERS.gamehub;
-  const ch = (srv.channels.text || []).find(c => c.id === currentChannel) || { name: currentChannel, desc: '' };
-  html += `<div class="channel-welcome">
-    <span class="welcome-icon">#</span>
-    <div class="welcome-title">Welcome to #${ch.name}!</div>
-    <div class="welcome-desc">${ch.desc || 'This is the beginning of the #'+ch.name+' channel.'}</div>
-  </div>`;
+  if (currentServer === 'dms') {
+    const dmFriend = document.getElementById('topbar-channel-name').textContent;
+    html += `<div class="channel-welcome">
+      <span class="welcome-icon">💬</span>
+      <div class="welcome-title">Direct Message with ${dmFriend}</div>
+      <div class="welcome-desc">This is the beginning of your direct message history with <strong>${dmFriend}</strong>. Say hello!</div>
+    </div>`;
+  } else {
+    const srv = SERVERS[currentServer] || SERVERS.gamehub;
+    const ch = (srv.channels.text || []).find(c => c.id === currentChannel) || { name: currentChannel, desc: '' };
+    html += `<div class="channel-welcome">
+      <span class="welcome-icon">#</span>
+      <div class="welcome-title">Welcome to #${ch.name}!</div>
+      <div class="welcome-desc">${ch.desc || 'This is the beginning of the #'+ch.name+' channel.'}</div>
+    </div>`;
+  }
 
   // Date divider
   html += `<div class="date-divider"><div class="date-divider-line"></div><span class="date-divider-text">TODAY</span><div class="date-divider-line"></div></div>`;
