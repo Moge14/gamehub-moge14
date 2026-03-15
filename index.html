@@ -48,6 +48,8 @@
   /* ── PAGES ── */
   main{padding-top:54px;position:relative;z-index:1;}
   .page{display:none;} .page.active{display:block;}
+  .page-chat-wrap{height:calc(100vh - 54px);overflow:hidden;}
+  .page-chat-wrap iframe{width:100%;height:100%;border:none;display:block;}
 
   /* ── HERO ── */
   .hero{display:grid;grid-template-columns:1fr 300px;grid-template-rows:340px;gap:3px;padding:3px;}
@@ -598,6 +600,7 @@
     <button class="nav-btn"         onclick="showPage('library',this)">Library</button>
     <button class="nav-btn"         onclick="showPage('store',this)">Store</button>
     <button class="nav-btn"         onclick="showPage('friends',this)">Friends <span id="friends-badge" style="display:none;background:var(--green);color:#fff;border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700;margin-left:4px;vertical-align:middle;"></span></button>
+    <button class="nav-btn"         onclick="showPage('chat',this)">💬 Chat</button>
   </nav>
   <div class="header-end">
     <div class="gp-pill">&#9889; Game Pass</div>
@@ -1237,6 +1240,13 @@
   </div>
 </div>
 
+<!-- ══ CHAT PAGE ════════════════════════════════════════════════ -->
+<div id="page-chat" class="page">
+  <div class="page-chat-wrap">
+    <iframe id="chat-iframe" src="gamechat/index.html" allow="microphone"></iframe>
+  </div>
+</div>
+
 </main>
 
 <!-- ══ FRIEND PROFILE DRAWER ════════════════════════════════════ -->
@@ -1259,6 +1269,7 @@
       <div id="fp-recent"></div>
     </div>
     <div class="fp-footer">
+      <button class="friend-btn view" style="width:100%;padding:9px;margin-bottom:6px;" id="fp-message-btn" onclick="messageFriendFromDrawer()">💬 Message</button>
       <button class="friend-btn remove" style="width:100%;padding:9px;" id="fp-remove-btn" onclick="removeFriendFromDrawer()">Remove Friend</button>
     </div>
   </div>
@@ -2110,7 +2121,8 @@ function friendRowHTML(username, type) {
   } else if (type==='sent') {
     actions=`<button class="friend-btn cancel" onclick="event.stopPropagation();cancelFriendRequest('${username}')">Cancel</button>`;
   } else {
-    actions=`<button class="friend-btn view" onclick="event.stopPropagation();openFriendProfile('${username}')">View</button>
+    actions=`<button class="friend-btn view" onclick="event.stopPropagation();openChatWithFriend('${username}')">💬 Message</button>
+             <button class="friend-btn view" onclick="event.stopPropagation();openFriendProfile('${username}')">View</button>
              <button class="friend-btn remove" onclick="event.stopPropagation();removeFriend('${username}')">Remove</button>`;
   }
   const click = type==='accepted' ? `onclick="openFriendProfile('${username}')"` : '';
@@ -2168,6 +2180,24 @@ async function removeFriendFromDrawer() {
   document.getElementById('fp-backdrop').classList.remove('open');
   document.body.style.overflow=''; fpCurrentUser=null;
   await removeFriend(u);
+}
+
+function messageFriendFromDrawer() {
+  if (!fpCurrentUser) return;
+  const u = fpCurrentUser;
+  document.getElementById('fp-backdrop').classList.remove('open');
+  document.body.style.overflow=''; fpCurrentUser=null;
+  openChatWithFriend(u);
+}
+
+function openChatWithFriend(username) {
+  localStorage.setItem('gh_dm_target', username);
+  const chatBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.textContent.includes('Chat'));
+  showPage('chat', chatBtn);
+  const iframe = document.getElementById('chat-iframe');
+  if (iframe && iframe.contentWindow) {
+    iframe.contentWindow.postMessage({ type: 'openDM', username }, '*');
+  }
 }
 
 document.getElementById('friend-input').addEventListener('keydown', e => {
