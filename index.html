@@ -3,258 +3,170 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameHub Pro</title>
+<title>GameHub | Sidebar Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green: #107C10; 
-  --green-b: #52B043;
-  --bg-dark: #070707; /* Deep solid black */
-  --bg-panel: #121212; /* Subtle panel gray */
-  --border: rgba(255,255,255,0.08);
-  --text: #FFFFFF;
-  --muted: #888888;
-  --sb-width: 260px;
+  --green:#107C10; --green-b:#52B043;
+  --bg:#070707; --bg-panel:#111111;
+  --text:#FFFFFF; --muted:#7A8A7A; --dim:#2E3E2E;
+  --sb-width: 240px;
 }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden;}
 
-* { margin:0; padding:0; box-sizing:border-box; }
-body { 
-    font-family: 'Barlow', sans-serif; 
-    background: var(--bg-dark); 
-    color: var(--text); 
-    display: flex; 
-    height: 100vh; 
-    overflow: hidden; 
-}
-
-/* ── SIDEBAR ── */
+/* ── NEW SIDEBAR ── */
 #sidebar {
     width: var(--sb-width);
     background: var(--bg-panel);
-    border-right: 1px solid var(--border);
+    border-right: 1px solid rgba(255,255,255,0.05);
     display: flex;
     flex-direction: column;
-    padding: 24px 0;
+    padding: 20px 0;
+    flex-shrink: 0;
 }
-
-.sb-brand {
-    padding: 0 24px;
-    margin-bottom: 32px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--green-b);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.sb-logo { padding: 0 24px; font-family: 'Rajdhani'; font-size: 24px; font-weight: 700; color: var(--green-b); margin-bottom: 30px; }
+.nav-item { 
+    padding: 12px 24px; cursor: pointer; color: var(--muted); transition: 0.2s; font-size: 14px; 
 }
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.active { color: var(--green-b); background: rgba(16, 124, 16, 0.1); border-right: 3px solid var(--green-b); }
 
-.nav-section { margin-bottom: 24px; }
-.nav-label {
-    padding: 0 24px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--muted);
-    margin-bottom: 12px;
-    display: block;
+/* ── MAIN CONTENT AREA ── */
+#main { flex: 1; overflow-y: auto; position: relative; scroll-behavior: smooth; }
+.page { display: none; padding: 30px; }
+.page.active { display: block; }
+
+/* ── RESTORED ORIGINAL STYLES (FLATTENED) ── */
+.sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.sec-label { font-family:'Rajdhani'; font-size:13px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); }
+.sec-label::before { content:''; display:inline-block; width:2px; height:12px; background:var(--green-b); margin-right:8px; }
+
+/* GAME PASS BANNER */
+.gp-banner {
+    border-radius: 10px; padding: 32px;
+    background: #0f1a10; /* Solid dark forest instead of gradient */
+    border: 1.5px solid rgba(82,176,67,0.15);
+    margin-bottom: 25px;
 }
+.gp-title { font-family:'Rajdhani'; font-size:32px; font-weight:700; margin-bottom:10px; }
+.gp-desc { font-size:14px; color:rgba(255,255,255,0.6); max-width:500px; margin-bottom:20px; line-height:1.6; }
 
-.nav-item {
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: 0.2s;
-    font-size: 14px;
-    font-weight: 500;
+/* HORIZONTAL SCROLL ROWS */
+.scroll-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+.gc { 
+    flex-shrink: 0; width: 140px; height: 190px; 
+    background: #1a1a1a; border-radius: 8px; overflow: hidden; 
+    position: relative; cursor: pointer; border: 1px solid rgba(255,255,255,0.05);
 }
+.gc:hover { border-color: var(--green-b); transform: scale(1.02); transition: 0.2s; }
+.gc-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: rgba(0,0,0,0.8); }
+.gc-name { font-size: 12px; font-weight: 600; }
 
-.nav-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
-.nav-item.active { 
-    background: rgba(16,124,16,0.1); 
-    color: var(--green-b); 
-    border-right: 3px solid var(--green-b); 
+/* PROFILE STATS */
+.mg-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.mg-stat { background: var(--bg-panel); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--dim); }
+.mg-stat-val { font-family:'Rajdhani'; font-size:24px; font-weight:700; color:var(--green-b); }
+
+/* MODAL FIX */
+#modal-bg {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000;
 }
-
-/* ── MAIN CONTENT ── */
-#main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 40px;
-    position: relative;
-}
-
-.page { display: none; max-width: 1100px; margin: 0 auto; }
-.page.active { display: block; animation: fadeIn 0.3s ease; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ── FEATURED COMPONENTS (TONED DOWN) ── */
-.hero-banner {
-    height: 320px;
-    background: #1a1a1a;
-    border-radius: 12px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    margin-bottom: 30px;
-    border: 1px solid var(--border);
-}
-
-.hero-title { font-family: 'Rajdhani'; font-size: 42px; line-height: 1; margin-bottom: 10px; }
-.btn-primary {
-    background: var(--green);
-    color: white;
-    padding: 12px 28px;
-    border: none;
-    border-radius: 4px;
-    font-weight: 600;
-    cursor: pointer;
-    width: fit-content;
-}
-
-/* ── GRID SYSTEM ── */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    font-family: 'Rajdhani';
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.game-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 40px;
-}
-
-.game-card {
-    background: var(--bg-panel);
-    border-radius: 8px;
-    aspect-ratio: 3/4;
-    padding: 12px;
-    border: 1px solid var(--border);
-    transition: 0.2s;
-    cursor: pointer;
-}
-
-.game-card:hover { border-color: var(--green-b); transform: translateY(-4px); }
-.card-thumb { height: 75%; background: #222; border-radius: 4px; margin-bottom: 10px; }
-
-/* ── OVERLAY FIX ── */
-#game-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000;
-    z-index: 1000;
-    flex-direction: column;
-}
-#game-modal.open { display: flex; }
-.modal-bar { 
-    height: 50px; 
-    padding: 0 20px; 
-    display: flex; 
-    align-items: center; 
-    background: #111; 
-    border-bottom: 1px solid var(--border);
-}
+#modal-bg.open { display: flex; flex-direction: column; }
+.modal-head { height: 50px; background: #111; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--dim); }
 
 </style>
 </head>
 <body>
 
 <aside id="sidebar">
-    <div class="sb-brand">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--green-b)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        GAMEHUB
-    </div>
-
-    <nav class="nav-section">
-        <span class="nav-label">Menu</span>
-        <div class="nav-item active" onclick="showPage('home')">Home</div>
-        <div class="nav-item" onclick="showPage('library')">My Library</div>
-        <div class="nav-item" onclick="showPage('store')">Store</div>
-    </nav>
-
-    <nav class="nav-section">
-        <span class="nav-label">Social</span>
-        <div class="nav-item" onclick="showPage('friends')">Friends</div>
-        <div class="nav-item" onclick="showPage('profile')">My Profile</div>
-    </nav>
+    <div class="sb-logo">GAMEHUB</div>
+    <div class="nav-item active" onclick="showPage('home')">Home</div>
+    <div class="nav-item" onclick="showPage('library')">My Library</div>
+    <div class="nav-item" onclick="showPage('store')">Store</div>
+    <div class="nav-item" onclick="showPage('friends')">Friends</div>
+    <div class="nav-item" onclick="showPage('profile')">Profile</div>
 </aside>
 
 <main id="main">
     <div id="home" class="page active">
-        <div class="hero-banner">
-            <h1 class="hero-title">NEON STRIKE</h1>
-            <p style="color: var(--muted); margin-bottom: 20px;">Experience the next generation of combat.</p>
-            <button class="btn-primary" onclick="launchGame('neon-strike', 'Neon Strike')">PLAY NOW</button>
+        <div class="gp-banner">
+            <div class="gp-pill" style="background:var(--green); font-size:10px; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:10px;">GAME PASS</div>
+            <h1 class="gp-title">Jump into Neon Strike</h1>
+            <p class="gp-desc">Experience the most intense cybernetic combat ever created. Included with your subscription.</p>
+            <button onclick="launchGame('neon-strike', 'Neon Strike')" style="background:var(--green); color:white; border:none; padding:10px 25px; border-radius:4px; font-weight:600; cursor:pointer;">Play Now</button>
         </div>
 
-        <div class="section-header"><h2>Recently Played</h2></div>
-        <div class="game-grid">
-            <div class="game-card"><div class="card-thumb"></div><p>Void Walker</p></div>
-            <div class="game-card"><div class="card-thumb"></div><p>Star Drift</p></div>
-            <div class="game-card"><div class="card-thumb"></div><p>Cyber Siege</p></div>
+        <div class="sec-head"><span class="sec-label">Jump Back In</span></div>
+        <div class="scroll-row">
+            <div class="gc"><div class="gc-info"><p class="gc-name">Halo Infinite</p></div></div>
+            <div class="gc"><div class="gc-info"><p class="gc-name">Forza Horizon 5</p></div></div>
+            <div class="gc"><div class="gc-info"><p class="gc-name">Starfield</p></div></div>
+            <div class="gc"><div class="gc-info"><p class="gc-name">Sea of Thieves</p></div></div>
+            <div class="gc"><div class="gc-info"><p class="gc-name">Minecraft</p></div></div>
+        </div>
+
+        <div class="sec-head"><span class="sec-label">New to Store</span></div>
+        <div class="scroll-row">
+            <div class="gc" style="width:200px;"><div class="gc-info"><p class="gc-name">Elden Ring</p></div></div>
+            <div class="gc" style="width:200px;"><div class="gc-info"><p class="gc-name">Cyberpunk 2077</p></div></div>
+            <div class="gc" style="width:200px;"><div class="gc-info"><p class="gc-name">Call of Duty</p></div></div>
         </div>
     </div>
 
-    <div id="store" class="page">
-        <div class="section-header"><h2>Store Highlights</h2></div>
-        <div class="game-grid">
-            <div class="game-card"><div class="card-thumb"></div><p>Premium Title A</p></div>
-            <div class="game-card"><div class="card-thumb"></div><p>Premium Title B</p></div>
+    <div id="profile" class="page">
+        <h1 style="font-family:'Rajdhani'; margin-bottom:20px;">My Profile</h1>
+        <div class="mg-stats">
+            <div class="mg-stat"><p class="mg-stat-val">1,240</p><p style="font-size:10px; color:var(--muted)">GAMERSCORE</p></div>
+            <div class="mg-stat"><p class="mg-stat-val">42</p><p style="font-size:10px; color:var(--muted)">GAMES</p></div>
+            <div class="mg-stat"><p class="mg-stat-val">15</p><p style="font-size:10px; color:var(--muted)">FRIENDS</p></div>
         </div>
+    </div>
+
+    <div id="library" class="page">
+        <h1 style="font-family:'Rajdhani'">My Library</h1>
+        <p style="color:var(--muted); margin-top:10px;">All your games will appear here.</p>
     </div>
 </main>
 
-<div id="game-modal">
-    <div class="modal-bar">
-        <span id="playing-title" style="font-weight: 600;">LOADING ENGINE...</span>
-        <button onclick="closeGame()" style="margin-left:auto; background:none; color:white; border:none; cursor:pointer;">Exit Game</button>
+<div id="modal-bg">
+    <div class="modal-head">
+        <span id="m-name" style="font-family:'Rajdhani'; font-weight:700;">GAME LOADING</span>
+        <button onclick="closeGame()" style="margin-left:auto; background:none; color:white; border:none; cursor:pointer; font-size:20px;">&times;</button>
     </div>
-    <div id="frame-host" style="flex:1;"></div>
+    <div id="m-frame" style="flex:1;"></div>
 </div>
 
 <script>
 const EMBEDDED = {
-    'neon-strike': `<html><body style="background:#000; color:#52B043; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;"><h1>NEON STRIKE IS RUNNING</h1></body></html>`
+    'neon-strike': `<html><body style="background:#000; color:#52B043; display:flex; align-items:center; justify-content:center; height:100vh;"><h1>LOADING NEON STRIKE...</h1></body></html>`
 };
 
-function showPage(pageId) {
+function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
-    document.getElementById(pageId).classList.add('active');
+    document.getElementById(id).classList.add('active');
     event.currentTarget.classList.add('active');
 }
 
 function launchGame(slug, name) {
     const html = EMBEDDED[slug];
-    const host = document.getElementById('frame-host');
-    const modal = document.getElementById('game-modal');
+    const frame = document.getElementById('m-frame');
+    const modal = document.getElementById('modal-bg');
     
     if (html) {
-        document.getElementById('playing-title').innerText = "PLAYING: " + name;
+        document.getElementById('m-name').innerText = name.toUpperCase();
         const blob = new Blob([html], {type: 'text/html'});
         const url = URL.createObjectURL(blob);
-        
-        host.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
-        modal.style.display = 'flex';
+        frame.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
+        modal.classList.add('open');
     }
 }
 
 function closeGame() {
-    document.getElementById('game-modal').style.display = 'none';
-    document.getElementById('frame-host').innerHTML = '';
+    document.getElementById('modal-bg').classList.remove('open');
+    document.getElementById('m-frame').innerHTML = '';
 }
 </script>
 
